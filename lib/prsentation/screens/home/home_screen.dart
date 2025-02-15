@@ -16,9 +16,10 @@ class HomeScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
                   children: [
-                    CircleAvatar(
+                    const CircleAvatar(
                       radius: 20,
-                      backgroundImage: AssetImage('assets/images/profile.jpg'),
+                      backgroundImage:
+                          AssetImage('lib/assets/images/avatar.jpg'),
                     ),
                     const SizedBox(width: 12),
                     const Text(
@@ -45,9 +46,9 @@ class HomeScreen extends StatelessWidget {
               Stack(
                 children: [
                   Image.asset(
-                    'assets/images/Angkor.jpg',
+                    'lib/assets/place_images/Angkor_wat.jpg',
                     width: double.infinity,
-                    height: 200,
+                    height: 300,
                     fit: BoxFit.cover,
                   ),
                   Positioned(
@@ -121,7 +122,7 @@ class HomeScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                         image: DecorationImage(
                           image: AssetImage(
-                              'assets/images/popular_${index + 1}.jpg'),
+                              'lib/assets/place_images/popular_${index + 1}.jpg'),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -156,7 +157,8 @@ class HomeScreen extends StatelessWidget {
                 itemCount: 4,
                 itemBuilder: (context, index) {
                   return DestinationCard(
-                    image: 'assets/images/destination_${index + 1}.jpg',
+                    image:
+                        'lib/assets/place_images/destination_${index + 1}.jpg',
                     title: _getDestinationTitle(index),
                     rating: 4.0,
                   );
@@ -264,7 +266,7 @@ class DestinationCard extends StatelessWidget {
               Text(
                 title,
                 style: const TextStyle(
-                  color: Colors.black,
+                  color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
