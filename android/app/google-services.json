@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "864597870395",
+    "project_id": "dertam-a445f",
+    "storage_bucket": "dertam-a445f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:864597870395:android:c7b74bf3f62c771161191e",
+        "android_client_info": {
+          "package_name": "com.example.test_auth"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaRxmjPMAX7FmriOHpW6gYY8gMd4eVEPM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:864597870395:android:9ab7fd924a078fd961191e",
+        "android_client_info": {
+          "package_name": "com.example.tourism_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaRxmjPMAX7FmriOHpW6gYY8gMd4eVEPM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
