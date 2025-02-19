@@ -182,22 +182,6 @@ class LoginScreen extends StatelessWidget {
   }
 
   /// Social Login Button
-  Widget _socialLoginButton(String iconPath) {
-    return Container(
-      width: 64,
-      height: 64,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F7FB),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Center(
-        child: Image.asset(
-          iconPath,
-          height: 24,
-        ),
-      ),
-    );
-  }
 
   /// Sign Up Link
   Widget _signup(BuildContext context) {
@@ -258,7 +242,7 @@ Widget _facebookLoginButton(BuildContext context) {
       await AuthService().signInWithFacebook(context);
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     },
     child: Container(

@@ -27,14 +27,14 @@ class _OTPScreenState extends State<OTPScreen> {
     }
 
     setState(() => _isLoading = true);
-    FirebaseAuth _auth = FirebaseAuth.instance;
+    FirebaseAuth auth = FirebaseAuth.instance;
 
     try {
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
         verificationId: widget.verificationId,
         smsCode: otpNumber,
       );
-      await _auth.signInWithCredential(credential);
+      await auth.signInWithCredential(credential);
       // Navigate to HomePage on success
       Navigator.pushReplacement(
         context,
