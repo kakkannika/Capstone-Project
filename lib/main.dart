@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tourism_app/prsentation/screens/auth/get_start_screen.dart';
 
 void main() {
+
   runApp(MyApp());
 }
 
