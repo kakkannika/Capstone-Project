@@ -38,7 +38,7 @@ class _OTPScreenState extends State<OTPScreen> {
       // Navigate to HomePage on success
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

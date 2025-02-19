@@ -43,7 +43,7 @@ class AuthService {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       await Future.delayed(const Duration(seconds: 1));
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const HomePage()));
+          context, MaterialPageRoute(builder: (context) => const HomeScreen()));
     } on FirebaseAuthException catch (e) {
       String message = '';
       if (e.code == 'invalid-email') {
@@ -67,7 +67,7 @@ class AuthService {
             await _auth.signInWithCredential(credential);
 
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => const HomePage()));
+            context, MaterialPageRoute(builder: (context) => const HomeScreen()));
         return userCredential;
       } else {
         _showToast("Facebook login failed");

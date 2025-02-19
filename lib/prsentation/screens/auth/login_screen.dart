@@ -285,7 +285,7 @@ Widget _googleLoginButton(BuildContext context) {
       if (isSignedIn) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
