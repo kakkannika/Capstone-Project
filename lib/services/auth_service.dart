@@ -127,4 +127,44 @@ class AuthService {
       fontSize: 14.0,
     );
   }
+
+
+    Future<void> sendOTP(String phoneNumber, Function(String) onCodeSent) async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+
+    await auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      timeout: const Duration(seconds: 60),
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        // Auto-signs in for some devices
+        await auth.signInWithCredential(credential);
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        print("Verification failed: ${e.message}");
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        onCodeSent(verificationId);
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {
+        print("Timeout: $verificationId");
+      },
+    );
+  }
+
+  Future<bool> verifyOTP(String verificationId, String otp) async {
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: otp,
+      );
+
+      UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
+      return userCredential.user != null;
+    } catch (e) {
+      print("Error verifying OTP: $e");
+      return false;
+    }
+  }
+
 }

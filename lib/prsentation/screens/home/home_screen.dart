@@ -19,7 +19,7 @@ class HomeScreen extends StatelessWidget {
                     const CircleAvatar(
                       radius: 20,
                       backgroundImage:
-                          AssetImage('lib/assets/images/avatar.jpg'),
+                          AssetImage('lib/assets/images/kannika.jpg'),
                     ),
                     const SizedBox(width: 12),
                     const Text(

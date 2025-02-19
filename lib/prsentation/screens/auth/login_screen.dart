@@ -239,11 +239,17 @@ Widget _phoneLoginButton(BuildContext context) {
 Widget _facebookLoginButton(BuildContext context) {
   return GestureDetector(
     onTap: () async {
-      await AuthService().signInWithFacebook(context);
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
+     bool isSignedIn = (await AuthService().signInWithFacebook(context)) as bool;
+      if (isSignedIn) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Google sign-in failed!")),
+        );
+      }
     },
     child: Container(
       width: 64,
@@ -254,7 +260,7 @@ Widget _facebookLoginButton(BuildContext context) {
       ),
       child: Center(
         child: Image.asset(
-          'lib/assets/images/phone.png',
+          'lib/assets/images/facebook.png',
           height: 24,
         ),
       ),

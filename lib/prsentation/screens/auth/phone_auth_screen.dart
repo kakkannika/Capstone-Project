@@ -1,7 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:tourism_app/prsentation/screens/auth/phone_OTP_screen.dart';
+import 'package:tourism_app/prsentation/screens/home/home_screen.dart';
+import 'package:tourism_app/services/auth_service.dart';
 
 class PhoneAuthScreen extends StatefulWidget {
   const PhoneAuthScreen({super.key});
@@ -11,36 +10,10 @@ class PhoneAuthScreen extends StatefulWidget {
 }
 
 class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
-  final TextEditingController _phoneController = TextEditingController();
-  final bool _isLoading = false;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  Future<void> signinWithPhoneNumber(BuildContext context) async {
-    await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: _phoneController.text.trim(),
-      verificationCompleted: (PhoneAuthCredential credential) async {
-        await _auth.signInWithCredential(credential).then((value) => {
-              print('You are login successfully'),
-            });
-      },
-      verificationFailed: (FirebaseAuthException e) {
-        if (e.code == 'invalid-phone-number') {
-          print('The provided phone number is not valid.');
-        }
-      },
-      codeSent: (String verificationId, int? resendToken) {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => OTPScreen(verificationId: verificationId,),
-            ));
-      },
-      timeout: const Duration(seconds: 60),
-      codeAutoRetrievalTimeout: (String verificationId) {
-        // Auto-resolution timed out...
-      },
-    );
-  }
+  TextEditingController _phoneController = TextEditingController();
+  TextEditingController _otpController = TextEditingController();
+  String verificationId = "";
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +53,10 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                 const SizedBox(height: 20),
                 _sendOTPButton(context),
                 const SizedBox(height: 20),
+                _otpField(),
+                const SizedBox(height: 20),
+                _verifyOTPButton(context),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -88,7 +65,9 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                       style: TextStyle(color: Colors.black54),
                     ),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        // Implement resend functionality here
+                      },
                       child: const Text(
                         "Resend",
                         style: TextStyle(color: Color(0xFF2F80ED)),
@@ -115,10 +94,10 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
             color: Colors.black12,
             blurRadius: 6,
             spreadRadius: 2,
-          )
+          ),
         ],
       ),
-      child: IntlPhoneField(
+      child: TextField(
         controller: _phoneController,
         decoration: InputDecoration(
           hintText: 'Enter your phone number',
@@ -126,14 +105,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 15),
         ),
-        initialCountryCode: 'US',
-        dropdownIconPosition: IconPosition.trailing,
-        flagsButtonPadding: const EdgeInsets.only(left: 8, right: 8),
-        textAlignVertical: TextAlignVertical.center,
-        disableLengthCheck: true,
-        onChanged: (phone) {
-          debugPrint(phone.completeNumber);
-        },
+        keyboardType: TextInputType.phone,
       ),
     );
   }
@@ -149,10 +121,62 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        onPressed: () => signinWithPhoneNumber(context),
+        onPressed: () async {
+          setState(() {
+            _isLoading = true;
+          });
+          await AuthService().sendOTP(_phoneController.text, (id) {
+            setState(() {
+              verificationId = id;
+              _isLoading = false;
+            });
+          });
+        },
         child: _isLoading
             ? const CircularProgressIndicator(color: Colors.white)
             : const Text('Send OTP', style: TextStyle(color: Colors.white)),
+      ),
+    );
+  }
+
+  Widget _otpField() {
+    return TextField(
+      controller: _otpController,
+      decoration: InputDecoration(
+        labelText: "Enter OTP",
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      keyboardType: TextInputType.number,
+    );
+  }
+
+  Widget _verifyOTPButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF2F80ED),
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        onPressed: () async {
+          bool isVerified = await AuthService().verifyOTP(verificationId, _otpController.text);
+          if (isVerified) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeScreen()), // Navigate to HomePage
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Invalid OTP, please try again")),
+            );
+          }
+        },
+        child: const Text('Verify OTP', style: TextStyle(color: Colors.white)),
       ),
     );
   }
