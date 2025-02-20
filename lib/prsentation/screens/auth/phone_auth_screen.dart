@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/prsentation/screens/home/home_screen.dart';
+import 'package:tourism_app/prsentation/screens/auth/phone_OTP_screen.dart';
 import 'package:tourism_app/services/auth_service.dart';
 
 class PhoneAuthScreen extends StatefulWidget {
@@ -10,9 +10,7 @@ class PhoneAuthScreen extends StatefulWidget {
 }
 
 class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
-  TextEditingController _phoneController = TextEditingController();
-  TextEditingController _otpController = TextEditingController();
-  String verificationId = "";
+  final TextEditingController _phoneController = TextEditingController();
   bool _isLoading = false;
 
   @override
@@ -52,29 +50,6 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                 _phoneNumberField(),
                 const SizedBox(height: 20),
                 _sendOTPButton(context),
-                const SizedBox(height: 20),
-                _otpField(),
-                const SizedBox(height: 20),
-                _verifyOTPButton(context),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Didn't receive the OTP? ",
-                      style: TextStyle(color: Colors.black54),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        // Implement resend functionality here
-                      },
-                      child: const Text(
-                        "Resend",
-                        style: TextStyle(color: Color(0xFF2F80ED)),
-                      ),
-                    )
-                  ],
-                ),
               ],
             ),
           ),
@@ -122,61 +97,26 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
           ),
         ),
         onPressed: () async {
-          setState(() {
-            _isLoading = true;
-          });
-          await AuthService().sendOTP(_phoneController.text, (id) {
-            setState(() {
-              verificationId = id;
-              _isLoading = false;
-            });
-          });
+          await AuthService().sendOTP(
+            _phoneController.text,
+            (verificationId) {
+              setState(() {
+                _isLoading = false;
+              });
+              //Navigate to OTP Screen after getting verificationId
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      OTPScreen(verificationId: verificationId),
+                ),
+              );
+            },
+          );
         },
         child: _isLoading
             ? const CircularProgressIndicator(color: Colors.white)
             : const Text('Send OTP', style: TextStyle(color: Colors.white)),
-      ),
-    );
-  }
-
-  Widget _otpField() {
-    return TextField(
-      controller: _otpController,
-      decoration: InputDecoration(
-        labelText: "Enter OTP",
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-      keyboardType: TextInputType.number,
-    );
-  }
-
-  Widget _verifyOTPButton(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF2F80ED),
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        onPressed: () async {
-          bool isVerified = await AuthService().verifyOTP(verificationId, _otpController.text);
-          if (isVerified) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const HomeScreen()), // Navigate to HomePage
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Invalid OTP, please try again")),
-            );
-          }
-        },
-        child: const Text('Verify OTP', style: TextStyle(color: Colors.white)),
       ),
     );
   }
