@@ -105,10 +105,10 @@ class AuthService {
   Future<void> resetPassword(String email, BuildContext context) async {
     await _auth.sendPasswordResetEmail(email: email);
     await sendEmailVerification(context);
-    _checkIfPasswordReset(context);
+    await _checkIfPasswordReset(context);
   }
 
-  void _checkIfPasswordReset(BuildContext context) async {
+  Future<void> _checkIfPasswordReset(BuildContext context) async {
     User? user = _auth.currentUser;
     Timer.periodic(const Duration(seconds: 5), (timer) async {
       await user?.reload(); // Reload the user to get the latest information
@@ -254,6 +254,23 @@ class AuthService {
     } catch (e) {
       print("Error verifying OTP: $e");
       return false;
+    }
+  }
+  // Sign out from all services
+  Future<void> signOutFromAll() async {
+    try {
+      // Sign out from Google
+      await GoogleSignIn().signOut();
+
+      // Sign out from Facebook
+      await FacebookAuth.instance.logOut();
+
+      // Sign out from Firebase Auth
+      await _auth.signOut();
+
+      _showToast('Signed out from all services successfully.');
+    } on FirebaseAuthException catch (e) {
+      _showToast('Error signing out: ${e.message}');
     }
   }
 }

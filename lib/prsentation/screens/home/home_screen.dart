@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tourism_app/prsentation/screens/profiles/user_profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -205,11 +206,20 @@ class HomeScreen extends StatelessWidget {
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
+        currentIndex: 0,
+        onTap: (index) {
+          if (index == 3) { // Profile icon index
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const UserProfileScreen()),
+            );
+          }
+        },
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.map), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: ''),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Map'),
+          BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: 'Saved'),
+          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
         ],
       ),
     );
