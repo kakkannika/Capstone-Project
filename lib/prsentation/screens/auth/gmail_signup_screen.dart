@@ -10,8 +10,11 @@ class EmailRegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<EmailRegisterScreen> {
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,49 +49,20 @@ class _RegisterScreenState extends State<EmailRegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                // Name TextField
-                // TextField(
-                //   decoration: InputDecoration(
-                //     hintText: 'Name',
-                //     filled: true,
-                //     fillColor: const Color(0xFFF5F7FB),
-                //     border: OutlineInputBorder(
-                //       borderRadius: BorderRadius.circular(8),
-                //       borderSide: BorderSide.none,
-                //     ),
-                //     enabledBorder: OutlineInputBorder(
-                //       borderRadius: BorderRadius.circular(8),
-                //       borderSide: const BorderSide(color: Color(0xFFE8ECF4)),
-                //     ),
-                //   ),
-                // ),
+                // Username TextField
+                _usernameField(),
                 const SizedBox(height: 16),
                 // Email TextField
-                _emailAddress(),
+                _emailField(),
                 const SizedBox(height: 16),
                 // Password TextField
-                _password(),
+                _passwordField(),
                 const SizedBox(height: 16),
                 // Confirm Password TextField
-                // TextField(
-                //   obscureText: true,
-                //   decoration: InputDecoration(
-                //     hintText: 'Confirm Password',
-                //     filled: true,
-                //     fillColor: const Color(0xFFF5F7FB),
-                //     border: OutlineInputBorder(
-                //       borderRadius: BorderRadius.circular(8),
-                //       borderSide: BorderSide.none,
-                //     ),
-                //     enabledBorder: OutlineInputBorder(
-                //       borderRadius: BorderRadius.circular(8),
-                //       borderSide: const BorderSide(color: Color(0xFFE8ECF4)),
-                //     ),
-                //   ),
-                // ),
+                _confirmPasswordField(),
                 const SizedBox(height: 32),
                 // Sign Up Button
-                _signup(context),
+                _signupButton(context),
                 const SizedBox(height: 16),
                 // Already have an account text
                 Center(
@@ -116,57 +90,85 @@ class _RegisterScreenState extends State<EmailRegisterScreen> {
     );
   }
 
-  Widget _emailAddress() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextField(
-          controller: _emailController,
-          decoration: InputDecoration(
-            hintText: 'Email Address',
-            filled: true,
-            fillColor: const Color(0xFFF5F7FB),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFE8ECF4)),
-            ),
-          ),
-        )
-      ],
+  Widget _usernameField() {
+    return TextField(
+      controller: _usernameController,
+      decoration: InputDecoration(
+        hintText: 'Username',
+        filled: true,
+        fillColor: const Color(0xFFF5F7FB),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFFE8ECF4)),
+        ),
+      ),
     );
   }
 
-  Widget _password() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextField(
-          controller: _passwordController,
-          decoration: InputDecoration(
-            hintText: 'Password',
-            filled: true,
-            fillColor: const Color(0xFFF5F7FB),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide.none,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFE8ECF4)),
-            ),
-          ),
-        )
-      ],
+  Widget _emailField() {
+    return TextField(
+      controller: _emailController,
+      decoration: InputDecoration(
+        hintText: 'Email Address',
+        filled: true,
+        fillColor: const Color(0xFFF5F7FB),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFFE8ECF4)),
+        ),
+      ),
     );
   }
 
-  Widget _signup(BuildContext context) {
+  Widget _passwordField() {
+    return TextField(
+      controller: _passwordController,
+      obscureText: true,
+      decoration: InputDecoration(
+        hintText: 'Password',
+        filled: true,
+        fillColor: const Color(0xFFF5F7FB),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFFE8ECF4)),
+        ),
+      ),
+    );
+  }
+
+  Widget _confirmPasswordField() {
+    return TextField(
+      controller: _confirmPasswordController,
+      obscureText: true,
+      decoration: InputDecoration(
+        hintText: 'Confirm Password',
+        filled: true,
+        fillColor: const Color(0xFFF5F7FB),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFFE8ECF4)),
+        ),
+      ),
+    );
+  }
+
+  Widget _signupButton(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blue,
@@ -179,6 +181,8 @@ class _RegisterScreenState extends State<EmailRegisterScreen> {
         await AuthService().signup(
           email: _emailController.text,
           password: _passwordController.text,
+          username: _usernameController.text,
+          confirmPassword: _confirmPasswordController.text,
           context: context,
         );
       },

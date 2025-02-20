@@ -18,6 +18,7 @@ class GetStartedScreen extends StatelessWidget {
           ),
           Container(
             decoration: BoxDecoration(
+              // ignore: deprecated_member_use
               color: Colors.black.withOpacity(0.5),
             ),
           ),

@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/prsentation/screens/auth/sucess_reset_screen.dart';
-import 'otp_screen.dart';
+import 'package:tourism_app/prsentation/screens/auth/new_password_screen.dart';
+import 'package:tourism_app/services/auth_service.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
+
   @override
   _ForgotPasswordScreenState createState() => _ForgotPasswordScreenState();
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   bool isEmailSelected = true; // Toggle between email and phone input
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -18,11 +21,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF085794), // Dark Blue
-              Color(0xFF17649F), // Medium Blue
-              Color(0xFF206CA6), // Light Blue
-              Color(0xFF74B5E3), // Very light Blue
-              Color(0xFFFFFFFF), // White
+              Color(0xFF085794),
+              Color(0xFF17649F),
+              Color(0xFF206CA6),
+              Color(0xFF74B5E3),
+              Color(0xFFFFFFFF),
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -35,62 +38,43 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Logo
                 Image.asset(
                   'lib/assets/images/logo.png',
                   height: 100,
                 ),
                 const SizedBox(height: 20),
-
-                // Title
                 const Text(
                   'Forgot Password?',
                   style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
                 const SizedBox(height: 10),
-
                 const Text(
                   'Select your preferred method to reset your password.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white70,
-                  ),
+                  style: TextStyle(fontSize: 16, color: Colors.white70),
                 ),
                 const SizedBox(height: 30),
-
-                // Toggle between email and phone input
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.all(4),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _toggleButton("Email", isEmailSelected, () {
-                        setState(() {
-                          isEmailSelected = true;
-                        });
-                      }),
-                      _toggleButton("Phone", !isEmailSelected, () {
-                        setState(() {
-                          isEmailSelected = false;
-                        });
-                      }),
-                    ],
-                  ),
+                // Toggle button
+                Row(
+                  children: [
+                    _toggleButton('Email', isEmailSelected, () {
+                      setState(() {
+                        isEmailSelected = true;
+                      });
+                    }),
+                    _toggleButton('Phone', !isEmailSelected, () {
+                      setState(() {
+                        isEmailSelected = false;
+                      });
+                    }),
+                  ],
                 ),
                 const SizedBox(height: 30),
-
-                // Email or Phone Fields based on the toggle selection
+                // Input field based on selection
                 _inputField(),
-
                 const SizedBox(height: 30),
 
                 // Buttons
@@ -102,17 +86,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     }),
                     _actionButton('Submit', Colors.blueAccent, () {
                       if (isEmailSelected) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SuccessResetEmailScreen()),
-                        );
+                        _resetPassword();
                       } else {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const EnterOTPScreen()),
-                        );
+                        // Handle phone reset logic
                       }
                     }),
                   ],
@@ -125,7 +101,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
-  /// Toggle Button for Email & Phone Selection
+  void _resetPassword() async {
+    try {
+      await AuthService().resetPassword(_emailController.text, context);
+      // ignore: use_build_context_synchronously
+    } catch (error) {
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error.toString())));
+    }
+  }
+
   Widget _toggleButton(String label, bool isSelected, VoidCallback onTap) {
     return Expanded(
       child: GestureDetector(
@@ -150,10 +136,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
-  /// Input Field for Email or Phone
   Widget _inputField() {
     return isEmailSelected
-        ? _textField("Email Address", Icons.email)
+        ? _textField("Email Address", Icons.email, _emailController)
         : Row(
             children: [
               Container(
@@ -180,15 +165,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: _textField("Mobile Number", Icons.phone),
+                child:
+                    _textField("Mobile Number", Icons.phone, _phoneController),
               ),
             ],
           );
   }
 
-  /// Custom Text Field
-  Widget _textField(String hintText, IconData icon) {
+  Widget _textField(
+      String hintText, IconData icon, TextEditingController controller) {
     return TextField(
+      controller: controller,
       style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         hintText: hintText,
@@ -204,7 +191,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
-  /// Custom Action Button
   Widget _actionButton(String label, Color color, VoidCallback onPressed) {
     return ElevatedButton(
       onPressed: onPressed,

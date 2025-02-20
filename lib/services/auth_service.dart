@@ -1,27 +1,40 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:tourism_app/main.dart';
+import 'package:tourism_app/prsentation/screens/auth/login_screen.dart';
+import 'package:tourism_app/prsentation/screens/auth/new_password_screen.dart';
 import 'package:tourism_app/prsentation/screens/home/home_screen.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:tourism_app/services/snackbar.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   var verificationId = '';
 
   // Signup with Email & Password
+  // Signup with Email & Password
   Future<void> signup({
     required String email,
     required String password,
+    required String username,
+    required String confirmPassword,
     required BuildContext context,
   }) async {
+    if (password != confirmPassword) {
+      _showToast('Passwords do not match');
+      return;
+    }
+
     try {
       await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
-      await Future.delayed(const Duration(seconds: 1));
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const MyApp()));
+      await sendEmailVerification(context);
+
+      // Start checking for email verification
+      _checkEmailVerification(context);
     } on FirebaseAuthException catch (e) {
       String message = '';
       if (e.code == 'weak-password') {
@@ -30,6 +43,36 @@ class AuthService {
         message = 'An account already exists with that email';
       }
       _showToast(message);
+    }
+  }
+
+// Method to check email verification
+  void _checkEmailVerification(BuildContext context) async {
+    User? user = _auth.currentUser;
+    Timer.periodic(const Duration(seconds: 5), (timer) async {
+      await user?.reload(); // Reload the user to get the latest information
+      user = _auth.currentUser; // Update the user instance
+
+      if (user != null && user!.emailVerified) {
+        timer.cancel(); // Stop the timer
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    LoginScreen())); // Navigate to Login Screen
+      }
+    });
+  }
+
+  //Email Verification
+  Future<void> sendEmailVerification(BuildContext context) async {
+    try {
+      await _auth.currentUser!.sendEmailVerification();
+      // ignore: use_build_context_synchronously
+      showSnackBar(context, 'Verification email sent');
+    } on FirebaseAuthException catch (e) {
+      // ignore: use_build_context_synchronously
+      showSnackBar(context, e.message!);
     }
   }
 
@@ -43,7 +86,9 @@ class AuthService {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       await Future.delayed(const Duration(seconds: 1));
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+          // ignore: use_build_context_synchronously
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()));
     } on FirebaseAuthException catch (e) {
       String message = '';
       if (e.code == 'invalid-email') {
@@ -52,6 +97,53 @@ class AuthService {
         message = 'Wrong password provided for that user';
       }
       _showToast(message);
+    }
+  }
+
+  // For reset Email password
+  // Reset password method
+  Future<void> resetPassword(String email, BuildContext context) async {
+    await _auth.sendPasswordResetEmail(email: email);
+    await sendEmailVerification(context);
+    _checkIfPasswordReset(context);
+  }
+
+  void _checkIfPasswordReset(BuildContext context) async {
+    User? user = _auth.currentUser;
+    Timer.periodic(const Duration(seconds: 5), (timer) async {
+      await user?.reload(); // Reload the user to get the latest information
+      user = _auth.currentUser; // Update the user instance
+
+      if (user != null && user!.emailVerified) {
+        timer.cancel(); // Stop the timer
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    const NewPasswordScreen())); // Navigate to Login Screen
+      }
+    });
+  }
+
+// Update password method
+  Future<void> updatePassword(String newPassword) async {
+    User? user = _auth.currentUser;
+
+    if (user != null) {
+      try {
+        await user.updatePassword(newPassword);
+        _showToast('Password updated successfully.');
+      } on FirebaseAuthException catch (e) {
+        String message = '';
+        if (e.code == 'requires-recent-login') {
+          message = 'Please log in again to update your password.';
+        } else {
+          message = 'Error: ${e.message}';
+        }
+        _showToast(message);
+      }
+    } else {
+      _showToast('No user is currently logged in.');
     }
   }
 
@@ -66,8 +158,8 @@ class AuthService {
         UserCredential userCredential =
             await _auth.signInWithCredential(credential);
 
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()));
         return userCredential;
       } else {
         _showToast("Facebook login failed");
@@ -109,7 +201,6 @@ class AuthService {
       return false; // Failed login
     }
   }
- 
 
   Future<void> googlesignOut() async {
     await GoogleSignIn().signOut();
@@ -128,8 +219,7 @@ class AuthService {
     );
   }
 
-
-    Future<void> sendOTP(String phoneNumber, Function(String) onCodeSent) async {
+  Future<void> sendOTP(String phoneNumber, Function(String) onCodeSent) async {
     FirebaseAuth auth = FirebaseAuth.instance;
 
     await auth.verifyPhoneNumber(
@@ -166,5 +256,4 @@ class AuthService {
       return false;
     }
   }
-
 }
