@@ -121,7 +121,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       }).toList(),
                     ),
                     const SizedBox(width: 10),
-
                     const Expanded(
                       child: TextField(
                         decoration: InputDecoration(
