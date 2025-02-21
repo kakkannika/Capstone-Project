@@ -46,8 +46,8 @@ class EnterOTPScreen extends StatelessWidget {
             // Submit Button
             ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context, MaterialPageRoute(builder: (context)=> LoginScreen()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blueAccent,

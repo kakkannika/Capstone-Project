@@ -37,149 +37,193 @@ class RegisterScreen extends StatelessWidget {
                       'lib/assets/images/Logo.png', 
                       height: 120,
                     ),
-                    const SizedBox(height: 10),
-
-                    // Register Text under the logo
-                    const Text(
-                      'Register',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue, // Text color
-                      ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Register Text
+                const Center(
+                  child: Text(
+                    'Register',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.blue,
                     ),
-                    const SizedBox(height: 40),
-
-                    // Name text field with updated design
-                    const TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Name',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.person),
-                        filled: true,
-                        fillColor: Color(0x80FFFFFF),
-                      ),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                // Name TextField
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Name',
+                    filled: true,
+                    fillColor: const Color(0xFFF5F7FB),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
                     ),
-                    const SizedBox(height: 20),
-
-                    // Email Address text field with updated design
-                    const TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Email Address',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.email),
-                        filled: true,
-                        fillColor: Color(0x80FFFFFF),
-                      ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFE8ECF4)),
                     ),
-                    const SizedBox(height: 20),
-
-                    // Mobile Number text field with updated design
-                    const TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Mobile Number',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.phone),
-                        filled: true,
-                        fillColor: Color(0x80FFFFFF),
-                      ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Email TextField
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Email Address',
+                    filled: true,
+                    fillColor: const Color(0xFFF5F7FB),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
                     ),
-                    const SizedBox(height: 20),
-
-                    // Password text field with updated design
-                    const TextField(
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        hintText: 'Password',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.lock),
-                        filled: true,
-                        fillColor: Color(0x80FFFFFF),
-                      ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFE8ECF4)),
                     ),
-                    const SizedBox(height: 20),
-
-                    // Confirm Password text field with updated design
-                    const TextField(
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        hintText: 'Confirm Password',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.lock),
-                        filled: true,
-                        fillColor: Color(0x80FFFFFF),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Sign Up button
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueAccent, 
-                        padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30), 
-                        ),
-                      ),
-                      onPressed: () {
-                        // Handle sign up logic here
-                      },
-                      child: const Text('SIGN UP', style: TextStyle(fontSize: 18)),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Social login buttons
-                    const Text("Or continue with"),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Facebook button (Circle with Facebook logo)
-                        CircleAvatar(
-                          radius: 25,
-                          backgroundColor: Colors.white, 
-                          child: Image.asset(
-                            'lib/assets/images/facebook.png', 
-                            height: 24, 
-                            color: Colors.blue,
-                          ),
-                        ),
-                        const SizedBox(width: 20), 
-                        
-                        CircleAvatar(
-                          radius: 25,
-                          backgroundColor: Colors.white, 
-                          child: Image.asset(
-                            'lib/assets/images/google.png', 
-                            height: 24, 
-                          ),
-                        ),
-                        const SizedBox(width: 20),
-
-                        CircleAvatar(
-                          radius: 25,
-                          backgroundColor: Colors.white, 
-                          child: Image.asset(
-                            'lib/assets/images/phone.png', 
-                            height: 24, 
-                          ),
-                        ),
-                      ],
-                    ),
-                    
-                    Align(
-                      alignment: Alignment.center,
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => LoginScreen()),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Mobile Number TextField
+                TextField(
+                  keyboardType: TextInputType.phone,
+                  decoration: InputDecoration(
+                    hintText: 'Mobile Number',
+                    filled: true,
+                    fillColor: const Color(0xFFF5F7FB),
+                    prefixIcon: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      margin: const EdgeInsets.symmetric(horizontal: 8),
+                      child: InkWell(
+                        onTap: () {
+                          showCountryPicker(
+                            context: context,
+                            showPhoneCode: true,
+                            favorite: ['KH'],
+                            countryListTheme: CountryListThemeData(
+                              borderRadius: BorderRadius.circular(8),
+                              inputDecoration: InputDecoration(
+                                labelText: 'Search',
+                                hintText: 'Start typing to search',
+                                prefixIcon: const Icon(Icons.search),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                            onSelect: (Country country) {
+                              setState(() {
+                                selectedCountry = country;
+                              });
+                            },
                           );
                         },
-                        child: const Text(
-                          "Already have an account? Login",
-                          style: TextStyle(color: Colors.blueAccent),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              selectedCountry.flagEmoji,
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              "+${selectedCountry.phoneCode}",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const Icon(Icons.arrow_drop_down),
+                          ],
                         ),
+                      ),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFE8ECF4)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Password TextField
+                TextField(
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    hintText: 'Password',
+                    filled: true,
+                    fillColor: const Color(0xFFF5F7FB),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFE8ECF4)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Confirm Password TextField
+                TextField(
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    hintText: 'Confirm Password',
+                    filled: true,
+                    fillColor: const Color(0xFFF5F7FB),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFE8ECF4)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                // Sign Up Button
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: () {
+                    // Handle sign up
+                  },
+                  child: const Text(
+                    'Sign up',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Already have an account text
+                Center(
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginScreen()),
+                      );
+                    },
+                    child: const Text(
+                      'Already have an account',
+                      style: TextStyle(
+                        color: Colors.black54,
+                        fontSize: 14,
                       ),
                     ),
                   ],

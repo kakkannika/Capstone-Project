@@ -47,9 +47,8 @@ class NewPasswordScreen extends StatelessWidget {
             // Submit button
             ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context, MaterialPageRoute(
-                    builder: (context) => LoginScreen()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blueAccent,
