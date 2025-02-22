@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tourism_app/prsentation/screens/auth/sucess_reset_screen.dart';
-import 'otp_screen.dart'; 
+import 'otp_screen.dart';
+
 class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
   @override
   _ForgotPasswordScreenState createState() => _ForgotPasswordScreenState();
 }
@@ -38,7 +40,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             children: [
               // Logo
               Image.asset(
-                'lib/assets/images/logo.png', 
+                'lib/assets/images/logo.png',
                 height: 150,
               ),
               const SizedBox(height: 30),
@@ -67,8 +69,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ChoiceChip(
-                    label: const Text("Email",
-                     style: TextStyle(color: Colors.black),),
+                    label: const Text(
+                      "Email",
+                      style: TextStyle(color: Colors.black),
+                    ),
                     selected: isEmailSelected,
                     onSelected: (selected) {
                       setState(() {
@@ -80,8 +84,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                   const SizedBox(width: 20),
                   ChoiceChip(
-                    label: const Text("Phone", 
-                    style: TextStyle(color: Colors.black),),
+                    label: const Text(
+                      "Phone",
+                      style: TextStyle(color: Colors.black),
+                    ),
                     selected: !isEmailSelected,
                     onSelected: (selected) {
                       setState(() {
@@ -110,7 +116,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 Row(
                   children: [
                     DropdownButton<String>(
-                      value: '+855', 
+                      value: '+855',
                       onChanged: (String? newValue) {},
                       items: <String>['+855', '+44', '+91', '+33']
                           .map<DropdownMenuItem<String>>((String value) {
@@ -144,7 +150,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey,
-                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -164,13 +171,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => EnterOTPScreen()),
+                              builder: (context) => const EnterOTPScreen()),
                         );
                       }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blueAccent,
-                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -185,7 +193,4 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       ),
     );
   }
-  
 }
-
-

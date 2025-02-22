@@ -3,166 +3,173 @@ import 'forgot_password_screen.dart';
 import 'register_screen.dart'; // Import the register screen
 
 class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Gradient Background
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFF085794), // Deep blue
-                  Color(0xFF17649F), // Medium blue
-                  Color(0xFF206CA6), // Light blue
-                  Color(0xFF74B5E3), // Very light blue
-                  Color(0xFFFFFFFF), // White
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 60),
+              // Logo
+              Center(
+                child: Image.asset(
+                  'lib/assets/images/logo.png',
+                  height: 80,
+                ),
               ),
-            ),
-          ),
-          // Content inside the center
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Column(
+              const SizedBox(height: 20),
+              const Center(
+                child: Text(
+                  'Login',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 40),
+              // Email field
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F7FB),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Email',
+                    border: InputBorder.none,
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Password field
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F7FB),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const TextField(
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    hintText: 'Password',
+                    border: InputBorder.none,
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ForgotPasswordScreen()),
+                    );
+                  },
+                  child: const Text(
+                    'Forgot your password?',
+                    style: TextStyle(
+                      color: Color(0xFF2F80ED),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Sign in button
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2F80ED),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                onPressed: () {},
+                child: const Text(
+                  'Sign in',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              const Center(
+                child: Text(
+                  'Or continue with',
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Social login buttons
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo at the top
-                  Image.asset(
-                    'lib/assets/images/Logo.png',
-                    height: 120, 
-                  ),
-                  const  Text(
-                    'Login',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white, 
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Email',
-                      border: const OutlineInputBorder(),
-                      prefixIcon: const Icon(Icons.email),
-                      filled: true,
-                      fillColor: Colors.white.withOpacity(0.8), 
-                    ),
-                  ),
-                 const  SizedBox(height: 20),
-
-                  // Password text field
-                  TextField(
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      hintText: 'Password',
-                      border: const OutlineInputBorder(),
-                      prefixIcon: const Icon(Icons.lock),
-                      filled: true,
-                      fillColor: Colors.white.withOpacity(0.8),
-                    ),
-                  ),
-                 const  SizedBox(height: 20),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
-                        );
-                      },
-                      child:const  Text(
-                        'Forgot your password?',
-                        style: TextStyle(color: Color.fromARGB(255, 106, 7, 205)),
-                      ),
-                    ),
-                  ),
-                 const SizedBox(height: 20),
-
-                  // Sign In button
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue, 
-                      padding: const EdgeInsets.symmetric(horizontal: 90, vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    onPressed: () {
-                      // Handle sign in logic here
-                    },
-                    child: const Text('Sign In', style:TextStyle(fontSize: 18,color: Colors.white)),
-                  ),
-                 const  SizedBox(height: 20),
-                  const Text("Or continue with"),
-                 const  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Facebook button)
-                      CircleAvatar(
-                        radius: 25,
-                        backgroundColor: Colors.white, 
-                         child: Image.asset(
-                          'lib/assets/images/facebook.png', 
-                          color: Colors.blue,
-                          height: 24, 
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      
-                      // Google button (Circle with white background and Google icon)
-                      CircleAvatar(
-                        radius: 25,
-                        backgroundColor: Colors.white, 
-                        child: Image.asset(
-                          'lib/assets/images/google.png', 
-                          height: 24, 
-                        ),
-                      ),
-                       const SizedBox(width: 20),
-                      
-                      // Google button (Circle with white background and Google icon)
-                      CircleAvatar(
-                        radius: 25,
-                        backgroundColor: Colors.white, 
-                        child: Image.asset(
-                          'lib/assets/images/phone.png', 
-                          height: 24, 
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Register link
-                  Align(
-                    alignment: Alignment.center,
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => RegisterScreen()),
-                        );
-                      },
-                      child: const Text(
-                        "Don't have an account? Register",
-                        style: TextStyle(color: Colors.blue),
-                      ),
-                    ),
-                  ),
+                  _socialLoginButton('lib/assets/images/google.png'),
+                  const SizedBox(width: 16),
+                  _socialLoginButton('lib/assets/images/facebook.png'),
+                  const SizedBox(width: 16),
+                  _socialLoginButton('lib/assets/images/phone.png'),
                 ],
               ),
-            ),
+              const Spacer(),
+              // Register link
+              Center(
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const RegisterScreen()),
+                    );
+                  },
+                  child: RichText(
+                    text: const TextSpan(
+                      text: "Don't have an account? ",
+                      style: TextStyle(color: Colors.black54),
+                      children: [
+                        TextSpan(
+                          text: 'Register',
+                          style: TextStyle(color: Color(0xFF2F80ED)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
           ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  Widget _socialLoginButton(String iconPath) {
+    return Container(
+      width: 64,
+      height: 64,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F7FB),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Center(
+        child: Image.asset(
+          iconPath,
+          height: 24,
+        ),
       ),
     );
   }

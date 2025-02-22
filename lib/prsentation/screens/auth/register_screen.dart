@@ -1,41 +1,46 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart'; 
+import 'package:country_picker/country_picker.dart';
+import 'login_screen.dart';
 
-class RegisterScreen extends StatelessWidget {
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
+
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
+  Country selectedCountry = Country(
+    phoneCode: "855",
+    countryCode: "KH",
+    e164Sc: 0,
+    geographic: true,
+    level: 1,
+    name: "Cambodia",
+    example: "012345678",
+    displayName: "Cambodia (KH) [+855]",
+    displayNameNoCountryCode: "Cambodia (KH)",
+    e164Key: "",
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Gradient Background
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFF1E3C72), // Dark Blue
-                  Color(0xFF2A5298), // Medium Blue
-                  Color(0xFF56CCF2), // Light Blue
-                  Color(0xFF6A9FE9), // Very light Blue
-                  Color(0xFFFFFFFF), // White
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
-          ),
-          // Content inside the center
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: SingleChildScrollView(  // Wrap the Column inside a SingleChildScrollView to make it scrollable
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Logo at the top
-                    Image.asset(
-                      'lib/assets/images/Logo.png', 
-                      height: 120,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 20),
+                // Logo
+                Center(
+                  child: SizedBox(
+                    height: 80,
+                    child: Image.asset(
+                      'lib/assets/images/logo.png',
+                      fit: BoxFit.contain,
                     ),
                   ),
                 ),
@@ -216,7 +221,8 @@ class RegisterScreen extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => LoginScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => LoginScreen()),
                       );
                     },
                     child: const Text(
@@ -226,12 +232,12 @@ class RegisterScreen extends StatelessWidget {
                         fontSize: 14,
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

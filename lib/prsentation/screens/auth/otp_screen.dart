@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tourism_app/prsentation/screens/auth/login_screen.dart';
 
 class EnterOTPScreen extends StatelessWidget {
+  const EnterOTPScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,17 +25,17 @@ class EnterOTPScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(4, (index) {
                 return const Padding(
-                  padding:  EdgeInsets.symmetric(horizontal: 8.0),
+                  padding: EdgeInsets.symmetric(horizontal: 8.0),
                   child: SizedBox(
                     width: 50,
                     child: TextField(
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
-                      style:  TextStyle(fontSize: 24),
+                      style: TextStyle(fontSize: 24),
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
                         filled: true,
-                        fillColor:  Color(0xFFF0F0F0),
+                        fillColor: Color(0xFFF0F0F0),
                       ),
                     ),
                   ),
@@ -46,12 +47,15 @@ class EnterOTPScreen extends StatelessWidget {
             // Submit Button
             ElevatedButton(
               onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => LoginScreen()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => LoginScreen()));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blueAccent,
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
