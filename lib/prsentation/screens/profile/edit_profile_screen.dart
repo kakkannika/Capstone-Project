@@ -88,6 +88,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
  //to build the app bar for the EditProfileScreen with a back button and a title
   AppBar _buildAppBar() {
     return AppBar(
+      //toolbarHeight: 100,
       centerTitle: true,
       title: const Text('Edit Profile', style: TextStyle(color: Colors.black, fontSize: 20)),
       backgroundColor: Colors.transparent,

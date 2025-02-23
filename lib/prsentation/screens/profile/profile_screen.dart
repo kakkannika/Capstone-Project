@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tourism_app/prsentation/screens/profile/settings_screen.dart';
 import 'edit_profile_screen.dart';
 import '../auth/login_screen.dart';
 
@@ -8,14 +9,14 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 50,
       child: Scaffold(
         appBar: _buildAppBar(context),
         body: _buildBody(),
       ),
     );
   }
-
+  
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       centerTitle: true,
@@ -33,7 +34,8 @@ class ProfileScreen extends StatelessWidget {
       ],
     );
   }
-
+  
+//to build the body of the ProfileScreen with a profile image, profile information, a tab bar, and a tab bar view
   Widget _buildBody() {
     return Column(
       children: [
@@ -55,6 +57,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+//to build the profile image for the ProfileScreen
   Widget _buildProfileImage() {
     return const CircleAvatar(
       radius: 50,
@@ -62,6 +65,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+//to build the profile information for the ProfileScreen
   Widget _buildProfileInfo() {
     return const Column(
       children: [
@@ -78,6 +82,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+//to build the tab bar for the ProfileScreen with two tabs: Trips and History
   Widget _buildTabBar() {
     return const TabBar(
       labelColor: Color(0xFF386FA4),
@@ -90,6 +95,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+//to build the tab bar view for the ProfileScreen with two tabs: Trips and History
   Widget _buildTabBarView() {
     return Expanded(
       child: TabBarView(
@@ -101,6 +107,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+//to build the Trips tab for the ProfileScreen with a list of trips
   Widget _buildTripsTab() {
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -110,7 +117,7 @@ class ProfileScreen extends StatelessWidget {
       ],
     );
   }
-
+//to build the History tab for the ProfileScreen with a list of trips
   Widget _buildHistoryTab() {
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -120,7 +127,7 @@ class ProfileScreen extends StatelessWidget {
       ],
     );
   }
-
+//to build a trip item for the ProfileScreen
   Widget _buildTripItem(String title, String places, String status) {
     final isCompleted = status == 'Completed';
     final statusColor = isCompleted ? Colors.green : const Color(0xFF386FA4);
@@ -144,7 +151,7 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
-
+//to show the option to choose such as ,setting edit profile or view profile reset password,logout
   void _showMoreOptions(BuildContext context) {
     showDialog(
       context: context,
@@ -154,6 +161,14 @@ class ProfileScreen extends StatelessWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            _buildOptionTile(
+              icon: Icons.settings,
+              title: 'Settings',
+              onTap: () {
+                Navigator.pop(context);
+                _goToSettings(context);
+              },
+            ),
             _buildOptionTile(
               icon: Icons.person_outline,
               title: 'Edit Profile',
@@ -182,6 +197,13 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+  void _goToSettings(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const SettingsScreen()),
+    );
+  }
+//to build the option tile 
   Widget _buildOptionTile({
     required IconData icon,
     required String title,
@@ -201,7 +223,7 @@ class ProfileScreen extends StatelessWidget {
       onTap: onTap,
     );
   }
-
+//to show logout confirmation dialog
   void _showLogoutConfirmation(BuildContext context) {
     showDialog(
       context: context,
