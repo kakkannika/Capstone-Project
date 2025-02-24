@@ -105,10 +105,10 @@ class AuthService {
   Future<void> resetPassword(String email, BuildContext context) async {
     await _auth.sendPasswordResetEmail(email: email);
     await sendEmailVerification(context);
-    await _checkIfPasswordReset(context);
+    _checkIfPasswordReset(context);
   }
 
-  Future<void> _checkIfPasswordReset(BuildContext context) async {
+  void _checkIfPasswordReset(BuildContext context) async {
     User? user = _auth.currentUser;
     Timer.periodic(const Duration(seconds: 5), (timer) async {
       await user?.reload(); // Reload the user to get the latest information
@@ -117,6 +117,7 @@ class AuthService {
       if (user != null && user!.emailVerified) {
         timer.cancel(); // Stop the timer
         Navigator.pushReplacement(
+            // ignore: use_build_context_synchronously
             context,
             MaterialPageRoute(
                 builder: (context) =>
@@ -158,6 +159,7 @@ class AuthService {
         UserCredential userCredential =
             await _auth.signInWithCredential(credential);
 
+        // ignore: use_build_context_synchronously
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => const HomeScreen()));
         return userCredential;
