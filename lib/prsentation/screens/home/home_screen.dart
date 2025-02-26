@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tourism_app/prsentation/widgets/destination_card.dart';
 import 'package:tourism_app/prsentation/widgets/navigationbar.dart';
+import 'package:tourism_app/prsentation/screens/home/detail_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -145,28 +146,6 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
 
-              // Destination grid
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 1.1,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                ),
-                itemCount: 4,
-                itemBuilder: (context, index) {
-                  return DestinationCard(
-                    image:
-                        'lib/assets/place_images/destination_${index + 1}.jpg',
-                    title: _getDestinationTitle(index),
-                    rating: 4.0,
-                  );
-                },
-              ),
-
               // Weekend Trips section
               const Padding(
                 padding: EdgeInsets.all(16.0),
@@ -193,9 +172,23 @@ class HomeScreen extends StatelessWidget {
                 itemCount: 4,
                 itemBuilder: (context, index) {
                   return DestinationCard(
-                    image: 'assets/images/destination_${index + 1}.jpg',
+                    image:
+                        'lib/assets/place_images/destination_${index + 1}.jpg',
                     title: _getDestinationTitle(index),
                     rating: 4.0,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DetailScreen(
+                            title: _getDestinationTitle(index),
+                            imagePath:
+                                'lib/assets/place_images/destination_${index + 1}.jpg',
+                            rating: 4.0,
+                          ),
+                        ),
+                      );
+                    },
                   );
                 },
               ),

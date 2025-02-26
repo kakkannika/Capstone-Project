@@ -5,24 +5,29 @@ class DestinationCard extends StatelessWidget {
   final String image;
   final String title;
   final double rating;
+  final VoidCallback onTap;
 
   const DestinationCard({
     super.key,
     required this.image,
     required this.title,
     required this.rating,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            image: DecorationImage(
-              image: AssetImage(image),
-              fit: BoxFit.cover,
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              image: DecorationImage(
+                image: AssetImage(image),
+                fit: BoxFit.cover,
+              ),
             ),
           ),
         ),
