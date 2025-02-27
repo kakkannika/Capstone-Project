@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:tourism_app/prsentation/screens/auth/widget/custome_input_field.dart';
 import 'package:tourism_app/services/auth_service.dart';
+import 'package:tourism_app/widget/dertam_button.dart';
 import 'login_screen.dart';
 
 class EmailRegisterScreen extends StatefulWidget {
@@ -13,7 +15,17 @@ class _RegisterScreenState extends State<EmailRegisterScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+  Future<void> signup(BuildContext context) async {
+    await AuthService().signup(
+      email: _emailController.text,
+      password: _passwordController.text,
+      username: _usernameController.text,
+      confirmPassword: _confirmPasswordController.text,
+      context: context,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,19 +62,32 @@ class _RegisterScreenState extends State<EmailRegisterScreen> {
                 ),
                 const SizedBox(height: 32),
                 // Username TextField
-                _usernameField(),
+                CustomInputField(
+                    controller: _usernameController,
+                    hintText: "enter your name"),
                 const SizedBox(height: 16),
                 // Email TextField
-                _emailField(),
+                CustomInputField(
+                    controller: _emailController, hintText: "enter your email"),
                 const SizedBox(height: 16),
                 // Password TextField
-                _passwordField(),
+                CustomInputField(
+                    controller: _passwordController,
+                    hintText: "Enter your password",
+                    obscureText: true),
                 const SizedBox(height: 16),
                 // Confirm Password TextField
-                _confirmPasswordField(),
+                CustomInputField(
+                    controller: _confirmPasswordController,
+                    hintText: "Please enter Confirm Password"),
                 const SizedBox(height: 32),
                 // Sign Up Button
-                _signupButton(context),
+                DertamButton(
+                    onPressed: () {
+                      signup(context);
+                    },
+                    text: 'Signup',
+                    buttonType: ButtonType.primary),
                 const SizedBox(height: 16),
                 // Already have an account text
                 Center(
@@ -85,113 +110,6 @@ class _RegisterScreenState extends State<EmailRegisterScreen> {
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _usernameField() {
-    return TextField(
-      controller: _usernameController,
-      decoration: InputDecoration(
-        hintText: 'Username',
-        filled: true,
-        fillColor: const Color(0xFFF5F7FB),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE8ECF4)),
-        ),
-      ),
-    );
-  }
-
-  Widget _emailField() {
-    return TextField(
-      controller: _emailController,
-      decoration: InputDecoration(
-        hintText: 'Email Address',
-        filled: true,
-        fillColor: const Color(0xFFF5F7FB),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE8ECF4)),
-        ),
-      ),
-    );
-  }
-
-  Widget _passwordField() {
-    return TextField(
-      controller: _passwordController,
-      obscureText: true,
-      decoration: InputDecoration(
-        hintText: 'Password',
-        filled: true,
-        fillColor: const Color(0xFFF5F7FB),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE8ECF4)),
-        ),
-      ),
-    );
-  }
-
-  Widget _confirmPasswordField() {
-    return TextField(
-      controller: _confirmPasswordController,
-      obscureText: true,
-      decoration: InputDecoration(
-        hintText: 'Confirm Password',
-        filled: true,
-        fillColor: const Color(0xFFF5F7FB),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFE8ECF4)),
-        ),
-      ),
-    );
-  }
-
-  Widget _signupButton(BuildContext context) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-      onPressed: () async {
-        await AuthService().signup(
-          email: _emailController.text,
-          password: _passwordController.text,
-          username: _usernameController.text,
-          confirmPassword: _confirmPasswordController.text,
-          context: context,
-        );
-      },
-      child: const Text(
-        'Sign Up',
-        style: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: Colors.white,
         ),
       ),
     );

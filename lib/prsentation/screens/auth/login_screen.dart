@@ -1,7 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tourism_app/prsentation/screens/auth/gmail_signup_screen.dart';
 import 'package:tourism_app/prsentation/screens/auth/phone_auth_screen.dart';
+import 'package:tourism_app/prsentation/screens/auth/widget/custome_input_field.dart';
 import 'package:tourism_app/prsentation/screens/home/home_screen.dart';
+import 'package:tourism_app/widget/dertam_button.dart';
 import 'forgot_password_screen.dart';
 import 'package:tourism_app/services/auth_service.dart';
 
@@ -9,6 +14,50 @@ class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  void handlePhoneLogin(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const PhoneAuthScreen()),
+    );
+  }
+
+  Future<void> handleGoogleLogin(BuildContext context) async {
+    bool isSignedIn = await AuthService().signInWithGoogle();
+    if (isSignedIn) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Google sign-in failed!")),
+      );
+    }
+  }
+
+  Future<void> handleFacbookLogin(BuildContext context) async {
+    UserCredential? userCredential =
+        await AuthService().signInWithFacebook(context);
+    if (userCredential != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Google sign-in failed!")),
+      );
+    }
+  }
+
+  void handleSignin(BuildContext context) async {
+    await AuthService().signinEmail(
+      email: _emailController.text,
+      password: _passwordController.text,
+      context: context,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,9 +92,16 @@ class LoginScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 40),
                 // Email field
-                _emailAddress(),
+                CustomInputField(
+                  controller: _emailController,
+                  hintText: 'Enter your email address',
+                ),
                 const SizedBox(height: 20),
-                _password(),
+                CustomInputField(
+                  controller: _passwordController,
+                  hintText: 'Enter your password',
+                  obscureText: true,
+                ),
                 const SizedBox(height: 20),
 
                 // Forgot password
@@ -68,9 +124,15 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-
                 // Sign in button
-                _signin(context),
+                DertamButton(
+                  onPressed: () => handleSignin(context),
+                  text: "Sign in",
+                  buttonType: ButtonType.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ), // Example of a custom shape
+                ),
                 const SizedBox(height: 24),
 
                 // OR continue with
@@ -89,11 +151,17 @@ class LoginScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _googleLoginButton(context),
+                    SocialLoginButton(
+                        onTap: () => handleGoogleLogin(context),
+                        imagePath: 'lib/assets/images/google.png'),
                     const SizedBox(width: 16),
-                    _facebookLoginButton(context),
+                    SocialLoginButton(
+                        onTap: () => handleFacbookLogin(context),
+                        imagePath: 'lib/assets/images/facebook.png'),
                     const SizedBox(width: 16),
-                    _phoneLoginButton(context),
+                    SocialLoginButton(
+                        onTap: () => handlePhoneLogin(context),
+                        imagePath: 'lib/assets/images/phone.png')
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -108,80 +176,6 @@ class LoginScreen extends StatelessWidget {
       ),
     );
   }
-
-  /// Email Input Field
-  Widget _emailAddress() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F7FB),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextField(
-            controller: _emailController,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              hintText: 'Enter your email address',
-              border: InputBorder.none,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Password Input Field
-  Widget _password() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F7FB),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextField(
-            controller: _passwordController,
-            obscureText: true,
-            decoration: const InputDecoration(
-              hintText: 'Enter your password',
-              border: InputBorder.none,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Sign In Button
-  Widget _signin(BuildContext context) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF2F80ED),
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-      onPressed: () async {
-        await AuthService().signinEmail(
-          email: _emailController.text,
-          password: _passwordController.text,
-          context: context,
-        );
-      },
-      child: const Text(
-        'Sign in',
-        style: TextStyle(color: Color.fromARGB(255, 244, 243, 243)),
-      ),
-    );
-  }
-
-  /// Social Login Button
 
   /// Sign Up Link
   Widget _signup(BuildContext context) {
@@ -211,91 +205,36 @@ class LoginScreen extends StatelessWidget {
   }
 }
 
-Widget _phoneLoginButton(BuildContext context) {
-  return GestureDetector(
-    onTap: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const PhoneAuthScreen()),
-      );
-    },
-    child: Container(
-      width: 64,
-      height: 64,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F7FB),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Center(
-        child: Image.asset(
-          'lib/assets/images/phone.png',
-          height: 24,
+/// Social Login Button
+class SocialLoginButton extends StatelessWidget {
+  final VoidCallback onTap;
+  final String imagePath;
+
+  const SocialLoginButton({
+    super.key,
+    required this.onTap,
+    required this.imagePath,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 64,
+        height: 64,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF5F7FB),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Center(
+          child: Image.asset(
+            imagePath,
+            height: 24,
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
-Widget _facebookLoginButton(BuildContext context) {
-  return GestureDetector(
-    onTap: () async {
-     bool isSignedIn = (await AuthService().signInWithFacebook(context)) as bool;
-      if (isSignedIn) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Google sign-in failed!")),
-        );
-      }
-    },
-    child: Container(
-      width: 64,
-      height: 64,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F7FB),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Center(
-        child: Image.asset(
-          'lib/assets/images/facebook.png',
-          height: 24,
-        ),
-      ),
-    ),
-  );
-}
-
-Widget _googleLoginButton(BuildContext context) {
-  return GestureDetector(
-    onTap: () async {
-      bool isSignedIn = await AuthService().signInWithGoogle();
-      if (isSignedIn) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Google sign-in failed!")),
-        );
-      }
-    },
-    child: Container(
-      width: 64,
-      height: 64,
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F7FB),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Center(
-        child: Image.asset(
-          'lib/assets/images/google.png',
-          height: 24,
-        ),
-      ),
-    ),
-  );
-}
