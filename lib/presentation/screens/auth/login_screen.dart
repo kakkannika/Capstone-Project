@@ -2,13 +2,13 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:tourism_app/prsentation/screens/auth/gmail_signup_screen.dart';
-import 'package:tourism_app/prsentation/screens/auth/phone_auth_screen.dart';
-import 'package:tourism_app/prsentation/screens/auth/widget/custome_input_field.dart';
-import 'package:tourism_app/prsentation/screens/home/home_screen.dart';
-import 'package:tourism_app/widget/dertam_button.dart';
+import 'package:tourism_app/presentation/screens/auth/gmail_signup_screen.dart';
+import 'package:tourism_app/presentation/screens/auth/phone_auth_screen.dart';
+import 'package:tourism_app/presentation/widgets/custome_input_field.dart';
+import 'package:tourism_app/presentation/screens/home/home_screen.dart';
+import 'package:tourism_app/presentation/widgets/dertam_button.dart';
 import 'forgot_password_screen.dart';
-import 'package:tourism_app/services/auth_service.dart';
+import 'package:tourism_app/providers/auth_service.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});

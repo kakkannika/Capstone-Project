@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/services/auth_service.dart';
-import 'package:tourism_app/prsentation/screens/auth/login_screen.dart';
+import 'package:tourism_app/providers/auth_service.dart';
+import 'package:tourism_app/presentation/screens/auth/login_screen.dart';
 
 class UserProfileScreen extends StatelessWidget {
   const UserProfileScreen({super.key});

@@ -1,9 +1,9 @@
 // ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:tourism_app/prsentation/screens/auth/widget/custome_input_field.dart';
-import 'package:tourism_app/services/auth_service.dart';
-import 'package:tourism_app/widget/dertam_button.dart';
+import 'package:tourism_app/presentation/widgets/custome_input_field.dart';
+import 'package:tourism_app/providers/auth_service.dart';
+import 'package:tourism_app/presentation/widgets/dertam_button.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/prsentation/screens/auth/phone_OTP_screen.dart';
-import 'package:tourism_app/services/auth_service.dart';
+import 'package:tourism_app/presentation/screens/auth/phone_OTP_screen.dart';
+import 'package:tourism_app/providers/auth_service.dart';
 
 class PhoneAuthScreen extends StatefulWidget {
   const PhoneAuthScreen({super.key});

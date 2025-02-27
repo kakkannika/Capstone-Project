@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/prsentation/screens/profiles/user_profile_screen.dart';
+import 'package:tourism_app/presentation/screens/home/detail_home_page.dart';
+import 'package:tourism_app/presentation/widgets/destination_card.dart';
+import 'package:tourism_app/presentation/widgets/navigationBar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -20,7 +22,7 @@ class HomeScreen extends StatelessWidget {
                     const CircleAvatar(
                       radius: 20,
                       backgroundImage:
-                          AssetImage('lib/assets/images/kannika.jpg'),
+                          AssetImage('lib/assets/images/avatar.jpg'),
                     ),
                     const SizedBox(width: 12),
                     const Text(
@@ -144,28 +146,6 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
 
-              // Destination grid
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 1.1,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                ),
-                itemCount: 4,
-                itemBuilder: (context, index) {
-                  return DestinationCard(
-                    image:
-                        'lib/assets/place_images/destination_${index + 1}.jpg',
-                    title: _getDestinationTitle(index),
-                    rating: 4.0,
-                  );
-                },
-              ),
-
               // Weekend Trips section
               const Padding(
                 padding: EdgeInsets.all(16.0),
@@ -192,9 +172,23 @@ class HomeScreen extends StatelessWidget {
                 itemCount: 4,
                 itemBuilder: (context, index) {
                   return DestinationCard(
-                    image: 'assets/images/destination_${index + 1}.jpg',
+                    image:
+                        'lib/assets/place_images/destination_${index + 1}.jpg',
                     title: _getDestinationTitle(index),
                     rating: 4.0,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DetailScreen(
+                            title: _getDestinationTitle(index),
+                            imagePath:
+                                'lib/assets/place_images/destination_${index + 1}.jpg',
+                            rating: 4.0,
+                          ),
+                        ),
+                      );
+                    },
                   );
                 },
               ),
@@ -204,24 +198,7 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: 0,
-        onTap: (index) {
-          if (index == 3) { // Profile icon index
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const UserProfileScreen()),
-            );
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Map'),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite_border), label: 'Saved'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
-        ],
-      ),
+      bottomNavigationBar: const Navigationbar(),
     );
   }
 
@@ -238,81 +215,5 @@ class HomeScreen extends StatelessWidget {
       default:
         return '';
     }
-  }
-}
-
-class DestinationCard extends StatelessWidget {
-  final String image;
-  final String title;
-  final double rating;
-
-  const DestinationCard({
-    super.key,
-    required this.image,
-    required this.title,
-    required this.rating,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            image: DecorationImage(
-              image: AssetImage(image),
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-        Positioned(
-          bottom: 8,
-          left: 8,
-          right: 8,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Row(
-                children: [
-                  const Icon(Icons.star, color: Colors.yellow, size: 16),
-                  const SizedBox(width: 4),
-                  Text(
-                    rating.toString(),
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        Positioned(
-          top: 8,
-          right: 8,
-          child: Container(
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.favorite_border, size: 20),
-              onPressed: () {},
-              constraints: const BoxConstraints(
-                minHeight: 32,
-                minWidth: 32,
-              ),
-              padding: EdgeInsets.zero,
-            ),
-          ),
-        ),
-      ],
-    );
   }
 }

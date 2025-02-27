@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
-import 'package:tourism_app/prsentation/screens/home/home_screen.dart';
-import 'package:tourism_app/services/auth_service.dart';
+import 'package:tourism_app/presentation/screens/home/home_screen.dart';
+import 'package:tourism_app/providers/auth_service.dart';
 
 class OTPScreen extends StatefulWidget {
   final String verificationId;
