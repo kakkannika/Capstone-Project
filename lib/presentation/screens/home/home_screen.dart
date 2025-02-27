@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:tourism_app/presentation/screens/home/detail_home_page.dart';
+import 'package:tourism_app/presentation/widgets/dertam_searchBar.dart';
 import 'package:tourism_app/presentation/widgets/destination_card.dart';
 import 'package:tourism_app/presentation/widgets/navigationBar.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  void onSearchChanged(String text) {}
+
+  void onBackPressed() {}
 
   @override
   Widget build(BuildContext context) {
@@ -55,37 +65,13 @@ class HomeScreen extends StatelessWidget {
                     fit: BoxFit.cover,
                   ),
                   Positioned(
-                    left: 16,
-                    right: 16,
-                    bottom: 16,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.search, color: Colors.grey),
-                          const SizedBox(width: 8),
-                          const Expanded(
-                            child: TextField(
-                              decoration: InputDecoration(
-                                hintText: 'Search destination',
-                                border: InputBorder.none,
-                                contentPadding:
-                                    EdgeInsets.symmetric(vertical: 15),
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.tune),
-                            onPressed: () {},
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                      left: 16,
+                      right: 16,
+                      bottom: 16,
+                      child: TamSearchbar(
+                        onBackPressed: onBackPressed,
+                        onSearchChanged: onSearchChanged,
+                      )),
                 ],
               ),
 

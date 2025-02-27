@@ -1,17 +1,37 @@
 class User {
-  final String firstName;
-  final String lastName;
-  final String email;
-  final String phone;
-  final String profilePicture;
+  String userId;
+  String name;
+  String email;
+  String profilePicture;
+  List<String> savedItineraries;
 
-  final bool verifiedProfile;
+  User({
+    required this.userId,
+    required this.name,
+    required this.email,
+    required this.profilePicture,
+    this.savedItineraries = const [],
+  });
 
-  User(
-      {required this.firstName,
-      required this.lastName,
-      required this.email,
-      required this.phone,
-      required this.profilePicture,
-      required this.verifiedProfile});
+  // Convert JSON to User object
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      userId: json['userId'] ?? '',
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      profilePicture: json['profilePicture'] ?? '',
+      savedItineraries: List<String>.from(json['savedItineraries'] ?? []),
+    );
+  }
+
+  // Convert User object to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'name': name,
+      'email': email,
+      'profilePicture': profilePicture,
+      'savedItineraries': savedItineraries,
+    };
+  }
 }
