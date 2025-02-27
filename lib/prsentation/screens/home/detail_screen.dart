@@ -255,7 +255,7 @@ class _DetailScreenState extends State<DetailScreen> {
 
   Widget _buildAttractionCard(String name) {
     return DestinationCard(
-      image: 'lib/assets/attractions/waterfall.jpg',
+      image: 'lib/assets/place_images/Angkor_wat.jpg',
       title: name,
       rating: widget.rating,
       onTap: () {
@@ -266,8 +266,9 @@ class _DetailScreenState extends State<DetailScreen> {
               name: name,
               location: widget.title,
               rating: widget.rating,
-              imagePath: 'lib/assets/attractions/waterfall.jpg',
-              description: 'Description of the place...',
+              imagePath: 'lib/assets/place_images/Angkor_wat.jpg',
+              description:
+                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum',
             ),
           ),
         );

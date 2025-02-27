@@ -400,7 +400,7 @@ class DetailEachPlace extends StatelessWidget {
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
             child: Image.asset(
-              'assets/images/placeholder.jpg',
+              'assets/place_images/Angkor_wat.jpg',
               height: 100,
               width: double.infinity,
               fit: BoxFit.cover,
