@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/prsentation/screens/auth/login_screen.dart';
+import 'package:tourism_app/presentation/screens/auth/login_screen.dart';
 
 class NewPasswordScreen extends StatelessWidget {
   const NewPasswordScreen({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/prsentation/widgets/destination_card.dart';
-import 'package:tourism_app/prsentation/widgets/navigationbar.dart';
+import 'package:tourism_app/presentation/widgets/destination_card.dart';
+import 'package:tourism_app/presentation/widgets/navigationbar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

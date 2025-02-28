@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import '../screens/profile/profile_screen.dart';
+import 'package:tourism_app/presentation/screens/profile/profile_screen.dart';
 
 class Navigationbar extends StatefulWidget {
   const Navigationbar({super.key});

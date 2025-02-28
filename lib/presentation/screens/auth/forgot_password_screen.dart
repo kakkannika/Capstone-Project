@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/prsentation/screens/auth/sucess_reset_screen.dart';
+import 'package:tourism_app/presentation/screens/auth/sucess_reset_screen.dart';
 import 'otp_screen.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {

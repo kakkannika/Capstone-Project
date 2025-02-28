@@ -1,6 +1,6 @@
 import 'dart:math'; // Import this to use Random
 import 'package:flutter/material.dart';
-import 'package:tourism_app/prsentation/screens/home/home_screen.dart';
+import 'package:tourism_app/presentation/screens/home/home_screen.dart';
 import 'login_screen.dart';
 
 class GetStartedScreen extends StatelessWidget {

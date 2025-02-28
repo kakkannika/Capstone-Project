@@ -32,6 +32,13 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  fonts:
+    - family: Eesti
+      fonts:
+        - asset: lib/assets/fonts/GT-Eesti-Bold.otf
+        - asset: lib/assets/fonts/GT-Eesti-Light.otf
+        - asset: lib/assets/fonts/GT-Eesti-Regular.otf
+        - asset: lib/assets/fonts/GT-Eesti-Thin.otf
 
   # Add assets to your application
   assets:
@@ -40,6 +47,7 @@ flutter:
     - lib/assets/images/google.png
     - lib/assets/images/phone.png
     - lib/assets/images/profile.png
+    
     
 
 
@@ -50,7 +58,8 @@ flutter:
     # - images/a_dot_ham.jpeg
     - lib/assets/icons/
     - lib/assets/images/
-    - lib/assets/place_images/
+    - lib/assets/place_images/AngKor_wat.jpg
+    - lib/assets/place_images/AngKor.jpg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
