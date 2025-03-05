@@ -12,6 +12,13 @@ class DertamColors {
   static Color neutralLighter = const Color(0xFF92A7AB);
   static Color greyLight = const Color(0xFFE2E2E2);
   static Color white = Colors.white;
+  static Color lightBlue = const Color(0xFF386FA4);
+  static Color red = Colors.red;
+  static Color green = Colors.green;
+  static Color black = Colors.black;
+  static Color grey = Colors.grey;
+  static Color orange = Colors.orange;
+  
   static Color get backGroundColor {
     return DertamColors.primary;
   }
@@ -23,16 +30,20 @@ class DertamColors {
   static Color get textLight {
     return DertamColors.neutralLight;
   }
+
   static Color get iconNormal {
     return DertamColors.neutral;
   }
+
   static Color get iconLight {
     return DertamColors.neutralLighter;
   }
+
   static Color get disabled {
     return DertamColors.greyLight;
   }
 }
+
 ///
 /// Definition of App text styles.
 ///

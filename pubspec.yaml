@@ -46,6 +46,7 @@ dependencies:
   cloud_firestore: ^5.6.4
   intl: ^0.20.2
   iconsax: ^0.0.8
+  provider: ^6.1.2
 
 
 dev_dependencies:
@@ -70,6 +71,13 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  fonts:
+    - family: Eesti
+      fonts:
+        - asset: lib/assets/fonts/GT-Eesti-Bold.otf
+        - asset: lib/assets/fonts/GT-Eesti-Light.otf
+        - asset: lib/assets/fonts/GT-Eesti-Regular.otf
+        - asset: lib/assets/fonts/GT-Eesti-Thin.otf
   # To add assets to your application, add an assets section, like this:
   assets:
     # - images/a_dot_burr.jpeg

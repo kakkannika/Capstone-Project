@@ -20,6 +20,7 @@ class DetailScreen extends StatefulWidget {
 
 class _DetailScreenState extends State<DetailScreen> {
   final TextEditingController _searchController = TextEditingController();
+  
 
   @override
   void initState() {
@@ -252,6 +253,7 @@ class _DetailScreenState extends State<DetailScreen> {
       ),
     );
   }
+  
 
   Widget _buildAttractionCard(String name) {
     return DestinationCard(
