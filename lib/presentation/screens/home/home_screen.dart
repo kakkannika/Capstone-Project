@@ -4,6 +4,8 @@ import 'package:tourism_app/presentation/screens/home/detail_home_page.dart';
 import 'package:tourism_app/presentation/widgets/dertam_searchBar.dart';
 import 'package:tourism_app/presentation/widgets/destination_card.dart';
 import 'package:tourism_app/presentation/widgets/navigationBar.dart';
+import 'package:tourism_app/providers/place_retrieve_service.dart';
+import 'package:tourism_app/providers/place_service.dart';
 import 'package:tourism_app/providers/service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -19,15 +21,24 @@ class _HomeScreenState extends State<HomeScreen> {
   void onBackPressed() {}
 
   @override
+  void initState() {
+    super.initState();
+    // Fetch the data when the screen is initialized
+    Provider.of<PlaceProvider>(context, listen: false).fetchPlaces();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Access the auth provider
     final authProvider = Provider.of<AuthServiceProvider>(context);
     final currentUser = authProvider.currentUser;
-    
+    final placesProvider = Provider.of<PlaceProvider>(context);
+    final places = placesProvider.places;
+
     // Get user's display name or fallback to email or 'User'
-    final displayName = currentUser?.displayName ?? 
-                        (currentUser?.email?.split('@')[0] ?? 'User');
-    
+    final displayName = currentUser?.displayName ??
+        (currentUser?.email.split('@')[0] ?? 'User');
+
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -41,8 +52,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     CircleAvatar(
                       radius: 20,
-                      backgroundImage: currentUser?.photoURL != null
-                          ? NetworkImage(currentUser!.photoURL!) as ImageProvider
+                      backgroundImage: currentUser?.photoUrl != null
+                          ? NetworkImage(currentUser!.photoUrl!)
+                              as ImageProvider
                           : const AssetImage('lib/assets/images/avatar.jpg'),
                     ),
                     const SizedBox(width: 12),
@@ -76,13 +88,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     fit: BoxFit.cover,
                   ),
                   Positioned(
-                      left: 16,
-                      right: 16,
-                      bottom: 16,
-                      child: TamSearchbar(
-                        onBackPressed: onBackPressed,
-                        onSearchChanged: onSearchChanged,
-                      )),
+                    left: 16,
+                    right: 16,
+                    bottom: 16,
+                    child: TamSearchbar(
+                      onBackPressed: onBackPressed,
+                      onSearchChanged: onSearchChanged,
+                    ),
+                  ),
                 ],
               ),
 
@@ -113,7 +126,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: 6,
+                  itemCount:
+                      6, // Assuming you still want to show a fixed count for the popular destinations
                   itemBuilder: (context, index) {
                     return Container(
                       width: 280,
@@ -143,19 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // Weekend Trips section
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text(
-                  'Weekend Trips',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-
-              // Weekend trips grid
+              // Grid to display destinations dynamically
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -166,22 +168,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
                 ),
-                itemCount: 4,
+                itemCount: places.length,
                 itemBuilder: (context, index) {
+                  final place = places[index];
                   return DestinationCard(
-                    image:
-                        'lib/assets/place_images/destination_${index + 1}.jpg',
-                    title: _getDestinationTitle(index),
-                    rating: 4.0,
+                    image: place.imageURL[0],
+                    title: place.name,
+                    rating: place.averageRating,
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => DetailScreen(
-                            title: _getDestinationTitle(index),
-                            imagePath:
-                                'lib/assets/place_images/destination_${index + 1}.jpg',
-                            rating: 4.0,
+                            title: place.name,
+                            imagePath: place.imageURL[0],
+                            rating: place.averageRating,
                           ),
                         ),
                       );
@@ -197,20 +198,5 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: const Navigationbar(),
     );
-  }
-
-  String _getDestinationTitle(int index) {
-    switch (index) {
-      case 0:
-        return 'Takeo Province';
-      case 1:
-        return 'SiemReap Province';
-      case 2:
-        return 'Phnom Penh';
-      case 3:
-        return 'Preah Vihear';
-      default:
-        return '';
-    }
   }
 }

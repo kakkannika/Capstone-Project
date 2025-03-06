@@ -3,19 +3,22 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:tourism_app/models/user/user_model.dart';
+import 'package:tourism_app/models/user/user_preference.dart';
 import 'package:tourism_app/presentation/screens/auth/login_screen.dart';
 import 'package:tourism_app/presentation/screens/home/home_screen.dart';
 
 class AuthServiceProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // User state
-  User? _currentUser;
-  User? get currentUser => _currentUser;
+  AppUser? _currentUser;
+  AppUser? get currentUser => _currentUser;
 
   // Authentication status
   bool _isLoading = false;
@@ -25,7 +28,7 @@ class AuthServiceProvider extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
-  // Signup method
+  // Signup method with Firestore integration
   Future<void> signUpWithEmail({
     required String email,
     required String password,
@@ -43,25 +46,33 @@ class AuthServiceProvider extends ChangeNotifier {
     }
 
     try {
-      // Create user account
-      UserCredential userCredential = await _auth
-          .createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-      _currentUser = userCredential.user;
+      User? firebaseUser = userCredential.user;
 
-      // Send verification email automatically
-      await _currentUser?.sendEmailVerification();
+      if (firebaseUser != null) {
+        AppUser newUser = AppUser(
+          uid: firebaseUser.uid,
+          email: email,
+          displayName: username,
+          photoUrl: firebaseUser.photoURL,
+          createdAt: DateTime.now(),
+          preferences: UserPreferences(), // Default preferences
+        );
 
-      // Show simple verification message
-      _showToast(
-          'Verification email sent. Please verify your email before logging in.');
+        await _firestore.collection('users').doc(firebaseUser.uid).set(newUser.toMap());
 
-      // Sign out the user until they verify their email
-      await _auth.signOut();
+        // Send email verification
+        await firebaseUser.sendEmailVerification();
 
-      // Navigate to login screen
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => LoginScreen()));
+        _showToast('Verification email sent. Please verify before logging in.');
+
+        await _auth.signOut();
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+      }
     } on FirebaseAuthException catch (e) {
       _handleAuthError(e);
     } finally {
@@ -70,7 +81,7 @@ class AuthServiceProvider extends ChangeNotifier {
     }
   }
 
-  // Sign In with Email
+  // Sign In with Email & Fetch User Data
   Future<void> signInWithEmail({
     required String email,
     required String password,
@@ -86,26 +97,25 @@ class AuthServiceProvider extends ChangeNotifier {
         password: password,
       );
 
-      _currentUser = userCredential.user;
+      User? firebaseUser = userCredential.user;
 
-      // Check if email is verified before allowing login
-      if (_currentUser != null && _currentUser!.emailVerified) {
-        _showToast('Sign in successful');
+      if (firebaseUser != null && firebaseUser.emailVerified) {
+        // Fetch user data from Firestore
+        DocumentSnapshot userDoc = await _firestore.collection('users').doc(firebaseUser.uid).get();
 
-        // Successfully verified and logged in - go to home screen
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()));
+        if (userDoc.exists) {
+          _currentUser = AppUser.fromFirestore(userDoc);
+          notifyListeners();
+
+          _showToast('Sign in successful');
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+        } else {
+          _handleError('User data not found in Firestore');
+        }
       } else {
-        // Email not verified - show error and sign out
-        _showToast(
-            'Please verify your email first. Check your inbox for the verification link.');
-
-        // Resend verification email
-        await _currentUser?.sendEmailVerification();
-
-        // Sign out since we don't want unverified users logged in
+        _showToast('Please verify your email before logging in.');
+        await firebaseUser?.sendEmailVerification();
         await _auth.signOut();
-        _currentUser = null;
       }
     } on FirebaseAuthException catch (e) {
       _handleAuthError(e);
@@ -123,8 +133,8 @@ class AuthServiceProvider extends ChangeNotifier {
 
     try {
       await _auth.sendPasswordResetEmail(email: email);
-      _showToast('Password reset email sent');
-      _checkIfPasswordReset(context);
+      _showToast('Password reset email sent.');
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
     } on FirebaseAuthException catch (e) {
       _handleAuthError(e);
     } finally {
@@ -133,79 +143,7 @@ class AuthServiceProvider extends ChangeNotifier {
     }
   }
 
-  void _checkIfPasswordReset(BuildContext context) async {
-    User? user = _auth.currentUser;
-    Timer.periodic(const Duration(seconds: 5), (timer) async {
-      await user?.reload(); // Reload the user to get the latest information
-      user = _auth.currentUser; // Update the user instance
-
-      if (user != null && user!.emailVerified) {
-        timer.cancel(); // Stop the timer
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    LoginScreen())); // Navigate to Login Screen
-      }
-    });
-  }
-
-  // Update Password - Requires email verification
-  Future<void> updatePassword(String newPassword) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      // Check if user is verified
-      if (_currentUser != null && !_currentUser!.emailVerified) {
-        _handleError('Email must be verified before updating password');
-        return;
-      }
-
-      await _currentUser?.updatePassword(newPassword);
-      _showToast('Password updated successfully');
-    } on FirebaseAuthException catch (e) {
-      _handleAuthError(e);
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  // Facebook Sign In
-  Future<void> signInWithFacebook(BuildContext context) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      final LoginResult result = await FacebookAuth.instance.login();
-
-      if (result.status == LoginStatus.success) {
-        final AccessToken accessToken = result.accessToken!;
-        final OAuthCredential credential =
-            FacebookAuthProvider.credential(accessToken.tokenString);
-
-        UserCredential userCredential =
-            await _auth.signInWithCredential(credential);
-
-        _currentUser = userCredential.user;
-        _showToast('Facebook sign in successful');
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()));
-      } else {
-        _handleError('Facebook login failed');
-      }
-    } catch (e) {
-      _handleError('Error: $e');
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  // Google Sign In
+  // Google Sign In with Firestore Integration
   Future<void> signInWithGoogle(BuildContext context) async {
     _isLoading = true;
     _errorMessage = null;
@@ -219,21 +157,37 @@ class AuthServiceProvider extends ChangeNotifier {
         return;
       }
 
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final AuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      UserCredential userCredential =
-          await _auth.signInWithCredential(credential);
+      UserCredential userCredential = await _auth.signInWithCredential(credential);
+      User? firebaseUser = userCredential.user;
 
-      _currentUser = userCredential.user;
-      _showToast('Google sign in successful');
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+      if (firebaseUser != null) {
+        DocumentSnapshot userDoc = await _firestore.collection('users').doc(firebaseUser.uid).get();
+
+        if (!userDoc.exists) {
+          AppUser newUser = AppUser(
+            uid: firebaseUser.uid,
+            email: firebaseUser.email!,
+            displayName: firebaseUser.displayName,
+            photoUrl: firebaseUser.photoURL,
+            createdAt: DateTime.now(),
+            preferences: UserPreferences(),
+          );
+
+          await _firestore.collection('users').doc(firebaseUser.uid).set(newUser.toMap());
+          _currentUser = newUser;
+        } else {
+          _currentUser = AppUser.fromFirestore(userDoc);
+        }
+
+        _showToast('Google sign in successful');
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+      }
     } catch (e) {
       _handleError('Google Sign-In Error: $e');
     } finally {
@@ -242,109 +196,48 @@ class AuthServiceProvider extends ChangeNotifier {
     }
   }
 
-  // Phone Number Authentication
-  Future<void> sendOTP(String phoneNumber, Function(String) onCodeSent) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+  // Update user profile
+  Future<void> updateUserProfile({
+    String? displayName,
+    String? photoUrl,
+    UserPreferences? preferences,
+  }) async {
+    if (_currentUser == null) return;
 
-    await _auth.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
-      timeout: const Duration(seconds: 60),
-      verificationCompleted: (PhoneAuthCredential credential) async {
-        await _auth.signInWithCredential(credential);
-        _currentUser = _auth.currentUser;
-        notifyListeners();
-      },
-      verificationFailed: (FirebaseAuthException e) {
-        _handleError('Verification failed: ${e.message}');
-      },
-      codeSent: (String verificationId, int? resendToken) {
-        onCodeSent(verificationId);
-      },
-      codeAutoRetrievalTimeout: (String verificationId) {
-        print("Timeout: $verificationId");
-      },
+    Map<String, dynamic> updates = {};
+    if (displayName != null) updates['displayName'] = displayName;
+    if (photoUrl != null) updates['photoUrl'] = photoUrl;
+    if (preferences != null) updates['preferences'] = preferences.toMap();
+
+    await _firestore.collection('users').doc(_currentUser!.uid).update(updates);
+
+    // Update local user model
+    _currentUser = AppUser(
+      uid: _currentUser!.uid,
+      email: _currentUser!.email,
+      displayName: displayName ?? _currentUser!.displayName,
+      photoUrl: photoUrl ?? _currentUser!.photoUrl,
+      createdAt: _currentUser!.createdAt,
+      preferences: preferences ?? _currentUser!.preferences,
     );
 
-    _isLoading = false;
     notifyListeners();
-  }
-
-  // Verify OTP
-  Future<bool> verifyOTP(
-      String verificationId, String otp, BuildContext context) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    try {
-      PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: verificationId,
-        smsCode: otp,
-      );
-
-      UserCredential userCredential =
-          await _auth.signInWithCredential(credential);
-
-      _currentUser = userCredential.user;
-      _showToast('Phone number verified');
-
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const HomeScreen()));
-
-      return userCredential.user != null;
-    } catch (e) {
-      _handleError('Error verifying OTP: $e');
-      return false;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
   }
 
   // Sign Out
   Future<void> signOut(BuildContext context) async {
-    try {
-      await GoogleSignIn().signOut();
-      await FacebookAuth.instance.logOut();
-      await _auth.signOut();
+    await GoogleSignIn().signOut();
+    await FacebookAuth.instance.logOut();
+    await _auth.signOut();
 
-      _currentUser = null;
-      _showToast('Signed out successfully');
-
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => LoginScreen()));
-    } catch (e) {
-      _handleError('Error signing out: $e');
-    }
-    notifyListeners();
+    _currentUser = null;
+    _showToast('Signed out successfully');
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
   }
 
-  // Error Handling Methods
+  // Error Handling
   void _handleAuthError(FirebaseAuthException e) {
-    switch (e.code) {
-      case 'weak-password':
-        _handleError('The password provided is too weak');
-        break;
-      case 'email-already-in-use':
-        _handleError('An account already exists with that email');
-        break;
-      case 'invalid-email':
-        _handleError('Invalid email format');
-        break;
-      case 'user-not-found':
-        _handleError('No user found with this email');
-        break;
-      case 'wrong-password':
-        _handleError('Wrong password provided');
-        break;
-      case 'requires-recent-login':
-        _handleError('Please log in again to update your password');
-        break;
-      default:
-        _handleError('Authentication error: ${e.message}');
-    }
+    _handleError('Error: ${e.message}');
   }
 
   void _handleError(String message) {
@@ -353,15 +246,7 @@ class AuthServiceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Toast Message
   void _showToast(String message) {
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: Colors.black54,
-      textColor: Colors.white,
-      fontSize: 14.0,
-    );
+    Fluttertoast.showToast(msg: message, toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.BOTTOM);
   }
 }

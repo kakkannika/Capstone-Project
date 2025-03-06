@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:tourism_app/firebase_options.dart';
 import 'package:tourism_app/presentation/screens/get_start_screen.dart';
 import 'package:tourism_app/providers/place_retrieve_service.dart';
+import 'package:tourism_app/providers/place_service.dart';
 import 'package:tourism_app/providers/service.dart';
 
 Future<void> main() async {
