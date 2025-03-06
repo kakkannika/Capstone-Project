@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tourism_app/presentation/widgets/destination_card.dart';
+import 'package:tourism_app/theme/theme.dart';
 import 'detail_each_place.dart';
 
 class DetailScreen extends StatefulWidget {
@@ -83,9 +84,9 @@ class _DetailScreenState extends State<DetailScreen> {
           SingleChildScrollView(
             padding: const EdgeInsets.only(top: 280),
             child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+              decoration: BoxDecoration(
+                color: DertamColors.white,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

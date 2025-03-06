@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/presentation/screens/profiles/widget/profile.dart';
-import '../auth/login_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:tourism_app/providers/service.dart';
 import 'package:tourism_app/presentation/widgets/dertam_tap.dart';
 import 'widget/trips_list.dart';
 import 'package:tourism_app/presentation/widgets/dertam_dialog_button.dart';
@@ -10,14 +10,21 @@ import 'package:tourism_app/presentation/widgets/dertam_dialog.dart';
 import 'widget/option_tile.dart';
 import 'edit_profile_screen.dart';
 import 'setting_screen.dart';
-
+// Import AuthServiceProvider
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
-
   @override
   Widget build(BuildContext context) {
+    // Access the auth provider to get current user
+    final authProvider = Provider.of<AuthServiceProvider>(context);
+    final currentUser = authProvider.currentUser;
+
+    // Get user display name or email
+    final userName = currentUser?.displayName ?? 'User';
+    final userEmail = currentUser?.email ?? 'No email';
+
     return DefaultTabController(
       length: 2, // Number of tabs
       child: Scaffold(
@@ -38,17 +45,21 @@ class ProfileScreen extends StatelessWidget {
         ),
         body: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
-                  SizedBox(height: 20),
-                  Profile(
-                    name: 'Kannika KAK',
-                    username: 'kannika',
-                    imagePath: 'lib/assets/images/profile.png',
+                  CircleAvatar(
+                    radius: 50,
+                    backgroundImage: currentUser?.photoURL != null
+                        ? NetworkImage(currentUser!.photoURL!) as ImageProvider
+                        : const AssetImage('lib/assets/images/avatar.jpg'),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: DertamSpacings.m),
+                  Text(userName, style: DertamTextStyles.heading),
+                  const SizedBox(height: DertamSpacings.s),
+                  Text(userEmail),
+                  const SizedBox(height: DertamSpacings.m),
                 ],
               ),
             ),
@@ -102,86 +113,91 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
-  
 
-//to show logout confirmation dialog
+  // To show logout confirmation dialog
   void _showLogoutConfirmation(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (context) => DertamDialog(
-      title: 'Logout',
-      content: 'Are you sure you want to logout?',
-      actions: [
-        DertamDialogButton(
-          onPressed: () => Navigator.pop(context),
-          text: 'Cancel',
-          dertamColor: DertamColors.primary,
-        ),
-        DertamDialogButton(
-          text: 'Logout',
-          onPressed: () {
-            Navigator.pop(context);
-            Navigator.pop(context);
-            _logout(context);
-          },
-          dertamColor: DertamColors.red,
-          hasBackground: true,
-        ),
-      ],
-    ),
-  );
-}
-  
-   //to show the option to choose such as ,setting edit profile or view profile reset password,logout
- void _showMoreOptions(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (context) => DertamDialog(
-      title: 'More Options',
-      contentWidgets: [
-        OptionTile(
-          icon: Icons.settings,
-          title: 'Settings',
-          onTap: () async {
-            Navigator.pop(context);
-            await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const SettingsScreen()),
-            );
-          },
-        ),
-        OptionTile(
-          icon: Icons.person_outline,
-          title: 'Edit Profile',
-          onTap: () async {
-            Navigator.pop(context);
-            await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const EditProfileScreen()),
-            );
-          },
-        ),
-        OptionTile(
-          icon: Icons.lock_outline,
-          title: 'Reset Password',
-          onTap: () {
-            // Navigator.pop(context);
-            // _resetPassword(context);
-          },
-        ),
-        OptionTile(
-          icon: Icons.logout,
-          title: 'Logout',
-          isDestructive: true,
-          onTap: () => _showLogoutConfirmation(context),
-        ),
-      ],
-      actions: const [],
-    ),
-  );
-}
+    showDialog(
+      context: context,
+      builder: (context) => DertamDialog(
+        title: 'Logout',
+        content: 'Are you sure you want to logout?',
+        actions: [
+          DertamDialogButton(
+            onPressed: () => Navigator.pop(context),
+            text: 'Cancel',
+            dertamColor: DertamColors.primary,
+          ),
+          DertamDialogButton(
+            text: 'Logout',
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+              _logout(context);
+            },
+            dertamColor: DertamColors.red,
+            hasBackground: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // To show the option to choose such as setting, edit profile or view profile, reset password, logout
+  void _showMoreOptions(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => DertamDialog(
+        title: 'More Options',
+        contentWidgets: [
+          OptionTile(
+            icon: Icons.settings,
+            title: 'Settings',
+            onTap: () async {
+              Navigator.pop(context);
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
+            },
+          ),
+          OptionTile(
+            icon: Icons.person_outline,
+            title: 'Edit Profile',
+            onTap: () async {
+              Navigator.pop(context);
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const EditProfileScreen()),
+              );
+            },
+          ),
+          OptionTile(
+            icon: Icons.lock_outline,
+            title: 'Reset Password',
+            onTap: () {
+              // Navigate to reset password screen or show reset password dialog
+              // Use the authProvider to reset password if you implement this
+            },
+          ),
+          OptionTile(
+            icon: Icons.logout,
+            title: 'Logout',
+            isDestructive: true,
+            onTap: () => _showLogoutConfirmation(context),
+          ),
+        ],
+        actions: const [],
+      ),
+    );
+  }
 
   void _goToTripDetails() => debugPrint('Navigate to Trip Details');
-  void _logout(BuildContext context) => Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>  LoginScreen()), (route) => false);
 
+  void _logout(BuildContext context) {
+    // Get the auth provider and call signOut
+    final authProvider =
+        Provider.of<AuthServiceProvider>(context, listen: false);
+    authProvider.signOut(context);
+  }
 }

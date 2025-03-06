@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:tourism_app/presentation/screens/home/detail_home_page.dart';
 import 'package:tourism_app/presentation/widgets/dertam_searchBar.dart';
 import 'package:tourism_app/presentation/widgets/destination_card.dart';
 import 'package:tourism_app/presentation/widgets/navigationBar.dart';
+import 'package:tourism_app/providers/service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,6 +20,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Access the auth provider
+    final authProvider = Provider.of<AuthServiceProvider>(context);
+    final currentUser = authProvider.currentUser;
+    
+    // Get user's display name or fallback to email or 'User'
+    final displayName = currentUser?.displayName ?? 
+                        (currentUser?.email?.split('@')[0] ?? 'User');
+    
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -29,15 +39,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
                   children: [
-                    const CircleAvatar(
+                    CircleAvatar(
                       radius: 20,
-                      backgroundImage:
-                          AssetImage('lib/assets/images/avatar.jpg'),
+                      backgroundImage: currentUser?.photoURL != null
+                          ? NetworkImage(currentUser!.photoURL!) as ImageProvider
+                          : const AssetImage('lib/assets/images/avatar.jpg'),
                     ),
                     const SizedBox(width: 12),
-                    const Text(
-                      'Hello, Kannika',
-                      style: TextStyle(
+                    Text(
+                      'Hello, $displayName',
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w500,
                       ),

@@ -1,6 +1,6 @@
 import 'dart:math'; // Import this to use Random
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
+import 'auth/login_screen.dart';
 
 class GetStartedScreen extends StatelessWidget {
   const GetStartedScreen({super.key});
