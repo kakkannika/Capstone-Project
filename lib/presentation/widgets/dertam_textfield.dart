@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/presentation/screens/profiles/widget/phone_number_format.dart';
 class DertamTextfield extends StatelessWidget {
   final String label;
   final TextEditingController controller;
@@ -32,10 +31,11 @@ class DertamTextfield extends StatelessWidget {
         controller: controller,
         keyboardType: keyboardType,
         obscureText: obscureText,
-        inputFormatters: isPhoneNumber ? [PhoneNumberFormatter()] : null,
         validator: validator,
+      
         decoration: InputDecoration(
           labelText: label,
+        
           prefixIcon: Icon(icon),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),

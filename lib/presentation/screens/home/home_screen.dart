@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tourism_app/presentation/screens/home/detail_each_place.dart';
 import 'package:tourism_app/presentation/screens/home/detail_home_page.dart';
+import 'package:tourism_app/presentation/screens/home/widget/filter_chip.dart';
 import 'package:tourism_app/presentation/widgets/dertam_searchBar.dart';
 import 'package:tourism_app/presentation/widgets/destination_card.dart';
 import 'package:tourism_app/presentation/widgets/navigationBar.dart';
@@ -15,6 +17,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String selectedCategory = 'all'; // Stores selected category
+
   void onSearchChanged(String text) {}
 
   void onBackPressed() {}
@@ -22,28 +26,32 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch the data when the screen is initialized
+    // Fetch data when the screen is initialized
     Provider.of<PlaceProvider>(context, listen: false).fetchAllPlaces();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Access the auth provider
     final authProvider = Provider.of<AuthServiceProvider>(context);
     final currentUser = authProvider.currentUser;
-
-    // Get user's display name or fallback to email or 'User'
-    final displayName = currentUser?.displayName ??
+    final displayName = currentUser?.displayName ?? 
         (currentUser?.email.split('@')[0] ?? 'User');
 
     return Consumer<PlaceProvider>(builder: (context, placeProvider, child) {
+      // Filter places based on selected category
+      final filteredPlaces = selectedCategory == 'all'
+          ? placeProvider.places
+          : placeProvider.places
+              .where((place) => place.category == selectedCategory)
+              .toList();
+
       return Scaffold(
         body: SafeArea(
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header with profile and icons
+                // Header Section
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
@@ -52,8 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         radius: 20,
                         backgroundImage: currentUser?.photoUrl != null
                             ? NetworkImage(currentUser!.photoUrl!)
-                                as ImageProvider
-                            : const AssetImage('lib/assets/images/avatar.jpg'),
+                            : const AssetImage('lib/assets/images/avatar.jpg') as ImageProvider,
                       ),
                       const SizedBox(width: 12),
                       Text(
@@ -76,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                // Hero image and search bar
+                // Hero Image & Search Bar
                 Stack(
                   children: [
                     Image.asset(
@@ -97,14 +104,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
 
-                // Popular destination section
+                // Popular Destination Section
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'Popular destination',
+                        'Popular Destinations',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -118,14 +125,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                // Popular destination cards
+                // Popular Destination Cards
                 SizedBox(
                   height: 150,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount:
-                        6, // Assuming you still want to show a fixed count for the popular destinations
+                    itemCount: 6,
                     itemBuilder: (context, index) {
                       return Container(
                         width: 280,
@@ -143,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                // Explore Destination section
+                // Explore Destination Section
                 const Padding(
                   padding: EdgeInsets.all(16.0),
                   child: Text(
@@ -155,7 +161,29 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                // Grid to display destinations dynamically
+                // Category Filter Chips
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: ['all', 'museum', 'market', 'entertain_attraction','historical_place','restaurant','hotel',]
+                        .map((category) => Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                              child: FiltersChip(
+                                label: category,
+                                isSelected: selectedCategory == category,
+                                onTap: () {
+                                  setState(() {
+                                    selectedCategory = category;
+                                  });
+                                },
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                ),
+
+                // Destination Grid View
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -166,21 +194,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
                   ),
-                  itemCount: placeProvider.places.length,
+                  itemCount: filteredPlaces.length,
                   itemBuilder: (context, index) {
                     return DestinationCard(
-                      image: placeProvider.places[index].imageURL,
-                      title: placeProvider.places[index].name,
-                      rating: placeProvider.places[index].averageRating,
+                      image: filteredPlaces[index].imageURL,
+                      title: filteredPlaces[index].name,
+                      rating: filteredPlaces[index].averageRating,
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => DetailScreen(
-                              title: placeProvider.places[index].name,
-                              imagePath: placeProvider.places[index].imageURL[0],
-                              rating: placeProvider.places[index].averageRating,
-                            ),
+                            builder: (context) => DetailEachPlace(placeId: filteredPlaces[index].id),
                           ),
                         );
                       },
@@ -188,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
 
-                const SizedBox(height: 80), // Bottom padding for navigation bar
+                const SizedBox(height: 80),
               ],
             ),
           ),

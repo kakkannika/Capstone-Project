@@ -16,6 +16,8 @@ class PlaceProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
+  get currentUser => null;
+
   // Fetch all places
   Future<void> fetchAllPlaces() async {
     _setLoading(true);
@@ -36,67 +38,67 @@ class PlaceProvider with ChangeNotifier {
   }
 
   // // Fetch a single place by ID
-  // Future<Place?> getPlaceById(String placeId) async {
-  //   _setLoading(true);
-  //   try {
-  //     DocumentSnapshot doc = await _firestore
-  //         .collection(collectionName)
-  //         .doc(placeId)
-  //         .get();
+  Future<Place?> getPlaceById(String placeId) async {
+    _setLoading(true);
+    try {
+      DocumentSnapshot doc = await _firestore
+          .collection(collectionName)
+          .doc(placeId)
+          .get();
       
-  //     _setLoading(false);
-  //     if (doc.exists) {
-  //       return Place.fromFirestore(doc);
-  //     } else {
-  //       _error = 'No place found with ID: $placeId';
-  //       notifyListeners();
-  //       return null;
-  //     }
-  //   } catch (e) {
-  //     _handleError('Error fetching place: $e');
-  //     return null;
-  //   }
-  // }
+      _setLoading(false);
+      if (doc.exists) {
+        return Place.fromFirestore(doc);
+      } else {
+        _error = 'No place found with ID: $placeId';
+        notifyListeners();
+        return null;
+      }
+    } catch (e) {
+      _handleError('Error fetching place: $e');
+      return null;
+    }
+  }
 
   // // Fetch places by category
-  // Future<void> fetchPlacesByCategory(String category) async {
-  //   _setLoading(true);
-  //   try {
-  //     QuerySnapshot querySnapshot = await _firestore
-  //         .collection(collectionName)
-  //         .where('category', isEqualTo: category)
-  //         .get();
+  Future<void> fetchPlacesByCategory(String category) async {
+    _setLoading(true);
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection(collectionName)
+          .where('category', isEqualTo: category)
+          .get();
       
-  //     _places = querySnapshot.docs
-  //         .map((doc) => Place.fromFirestore(doc))
-  //         .toList();
+      _places = querySnapshot.docs
+          .map((doc) => Place.fromFirestore(doc))
+          .toList();
       
-  //     _setLoading(false);
-  //     notifyListeners();
-  //   } catch (e) {
-  //     _handleError('Error fetching places by category: $e');
-  //   }
-  // }
+      _setLoading(false);
+      notifyListeners();
+    } catch (e) {
+      _handleError('Error fetching places by category: $e');
+    }
+  }
 
   // // Fetch highly rated places
-  // Future<void> fetchHighlyRatedPlaces(double minRating) async {
-  //   _setLoading(true);
-  //   try {
-  //     QuerySnapshot querySnapshot = await _firestore
-  //         .collection(collectionName)
-  //         .where('averageRating', isGreaterThanOrEqualTo: minRating)
-  //         .get();
+  Future<void> fetchHighlyRatedPlaces(double minRating) async {
+    _setLoading(true);
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection(collectionName)
+          .where('averageRating', isGreaterThanOrEqualTo: minRating)
+          .get();
       
-  //     _places = querySnapshot.docs
-  //         .map((doc) => Place.fromFirestore(doc))
-  //         .toList();
+      _places = querySnapshot.docs
+          .map((doc) => Place.fromFirestore(doc))
+          .toList();
       
-  //     _setLoading(false);
-  //     notifyListeners();
-  //   } catch (e) {
-  //     _handleError('Error fetching highly rated places: $e');
-  //   }
-  // }
+      _setLoading(false);
+      notifyListeners();
+    } catch (e) {
+      _handleError('Error fetching highly rated places: $e');
+    }
+  }
 
   // Helper methods
   void _setLoading(bool loading) {

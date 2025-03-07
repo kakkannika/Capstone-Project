@@ -8,8 +8,7 @@ class Place {
   final String description;
   final GeoPoint location;
   final String imageURL;
-  final String
-      category; // Changed from PlaceCategory to String to match Firestore
+  final String category; // Changed from PlaceCategory to String to match Firestore
   final double averageRating;
   final double entranceFees;
   final String openingHours;
