@@ -1,0 +1,2 @@
+D:/YEAR3/Term2/Capstone-Project/android/app/.cxx/Debug/4f5qo400/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/YEAR3/Term2/Capstone-Project/android/app/.cxx/Debug/4f5qo400/armeabi-v7a/CMakeFiles/rebuild_cache.dir
