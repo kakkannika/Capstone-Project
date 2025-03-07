@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tourism_app/providers/service.dart';
+import 'package:tourism_app/providers/firebase/auth_service.dart';
 import 'package:tourism_app/presentation/widgets/dertam_tap.dart';
 import 'widget/trips_list.dart';
 import 'package:tourism_app/presentation/widgets/dertam_dialog_button.dart';

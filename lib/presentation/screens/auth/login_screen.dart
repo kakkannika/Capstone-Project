@@ -5,7 +5,7 @@ import 'package:tourism_app/presentation/screens/auth/gmail_signup_screen.dart';
 import 'package:tourism_app/presentation/screens/auth/phone_auth_screen.dart';
 import 'package:tourism_app/presentation/widgets/custome_input_field.dart';
 import 'package:tourism_app/presentation/widgets/dertam_button.dart';
-import 'package:tourism_app/providers/service.dart';
+import 'package:tourism_app/providers/firebase/auth_service.dart';
 import 'forgot_password_screen.dart';
 import 'package:tourism_app/providers/auth_service.dart';
 

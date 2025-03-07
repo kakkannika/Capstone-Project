@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/firebase_options.dart';
 import 'package:tourism_app/presentation/screens/get_start_screen.dart';
-import 'package:tourism_app/providers/place_retrieve_service.dart';
-import 'package:tourism_app/providers/place_service.dart';
-import 'package:tourism_app/providers/service.dart';
+import 'package:tourism_app/providers/firebase/place_retrieve_service.dart';
+// import 'package:tourism_app/providers/place_service.dart';
+import 'package:tourism_app/providers/firebase/auth_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

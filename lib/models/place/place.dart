@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Place {
@@ -5,8 +7,9 @@ class Place {
   final String name;
   final String description;
   final GeoPoint location;
-  final List<String> imageURL;
-  final PlaceCategory category;
+  final String imageURL;
+  final String
+      category; // Changed from PlaceCategory to String to match Firestore
   final double averageRating;
   final double entranceFees;
   final String openingHours;
@@ -23,57 +26,41 @@ class Place {
     required this.openingHours,
   });
 
-  // Convert a Place object into a Map (for Firestore)
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'description': description,
-      'location': {
-        'latitude': location.latitude,
-        'longitude': location.longitude,
-      },
-      'imageURL': imageURL,
-      'category': category.toString().split('.').last, // Convert enum to string
-      'averageRating': averageRating,
-      'entranceFees': entranceFees,
-      'openingHours': openingHours,
-    };
-  }
+  factory Place.fromFirestore(DocumentSnapshot doc) {
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
-  // Create a Place object from a Firestore document
-  factory Place.fromMap(Map<String, dynamic> data, String documentId) {
+    // Handle location which is stored as a string in format "latitude, longitude"
+    GeoPoint locationGeoPoint;
+    if (data['location'] is String) {
+      try {
+        final List<String> latLng = (data['location'] as String).split(',');
+        double lat = double.parse(latLng[0].trim());
+        double lng = double.parse(latLng[1].trim());
+        locationGeoPoint = GeoPoint(lat, lng);
+      } catch (e) {
+        print('Error parsing location string: ${data['location']}');
+        locationGeoPoint = GeoPoint(0, 0);
+      }
+    } else if (data['location'] is GeoPoint) {
+      locationGeoPoint = data['location'] as GeoPoint;
+    } else {
+      locationGeoPoint = GeoPoint(0, 0);
+    }
+
     return Place(
-      id: documentId,
-      name: data['name'],
-      description: data['description'],
-      location: GeoPoint(
-        data['location']['latitude'],
-        data['location']['longitude'],
-      ),
-      imageURL: List<String>.from(data['imageURL']),
-      category: _parseCategory(data['category']),
-      averageRating: data['averageRating'],
-      entranceFees: data['entranceFees'],
-      openingHours: data['openingHours'],
+      id: doc.id,
+      name: data['name'] ?? '',
+      description: data['description'] ?? '',
+      location: locationGeoPoint,
+      imageURL: data['imageURL'] ?? '',
+      category: data['category'] ?? '',
+      averageRating: (data['averageRating'] ?? 0).toDouble(),
+      entranceFees: (data['entranceFees'] ?? 0).toDouble(),
+      openingHours: data['openingHours'] ?? '',
     );
   }
 
   // Helper method to convert a string to PlaceCategory enum
-  static PlaceCategory _parseCategory(String category) {
-    switch (category) {
-      case 'historical_place':
-        return PlaceCategory.historical_place;
-      case 'museum':
-        return PlaceCategory.museum;
-      case 'market':
-        return PlaceCategory.market;
-      case 'entertain_attraction':
-        return PlaceCategory.entertain_attraction; // Add this case
-      default:
-        throw ArgumentError('Unknown category: $category');
-    }
-  }
 }
 
 enum PlaceCategory {

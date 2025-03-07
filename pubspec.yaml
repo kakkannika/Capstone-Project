@@ -49,12 +49,14 @@ dependencies:
   provider: ^6.1.2
   firebase_admin: ^0.3.0+1
   file_picker: ^9.0.2
+  json_annotation: ^4.9.0
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   country_picker: ^2.0.25
+  json_serializable: ^6.9.4
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
