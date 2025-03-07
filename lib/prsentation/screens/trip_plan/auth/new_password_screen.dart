@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/prsentation/screens/auth/login_screen.dart';
+import 'login_screen.dart';
 
 class NewPasswordScreen extends StatelessWidget {
+  const NewPasswordScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,7 +17,7 @@ class NewPasswordScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Image.asset(
-              'lib/assets/images/logo.png', 
+              'lib/assets/images/logo.png',
               height: 100,
             ),
             const SizedBox(height: 30),
@@ -47,13 +48,13 @@ class NewPasswordScreen extends StatelessWidget {
             // Submit button
             ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context, MaterialPageRoute(
-                    builder: (context) => LoginScreen()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blueAccent,
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),

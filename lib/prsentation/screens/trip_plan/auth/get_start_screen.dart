@@ -3,45 +3,36 @@ import 'package:flutter/material.dart';
 import 'login_screen.dart';
 
 class GetStartedScreen extends StatelessWidget {
+  const GetStartedScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Gradient Background with a Starry effect
+          Image.asset(
+            'lib/assets/images/night-sky.jpg',
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+          ),
           Container(
-            decoration:  const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFF085794), // Deep blue
-                  Color(0xFF17649F), // Medium blue
-                  Color(0xFF206CA6), // Light blue
-                  Color(0xFF74B5E3), // Very light blue
-                  Color(0xFFFFFFFF), // White
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.5),
             ),
           ),
-          Positioned.fill(
-            child: CustomPaint(
-              painter: StarrySkyPainter(),
-            ),
-          ),
-         Center(
+          Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-            
                 Image.asset(
-                  'lib/assets/images/Logo.png', 
-                  height: 200, 
+                  'lib/assets/images/logo.png',
+                  height: 200,
                 ),
                 const SizedBox(height: 20),
                 const Text(
                   "Let's Explore New Destinations",
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -52,29 +43,41 @@ class GetStartedScreen extends StatelessWidget {
                 const SizedBox(height: 10),
                 const Text(
                   "Find Your Dream Destination With Us",
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.white70,
                   ),
                 ),
-               const  SizedBox(height: 40),
-                ElevatedButton(
+                const SizedBox(height: 40),
+                SizedBox(
+                  width: 200, // Fixed width for the button
+                  child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue, 
-                      padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 15),
+                      backgroundColor: const Color(0xFF386FA4),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 15),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(30),
                       ),
+                      elevation: 5,
                     ),
                     onPressed: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) =>LoginScreen()),
-                        );
-                      
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LoginScreen()),
+                      );
                     },
-                    child: const Text('GET START', style:TextStyle(fontSize: 18,color: Colors.white)),
+                    child: const Text(
+                      'Get Started',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
+                ),
               ],
             ),
           ),
@@ -83,6 +86,7 @@ class GetStartedScreen extends StatelessWidget {
     );
   }
 }
+
 class StarrySkyPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -92,7 +96,7 @@ class StarrySkyPainter extends CustomPainter {
     for (int i = 0; i < 100; i++) {
       final x = random.nextDouble() * size.width;
       final y = random.nextDouble() * size.height;
-      final radius = random.nextDouble() * 1.5 + 0.5; // random star 
+      final radius = random.nextDouble() * 1.5 + 0.5; // random star
 
       canvas.drawCircle(Offset(x, y), radius, paint);
     }
