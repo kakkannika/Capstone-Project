@@ -6,6 +6,7 @@ import 'package:tourism_app/models/trip_model/day.dart';
 import 'package:tourism_app/models/place_model.dart';
 import 'package:intl/intl.dart';
 import 'package:tourism_app/views/trips_screen/search_place_screen.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class ItineraryPage extends StatefulWidget {
   final String? tripId;
@@ -23,6 +24,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
   final PageController _pageController = PageController(initialPage: 1);
   int _selectedIndex = 1; // Set initial index to 1 for Itinerary
   int _selectedDayIndex = 0; // Track the selected day tab
+  Day? _selectedDay; // Track the currently selected day
 
   @override
   void initState() {
@@ -37,22 +39,36 @@ class _ItineraryPageState extends State<ItineraryPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TripViewModel>(
-      builder: (context, tripProvider, child) {
-        final trip = tripProvider.selectedTrip;
-        final isLoading = tripProvider.isLoading;
-        final error = tripProvider.error;
+    if (widget.tripId == null) {
+      return const Center(child: Text('No trip selected'));
+    }
 
-        if (isLoading) {
+    return StreamBuilder<List<Trip>>(
+      stream: Provider.of<TripViewModel>(context, listen: false).getTripsStream(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
-
-        if (error != null) {
-          return Center(child: Text('Error: $error'));
+        
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
         }
-
+        
+        final trips = snapshot.data ?? [];
+        final trip = trips.firstWhere(
+          (t) => t.id == widget.tripId,
+          orElse: () => Trip(
+            id: widget.tripId!,
+            userId: '',
+            tripName: 'Trip not found',
+            startDate: DateTime.now(),
+            endDate: DateTime.now().add(const Duration(days: 1)),
+            days: [],
+          ),
+        );
+        
         if (trip == null) {
-          return const Center(child: Text('No trip selected'));
+          return const Center(child: Text('Trip not found'));
         }
 
         return WillPopScope(
@@ -143,26 +159,26 @@ class _ItineraryPageState extends State<ItineraryPage> {
     );
   }
 
-  void _navigateToSearchPlace(Day day) {
+  void _navigateToSearchPlace(Day day) async {
     final tripProvider = context.read<TripViewModel>();
     if (tripProvider.selectedTrip == null) return;
     
-    Navigator.push(
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => SearchPlaceScreen(
           tripId: tripProvider.selectedTrip!.id,
           dayId: day.id,
           onPlaceSelected: (Place place) {
-            // Add the selected place to the day
-            tripProvider.addPlaceToDay(
-              dayId: day.id,
-              placeId: place.id,
-            );
+            // This callback will be called when a place is selected
+            // The UI will update automatically through the StreamBuilder
           },
         ),
       ),
     );
+    
+    // If we got a result back, the place was added successfully
+    // The UI will update automatically through the StreamBuilder
   }
 
   Widget _buildTabButton(String title, int index) {
@@ -201,6 +217,11 @@ class _ItineraryPageState extends State<ItineraryPage> {
   Widget _buildItineraryPage(Trip trip) {
     if (trip.days.isEmpty) {
       return const Center(child: Text('No days in this trip'));
+    }
+
+    // Ensure _selectedDayIndex is within bounds
+    if (_selectedDayIndex >= trip.days.length) {
+      _selectedDayIndex = 0;
     }
 
     return ListView(
@@ -261,8 +282,13 @@ class _ItineraryPageState extends State<ItineraryPage> {
   }
 
   Widget _buildDayContent(Day day) {
-    final date = context.read<TripViewModel>().selectedTrip!.startDate.add(Duration(days: day.dayNumber - 1));
+    final tripProvider = context.read<TripViewModel>();
+    final trip = tripProvider.selectedTrip!;
+    final date = trip.startDate.add(Duration(days: day.dayNumber - 1));
     final dateStr = DateFormat('EEE d/M').format(date);
+    
+    // Store the selected day for use in the delete operation
+    _selectedDay = day;
     
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,31 +305,60 @@ class _ItineraryPageState extends State<ItineraryPage> {
               ),
             ),
             const SizedBox(width: 10),
-            const Text(
-              'Add subheading',
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 14,
-              ),
-            ),
+            
           ],
         ),
         
         const SizedBox(height: 16),
         
-        // Places for this day
-        if (day.places.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16.0),
-            child: Center(child: Text('No places added to this day yet')),
-          )
-        else
-          ...day.places.map((place) => Column(
-            children: [
-              _buildPlaceCard(place),
-              const SizedBox(height: 16),
-            ],
-          )).toList(),
+        // Places for this day - Using StreamBuilder for real-time updates
+        StreamBuilder<List<Place>>(
+          stream: tripProvider.getPlacesForDayStream(
+            tripId: trip.id,
+            dayId: day.id,
+          ),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+              return const Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20.0),
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
+            
+            if (snapshot.hasError) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20.0),
+                  child: Text('Error: ${snapshot.error}'),
+                ),
+              );
+            }
+            
+            final places = snapshot.data ?? [];
+            
+            if (places.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16.0),
+                child: Center(child: Text('No places added to this day yet')),
+              );
+            }
+            
+            return ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: places.length,
+              itemBuilder: (context, index) {
+                final place = places[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: _buildPlaceCard(place),
+                );
+              },
+            );
+          },
+        ),
         
         // Add a place button
         _buildAddPlaceButton(day),
@@ -334,88 +389,108 @@ class _ItineraryPageState extends State<ItineraryPage> {
   }
 
   Widget _buildPlaceCard(Place place) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+    // Get the current day to use for delete operation
+    final currentDay = _selectedDay;
+    
+    return Slidable(
+      // Enable sliding from left to right (endActionPane for right-to-left)
+      endActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        children: [
+          SlidableAction(
+            onPressed: (context) {
+              _deletePlace(place.id, currentDay!.id);
+            },
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+            icon: Icons.delete,
+            label: 'Delete',
           ),
         ],
       ),
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Location
-                Row(
-                  children: [
-                    const Icon(Icons.location_on, color: Color(0xFF0D3E4C), size: 20),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        place.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Content
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Location
+                  Row(
+                    children: [
+                      const Icon(Icons.location_on, color: Color(0xFF0D3E4C), size: 20),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          place.name,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
-                ),
-                
-                const SizedBox(height: 8),
-                
-                // Description
-                Text(
-                  place.description,
-                  style: const TextStyle(
-                    color: Colors.grey,
-                    fontSize: 14,
+                    ],
                   ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          
-          // Image
-          if (place.imageUrls.isNotEmpty)
-            Container(
-              width: 80,
-              height: 80,
-              margin: const EdgeInsets.only(left: 12),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                image: DecorationImage(
-                  image: NetworkImage(place.imageUrls.first),
-                  fit: BoxFit.cover,
-                  onError: (exception, stackTrace) => const AssetImage('assets/images/placeholder.jpg'),
-                ),
+                  
+                  const SizedBox(height: 8),
+                  
+                  // Description
+                  Text(
+                    place.description,
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
-            )
-          else
-            Container(
-              width: 80,
-              height: 80,
-              margin: const EdgeInsets.only(left: 12),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: Colors.grey[300],
-              ),
-              child: const Icon(Icons.image, color: Colors.grey),
             ),
-        ],
+            
+            // Image
+            if (place.imageUrls.isNotEmpty)
+              Container(
+                width: 80,
+                height: 80,
+                margin: const EdgeInsets.only(left: 12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  image: DecorationImage(
+                    image: NetworkImage(place.imageUrls.first),
+                    fit: BoxFit.cover,
+                    onError: (exception, stackTrace) => const AssetImage('assets/images/placeholder.jpg'),
+                  ),
+                ),
+              )
+            else
+              Container(
+                width: 80,
+                height: 80,
+                margin: const EdgeInsets.only(left: 12),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.grey[300],
+                ),
+                child: const Icon(Icons.image, color: Colors.grey),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -553,6 +628,53 @@ class _ItineraryPageState extends State<ItineraryPage> {
         ),
       ),
     );
+  }
+
+  // Method to delete a place from a day
+  Future<void> _deletePlace(String placeId, String dayId) async {
+    try {
+      final tripProvider = context.read<TripViewModel>();
+      final trip = tripProvider.selectedTrip;
+      
+      if (trip == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No trip selected'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+        return;
+      }
+      
+      // Show loading indicator
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Removing place from trip...'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+      
+      await tripProvider.removePlaceFromDay(
+        dayId: dayId,
+        placeId: placeId,
+      );
+      
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Place removed from trip'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+    } catch (e) {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error removing place: $e'),
+          duration: const Duration(seconds: 1),
+        ),
+      );
+    }
   }
   
   @override

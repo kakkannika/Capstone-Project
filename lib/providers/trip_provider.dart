@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:tourism_app/services/trip_service.dart';
 import 'package:tourism_app/models/trip_model/trip.dart';
@@ -10,11 +11,70 @@ class TripViewModel with ChangeNotifier {
   Trip? _selectedTrip;
   bool _isLoading = false;
   String? _error;
+  StreamSubscription<List<Trip>>? _tripsSubscription;
 
   List<Trip> get trips => _trips;
   Trip? get selectedTrip => _selectedTrip;
   bool get isLoading => _isLoading;
   String? get error => _error;
+
+  // Get a stream of trips for the current user
+  Stream<List<Trip>> getTripsStream() {
+    return _tripService.getTripsStream();
+  }
+
+  // Get a stream for a specific trip by ID
+  Stream<Trip?> getTripByIdStream(String tripId) {
+    return _tripService.getTripByIdStream(tripId);
+  }
+
+  // Get a stream of places for a specific day
+  Stream<List<Place>> getPlacesForDayStream({
+    required String tripId,
+    required String dayId,
+  }) {
+    return _tripService.getPlacesForDayStream(
+      tripId: tripId,
+      dayId: dayId,
+    );
+  }
+
+  // Start listening to the trips stream
+  void startListeningToTrips() {
+    _setLoading(true);
+    _error = null;
+
+    try {
+      // Cancel any existing subscription
+      _tripsSubscription?.cancel();
+      
+      // Subscribe to the trips stream
+      _tripsSubscription = getTripsStream().listen(
+        (trips) {
+          _trips = trips;
+          _setLoading(false);
+          notifyListeners();
+        },
+        onError: (e) {
+          _error = 'Error fetching trips: $e';
+          _setLoading(false);
+          notifyListeners();
+          print(_error);
+        }
+      );
+    } catch (e) {
+      _error = 'Error setting up trips stream: $e';
+      _setLoading(false);
+      notifyListeners();
+      print(_error);
+    }
+  }
+
+  // Stop listening to the trips stream
+  void stopListeningToTrips() {
+    _tripsSubscription?.cancel();
+    _tripsSubscription = null;
+  }
 
   // Fetch trips for the current user
   Future<void> fetchTripsForCurrentUser() async {
@@ -109,10 +169,13 @@ class TripViewModel with ChangeNotifier {
         dayId: dayId,
         placeId: placeId,
       );
-      await selectTrip(_selectedTrip!.id); // Refresh the selected trip
+      
+      // We don't need to refresh the entire trip here
+      // The UI will update automatically through the StreamBuilder
     } catch (e) {
       _error = 'Error adding place to day: $e';
       print(_error);
+      rethrow; // Rethrow to allow the UI to handle the error
     } finally {
       _setLoading(false);
     }
@@ -210,5 +273,11 @@ class TripViewModel with ChangeNotifier {
   void clearSelectedTrip() {
     _selectedTrip = null;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    stopListeningToTrips();
+    super.dispose();
   }
 }

@@ -319,4 +319,66 @@ class TripService {
       rethrow;
     }
   }
+  
+  // Get a stream of trips for the current user
+  Stream<List<Trip>> getTripsStream() {
+    try {
+      final userId = getCurrentUserId();
+      
+      return _firestore
+          .collection('trips')
+          .where('userId', isEqualTo: userId)
+          .snapshots()
+          .asyncMap((snapshot) async {
+            final List<Trip> trips = [];
+            
+            for (final tripDoc in snapshot.docs) {
+              final days = await _fetchDaysForTrip(tripDoc.reference);
+              trips.add(Trip.fromFirestore(tripDoc, days));
+            }
+            
+            return trips;
+          });
+    } catch (e) {
+      print('Error getting trips stream: $e');
+      rethrow;
+    }
+  }
+  
+  // Get a stream of places for a specific day in a trip
+  Stream<List<Place>> getPlacesForDayStream({
+    required String tripId,
+    required String dayId,
+  }) {
+    return _firestore
+        .collection('trips')
+        .doc(tripId)
+        .collection('days')
+        .doc(dayId)
+        .snapshots()
+        .asyncMap((dayDoc) async {
+          if (!dayDoc.exists) {
+            return [];
+          }
+          
+          final placeIds = List<String>.from(dayDoc.data()?['placeIds'] ?? []);
+          return await _fetchPlacesFromMainCollection(placeIds);
+        });
+  }
+  
+  // Get a stream for a specific trip by ID
+  Stream<Trip?> getTripByIdStream(String tripId) {
+    return _firestore
+        .collection('trips')
+        .doc(tripId)
+        .snapshots()
+        .asyncMap((tripDoc) async {
+          if (!tripDoc.exists) {
+            return null;
+          }
+          
+          final days = await _fetchDaysForTrip(tripDoc.reference);
+          return Trip.fromFirestore(tripDoc, days);
+        });
+  }
 }

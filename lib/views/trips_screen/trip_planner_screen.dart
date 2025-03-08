@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/providers/trip_provider.dart';
+import 'package:tourism_app/models/trip_model/trip.dart';
 import 'package:tourism_app/views/trips_screen/plan_trip_detail.dart';
 
 class TripPlannerScreen extends StatefulWidget {
@@ -69,7 +71,35 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
             ),
             // Itinerary page takes up the rest of the space
             Expanded(
-              child: ItineraryPage(tripId: widget.tripId),
+              child: widget.tripId != null
+                  ? StreamBuilder<List<Trip>>(
+                      stream: Provider.of<TripViewModel>(context, listen: false).getTripsStream(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        
+                        if (snapshot.hasError) {
+                          return Center(child: Text('Error: ${snapshot.error}'));
+                        }
+                        
+                        final trips = snapshot.data ?? [];
+                        final trip = trips.firstWhere(
+                          (t) => t.id == widget.tripId,
+                          orElse: () => Trip(
+                            id: widget.tripId!,
+                            userId: '',
+                            tripName: widget.tripName,
+                            startDate: widget.startDate,
+                            endDate: widget.returnDate ?? widget.startDate.add(const Duration(days: 7)),
+                            days: [],
+                          ),
+                        );
+                        
+                        return ItineraryPage(tripId: widget.tripId);
+                      },
+                    )
+                  : ItineraryPage(tripId: widget.tripId),
             ),
           ],
         ),

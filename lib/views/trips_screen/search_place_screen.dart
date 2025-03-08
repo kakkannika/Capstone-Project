@@ -64,30 +64,47 @@ class _SearchPlaceScreenState extends State<SearchPlaceScreen> {
     final tripProvider = context.read<TripViewModel>();
     
     try {
+      // Show loading indicator
+      setState(() {
+        _isLoading = true;
+      });
+      
+      // Add the place to the day
       await tripProvider.addPlaceToDay(
         dayId: widget.dayId,
         placeId: place.id,
       );
       
       if (mounted) {
+        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${place.name} added to your itinerary'),
             backgroundColor: Colors.green,
+            duration: const Duration(seconds: 1),
           ),
         );
         
+        // Call the callback to update the UI
         widget.onPlaceSelected(place);
-        Navigator.pop(context);
+        
+        // Return to the previous screen
+        Navigator.pop(context, true);
       }
     } catch (e) {
       if (mounted) {
+        // Show error message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error adding place: $e'),
             backgroundColor: Colors.red,
           ),
         );
+        
+        // Reset loading state
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
@@ -104,65 +121,80 @@ class _SearchPlaceScreenState extends State<SearchPlaceScreen> {
         ),
         iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: Column(
+      body: Stack(
         children: [
-          // Search Bar
-          Container(
-            padding: const EdgeInsets.all(16),
-            color: Colors.white,
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search for a place...',
-                prefixIcon: const Icon(Icons.search, color: Color(0xFF0D3E4C)),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
+          Column(
+            children: [
+              // Search Bar
+              Container(
+                padding: const EdgeInsets.all(16),
+                color: Colors.white,
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search for a place...',
+                    prefixIcon: const Icon(Icons.search, color: Color(0xFF0D3E4C)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.grey[300]!),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFF0D3E4C)),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[50],
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  ),
+                  onChanged: (value) {
+                    _searchPlaces(value);
+                  },
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Color(0xFF0D3E4C)),
-                ),
-                filled: true,
-                fillColor: Colors.grey[50],
-                contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               ),
-              onChanged: (value) {
-                _searchPlaces(value);
-              },
+              
+              // Divider
+              Container(
+                height: 1,
+                color: Colors.grey[300],
+              ),
+              
+              // Search Results
+              Expanded(
+                child: _isLoading && _searchResults.isEmpty
+                    ? const Center(child: CircularProgressIndicator())
+                    : _error != null
+                        ? Center(child: Text(_error!, style: const TextStyle(color: Colors.red)))
+                        : _searchResults.isEmpty
+                            ? Center(
+                                child: _searchController.text.isEmpty
+                                    ? const Text('Search for places to add to your itinerary')
+                                    : const Text('No places found. Try a different search term.'),
+                              )
+                            : ListView.builder(
+                                itemCount: _searchResults.length,
+                                itemBuilder: (context, index) {
+                                  final place = _searchResults[index];
+                                  return _buildPlaceListItem(place);
+                                },
+                              ),
+              ),
+            ],
+          ),
+          
+          // Loading Overlay when adding a place
+          if (_isLoading && _searchResults.isNotEmpty)
+            Container(
+              color: Colors.black.withOpacity(0.3),
+              child: const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ),
             ),
-          ),
-          
-          // Divider
-          Container(
-            height: 1,
-            color: Colors.grey[300],
-          ),
-          
-          // Search Results
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _error != null
-                    ? Center(child: Text(_error!, style: const TextStyle(color: Colors.red)))
-                    : _searchResults.isEmpty
-                        ? Center(
-                            child: _searchController.text.isEmpty
-                                ? const Text('Search for places to add to your itinerary')
-                                : const Text('No places found. Try a different search term.'),
-                          )
-                        : ListView.builder(
-                            itemCount: _searchResults.length,
-                            itemBuilder: (context, index) {
-                              final place = _searchResults[index];
-                              return _buildPlaceListItem(place);
-                            },
-                          ),
-          ),
         ],
       ),
     );

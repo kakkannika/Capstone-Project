@@ -22,35 +22,19 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _loadUserTrips();
+    
+    // Start listening to trips stream
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<TripViewModel>(context, listen: false).startListeningToTrips();
+    });
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    // Stop listening to trips stream
+    Provider.of<TripViewModel>(context, listen: false).stopListeningToTrips();
     super.dispose();
-  }
-
-  Future<void> _loadUserTrips() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      // Fetch trips for the current user
-      await Provider.of<TripViewModel>(context, listen: false).fetchTripsForCurrentUser();
-    } catch (e) {
-      // Handle error
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading trips: $e')),
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
   }
 
   @override
@@ -77,38 +61,43 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
           ],
         ),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Consumer<TripViewModel>(
-              builder: (context, tripViewModel, child) {
-                if (tripViewModel.error != null) {
-                  return Center(child: Text('Error: ${tripViewModel.error}'));
-                }
+      body: StreamBuilder<List<Trip>>(
+        stream: Provider.of<TripViewModel>(context, listen: false).getTripsStream(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+          
+          final trips = snapshot.data ?? [];
+          
+          final upcomingTrips = trips.where((trip) {
+            return trip.endDate.isAfter(DateTime.now());
+          }).toList();
 
-                final upcomingTrips = tripViewModel.trips.where((trip) {
-                  return trip.endDate.isAfter(DateTime.now());
-                }).toList();
+          final pastTrips = trips.where((trip) {
+            return trip.endDate.isBefore(DateTime.now());
+          }).toList();
+          
+          return TabBarView(
+            controller: _tabController,
+            children: [
+              // Upcoming Trips Tab
+              upcomingTrips.isEmpty
+                  ? _buildEmptyState('No upcoming trips', 'Plan a new trip to get started!')
+                  : _buildTripsList(upcomingTrips),
 
-                final pastTrips = tripViewModel.trips.where((trip) {
-                  return trip.endDate.isBefore(DateTime.now());
-                }).toList();
-
-                return TabBarView(
-                  controller: _tabController,
-                  children: [
-                    // Upcoming Trips Tab
-                    upcomingTrips.isEmpty
-                        ? _buildEmptyState('No upcoming trips', 'Plan a new trip to get started!')
-                        : _buildTripsList(upcomingTrips),
-
-                    // Past Trips Tab
-                    pastTrips.isEmpty
-                        ? _buildEmptyState('No past trips', 'Your completed trips will appear here.')
-                        : _buildTripsList(pastTrips),
-                  ],
-                );
-              },
-            ),
+              // Past Trips Tab
+              pastTrips.isEmpty
+                  ? _buildEmptyState('No past trips', 'Your completed trips will appear here.')
+                  : _buildTripsList(pastTrips),
+            ],
+          );
+        },
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -377,7 +366,7 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
 
     // If the trip was updated successfully, refresh the trips list
     if (result == true) {
-      _loadUserTrips();
+      Provider.of<TripViewModel>(context, listen: false).startListeningToTrips();
     }
   }
 
@@ -436,9 +425,6 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
         setState(() {
           _isLoading = false;
         });
-        
-        // Refresh the trips list
-        _loadUserTrips();
       }
     }
   }

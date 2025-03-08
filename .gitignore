@@ -41,3 +41,16 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Ignore everything
+*
+
+# Except the lib directory
+!lib/
+!lib/**
+
+# Except the pubspec.yaml file
+!pubspec.yaml
+
+# Ignore build outputs
+build/
