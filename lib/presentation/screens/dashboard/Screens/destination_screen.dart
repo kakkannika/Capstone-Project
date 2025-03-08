@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tourism_app/models/place/place.dart';
 import 'package:tourism_app/models/place/place_category.dart';
+import 'package:tourism_app/presentation/screens/dashboard/Screens/main_screen.dart';
 import 'package:tourism_app/presentation/screens/dashboard/widgets/header.dart';
+import 'package:tourism_app/presentation/widgets/dertam_button.dart';
 import 'package:tourism_app/theme/theme.dart';
 
 class DestinationScreen extends StatefulWidget {
-  const DestinationScreen({super.key});
+  final ScreenType screenType;
+  const DestinationScreen({super.key, required this.screenType});
 
   @override
   State<DestinationScreen> createState() => _DestinationScreenState();
@@ -32,39 +35,101 @@ class _DestinationScreenState extends State<DestinationScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Header(),
+              Header(
+                currentScreen: widget.screenType,
+              ),
               SizedBox(height: DertamSpacings.m),
               Form(
                 key: _formKey,
                 child: Column(
                   children: [
-                    _buildTextField('Place Name', nameController),
-                    _buildTextField('Description', descriptionController,
+                    InputTextField(
+                        label: 'Place Name', controller: nameController),
+                    InputTextField(
+                        label: 'Description',
+                        controller: descriptionController,
                         maxLines: 3),
-                    _buildDropdown('Category', PlaceCategory.values,
-                        (value) => setState(() => selectedCategory = value)),
-                    _buildTextField('Entrance Fees', entranceFeesController,
-                        keyboardType: TextInputType.number),
-                    _buildTextField('Opening Hours', openingHoursController),
-                    _buildTextField('Image URL', imageUrlController),
-                    _buildTextField('Location', locationController),
-                    SwitchListTile(
-                      title: Text('Enabled'),
-                      value: isEnabled,
-                      onChanged: (value) => setState(() => isEnabled = value),
+                    DropDownMenu(
+                      label: 'Category',
+                      items: PlaceCategory.values,
+                      onChanged: (value) =>
+                          setState(() => selectedCategory = value),
+                      value: selectedCategory,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ElevatedButton(
-                            onPressed: _savePlace, child: Text('Save')),
-                        ElevatedButton(
-                          onPressed: _resetForm,
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red),
-                          child: Text('Reset'),
+                    InputTextField(
+                        label: 'Entrance Fees',
+                        controller: entranceFeesController),
+                    InputTextField(
+                        label: 'Opening Hours',
+                        controller: openingHoursController),
+                    InputTextField(
+                        label: 'Image URL', controller: imageUrlController),
+                    InputTextField(
+                        label: 'Location', controller: locationController),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      child: Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        decoration: BoxDecoration(
+                          color: DertamColors.white,
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      ],
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: Checkbox(
+                                value: isEnabled,
+                                activeColor: DertamColors.primary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                onChanged: (value) =>
+                                    setState(() => isEnabled = value ?? false),
+                              ),
+                            ),
+                            SizedBox(width: 16),
+                            Text(
+                              'Enabled',
+                              style: DertamTextStyles.body
+                                  .copyWith(color: DertamColors.textNormal),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 8),
+                              child: DertamButton(
+                                onPressed: _savePlace,
+                                text: 'Save',
+                                buttonType: ButtonType.primary,
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 8),
+                              child: DertamButton(
+                                onPressed: _resetForm,
+                                text: 'Reset',
+                                buttonType: ButtonType.secondary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -73,32 +138,6 @@ class _DestinationScreenState extends State<DestinationScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildTextField(String label, TextEditingController controller,
-      {int maxLines = 1, TextInputType keyboardType = TextInputType.text}) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 8),
-      child: TextFormField(
-        controller: controller,
-        maxLines: maxLines,
-        keyboardType: keyboardType,
-        decoration:
-            InputDecoration(labelText: label, border: OutlineInputBorder()),
-      ),
-    );
-  }
-
-  Widget _buildDropdown(String label, List<PlaceCategory> items,
-      ValueChanged<PlaceCategory?> onChanged) {
-    return DropdownButtonFormField<PlaceCategory>(
-      decoration:
-          InputDecoration(labelText: label, border: OutlineInputBorder()),
-      items: items
-          .map((e) => DropdownMenuItem(value: e, child: Text(e.name)))
-          .toList(),
-      onChanged: onChanged,
     );
   }
 
@@ -130,5 +169,142 @@ class _DestinationScreenState extends State<DestinationScreen> {
       selectedCategory = null;
       isEnabled = false;
     });
+  }
+}
+
+class InputTextField extends StatelessWidget {
+  final String label;
+  final TextEditingController controller;
+  final int? maxLines;
+  const InputTextField(
+      {super.key,
+      required this.label,
+      required this.controller,
+      this.maxLines = 1});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      child: TextFormField(
+        controller: controller,
+        maxLines: maxLines,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: DertamTextStyles.body.copyWith(
+            color: DertamColors.textNormal,
+          ),
+          filled: true,
+          fillColor: DertamColors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        ),
+      ),
+    );
+  }
+}
+
+class DropDownMenu extends StatelessWidget {
+  final String label;
+  final List<PlaceCategory> items;
+  final void Function(PlaceCategory?) onChanged;
+  final PlaceCategory? value;
+
+  const DropDownMenu({
+    super.key,
+    required this.label,
+    required this.items,
+    required this.onChanged,
+    this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      child: DropdownButtonFormField<PlaceCategory>(
+        value: value,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: DertamTextStyles.body.copyWith(
+            color: DertamColors.textNormal,
+          ),
+          filled: true,
+          fillColor: DertamColors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: Colors.grey.shade300),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: Colors.grey.shade300),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: DertamColors.primary, width: 2),
+          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        ),
+        dropdownColor: Colors.white,
+        icon: Icon(Icons.arrow_drop_down, color: DertamColors.iconNormal),
+        isExpanded: true,
+        style: DertamTextStyles.body.copyWith(
+          color: DertamColors.textNormal,
+        ),
+
+        // Customize dropdown items
+        items: items.map((PlaceCategory category) {
+          return DropdownMenuItem<PlaceCategory>(
+            value: category,
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                children: [
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      _formatCategoryName(category.name),
+                      style: DertamTextStyles.body.copyWith(
+                        color: DertamColors.textNormal,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
+
+        selectedItemBuilder: (BuildContext context) {
+          return items.map<Widget>((PlaceCategory category) {
+            return Row(
+              children: [
+                SizedBox(width: 12),
+                Text(
+                  _formatCategoryName(category.name),
+                  style: DertamTextStyles.body.copyWith(
+                    color: DertamColors.textNormal,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            );
+          }).toList();
+        },
+
+        onChanged: onChanged,
+        menuMaxHeight: 300,
+      ),
+    );
+  }
+
+  String _formatCategoryName(String name) {
+    return name
+        .split('_')
+        .map((word) =>
+            word.isEmpty ? '' : '${word[0].toUpperCase()}${word.substring(1)}')
+        .join(' ');
   }
 }

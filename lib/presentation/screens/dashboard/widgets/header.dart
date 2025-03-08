@@ -1,16 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:tourism_app/presentation/screens/dashboard/Screens/main_screen.dart';
 import 'package:tourism_app/theme/theme.dart';
 
 class Header extends StatelessWidget {
+  final ScreenType currentScreen;
   const Header({
     super.key,
+    required this.currentScreen,
   });
+
+  String _getScreenTitle() {
+    switch (currentScreen) {
+      case ScreenType.dashboard:
+        return 'Dashboard';
+      case ScreenType.destination:
+        return 'Destinations';
+      case ScreenType.users:
+        return 'Users';
+      case ScreenType.notifications:
+        return 'Notifications';
+      case ScreenType.expenses:
+        return 'Expenses';
+      case ScreenType.settings:
+        return 'Settings';
+      default:
+        return 'Dashboard';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text('Dashboard',
+        Text(_getScreenTitle(),
             style:
                 DertamTextStyles.heading.copyWith(color: DertamColors.primary)),
         Spacer(

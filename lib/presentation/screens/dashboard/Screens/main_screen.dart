@@ -30,21 +30,25 @@ class _MainScreenState extends State<MainScreen> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Simplified side menu that just calls _setScreen
-            Expanded(
+            // Give the side menu a more specific width constraint
+            Container(
+              width: 280, // Or use a responsive approach
               child: SideMenu(
                 currentScreen: _currentScreen,
                 onScreenChanged: _setScreen,
               ),
             ),
-            // Using IndexedStack to maintain state of all screens
+            // Main content
             Expanded(
-              flex: 5,
               child: IndexedStack(
                 index: _getScreenIndex(),
                 children: [
-                  DashboardScreen(),
-                  DestinationScreen(), // Settings screen
+                  DashboardScreen(
+                    screenType: ScreenType.dashboard,
+                  ),
+                  DestinationScreen(
+                    screenType: ScreenType.destination,
+                  ), // Placeholder for settings
                 ],
               ),
             ),
