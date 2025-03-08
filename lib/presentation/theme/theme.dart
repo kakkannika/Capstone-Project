@@ -18,6 +18,9 @@ class DertamColors {
   static Color black = Colors.black;
   static Color grey = Colors.grey;
   static Color orange = Colors.orange;
+  static Color blueSky = const Color.fromARGB(255, 200, 233, 252);
+
+
   
   static Color get backGroundColor {
     return DertamColors.primary;
@@ -70,6 +73,7 @@ class DertamSpacings {
   static const double l = 24;
   static const double xl = 32;
   static const double xxl = 40;
+  static const double xxxl = 50;
 
   static const double radius = 16;
   static const double radiusLarge = 24;

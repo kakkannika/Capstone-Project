@@ -11,6 +11,7 @@ class DertamButton extends StatelessWidget {
     this.shape,
     this.height,
     this.width, // Add shape parameter
+    this.color,
   });
 
   final VoidCallback onPressed;
@@ -20,12 +21,14 @@ class DertamButton extends StatelessWidget {
   final OutlinedBorder? shape;
   final double? width;
   final double? height; // Define shape parameter
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
-    Color backGroundColor = buttonType == ButtonType.primary
-        ? DertamColors.primary
-        : DertamColors.white;
+     Color backGroundColor = color ?? // Use the provided color, or fallback to default
+        (buttonType == ButtonType.primary
+            ? DertamColors.primary
+            : DertamColors.white);
 
     BorderSide border = buttonType == ButtonType.primary
         ? BorderSide.none

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tourism_app/presentation/budget/select_currency_screen.dart';
 import 'package:tourism_app/presentation/screens/auth/get_start_screen.dart';
 
 void main() {
@@ -13,7 +14,7 @@ class MyApp extends StatelessWidget {
     
       title: 'Tourism App',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: GetStartedScreen(),
+      home: SelectCurrencyScreen(),
     );
   }
 }

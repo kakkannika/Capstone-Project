@@ -26,7 +26,7 @@ class ProfileScreen extends StatelessWidget {
             'Profile',
             style: TextStyle(color: Colors.black, fontSize: 20),
           ),
-          backgroundColor: Colors.transparent,
+          backgroundColor: DertamColors.black,
           elevation: 0,
           actions: [
             IconButton(

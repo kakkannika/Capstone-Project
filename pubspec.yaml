@@ -47,6 +47,7 @@ flutter:
     - lib/assets/images/google.png
     - lib/assets/images/phone.png
     - lib/assets/images/profile.png
+    - lib/assets/images/background_budget.jpg
     
     
 
