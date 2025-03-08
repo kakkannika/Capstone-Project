@@ -1,32 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:tourism_app/main.dart';
-import 'package:tourism_app/prsentation/screens/Trip_Plan1/search_screen.dart' as search;
-import 'package:tourism_app/prsentation/screens/Trip_Plan1/trip_plan_test.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: 'SF Pro Display',
-        useMaterial3: true,
-      ),
-      home: const PlanNewTripScreen(),
-    );
-  }
-}
+import 'package:tourism_app/prsentation/screens/Trip_Plan1/Start_Plan/search_screen.dart' as search;
+import 'package:tourism_app/prsentation/screens/Trip_Plan1/Trip_Planner/trip_plan_test.dart';
 
 class PlanNewTripScreen extends StatefulWidget {
-  const PlanNewTripScreen({Key? key}) : super(key: key);
+  const  PlanNewTripScreen({Key? key}) : super(key: key);
 
   @override
   _PlanNewTripScreenState createState() => _PlanNewTripScreenState();
@@ -324,44 +302,45 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
                     const SizedBox(height: 30),
                     // Start Planning Button
                     ElevatedButton(
-                      onPressed: isFormValid() ? () async {
-                        if (_formKey.currentState!.validate()) {
-                          final result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TripPlannerScreen(
-                                selectedDestinations: selectedDestinations,
-                                startDate: startDate!,
-                              ),
-                            ),
-                          );
-                          if (result != null) {
-                            setState(() {
-                              selectedDestinations.add(result);
-                            });
-                          }
-                        }
-                      } : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF0D3E4C),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        elevation: 2,
-                        disabledBackgroundColor: Colors.grey[300],
-                      ),
-                      child: const Text(
-                        'START PLANNING',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                    ),
-                    if (!isFormValid())
+  onPressed: isFormValid() ? () async {
+    if (_formKey.currentState!.validate()) {
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => TripPlannerScreen(
+            selectedDestinations: selectedDestinations,
+            startDate: startDate!,
+            returnDate: returnDate, // Pass the return date here
+          ),
+        ),
+      );
+      if (result != null) {
+        setState(() {
+          selectedDestinations.add(result);
+        });
+      }
+    }
+  } : null,
+  style: ElevatedButton.styleFrom(
+    backgroundColor: const Color(0xFF0D3E4C),
+    foregroundColor: Colors.white,
+    padding: const EdgeInsets.symmetric(vertical: 16),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+    ),
+    elevation: 2,
+    disabledBackgroundColor: Colors.grey[300],
+  ),
+  child: const Text(
+    'START PLANNING',
+    style: TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.bold,
+      letterSpacing: 1.2,
+    ),
+  ),
+),
+       if (!isFormValid())
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(

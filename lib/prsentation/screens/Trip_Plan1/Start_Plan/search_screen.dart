@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../data/dummy_data.dart';
+import '../../../../data/dummy_data.dart';
 
 class DetailedSearchScreen extends StatefulWidget {
   const DetailedSearchScreen({Key? key}) : super(key: key);
