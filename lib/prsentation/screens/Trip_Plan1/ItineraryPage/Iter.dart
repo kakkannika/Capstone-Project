@@ -1,363 +1,420 @@
-// import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:tourism_app/data/models/Trip_Plan/trip_model.dart';
 
-// void main() {
-//   runApp(const MyApp());
-// }
+void main() {
+  runApp(MyApp());
+}
 
-// class MyApp extends StatelessWidget {
-//   const MyApp({Key? key}) : super(key: key);
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    
+    // Example trip data
+    final trip = TripModel(
+      startDate: DateTime(2025, 3, 8),
+      returnDate: DateTime(2025, 3, 15),
+      selectedDestinations: ['Paris', 'London', 'Rome'],
+    );
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       theme: ThemeData(
-//         primarySwatch: Colors.blue,
-//         fontFamily: 'SF Pro Display',
-//       ),
-//       home: const ItineraryPage(),
-//     );
-//   }
-// }
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Tourism App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: ItineraryPage(trip: trip),
+    );
+  }
+}
+class ItineraryPage extends StatefulWidget {
+  final TripModel trip;
 
-// class ItineraryPage extends StatelessWidget {
-//   const ItineraryPage({Key? key}) : super(key: key);
+  const ItineraryPage({
+    Key? key,
+    required this.trip,
+  }) : super(key: key);
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: Colors.grey[100],
-//       body: SafeArea(
-//         child: Column(
-//           children: [
-//             // Header section with back button, title, and menu
-//             Padding(
-//               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                 children: [
-//                   const Icon(Icons.home, color: Colors.black),
-//                   const Text(
-//                     'Trip to Siem Reap',
-//                     style: TextStyle(
-//                       fontSize: 18,
-//                       fontWeight: FontWeight.bold,
-//                     ),
-//                   ),
-//                   Row(
-//                     children: [
-//                       const Icon(Icons.share, color: Colors.black),
-//                       const SizedBox(width: 16),
-//                       Icon(Icons.more_vert, color: Colors.black),
-//                     ],
-//                   ),
-//                 ],
-//               ),
-//             ),
-            
-//             // Main content
-//             Expanded(
-//               child: Container(
-//                 margin: const EdgeInsets.all(16.0),
-//                 decoration: BoxDecoration(
-//                   color: Colors.white,
-//                   borderRadius: BorderRadius.circular(8.0),
-//                   boxShadow: [
-//                     BoxShadow(
-//                       color: Colors.black.withOpacity(0.1),
-//                       blurRadius: 4,
-//                       offset: const Offset(0, 2),
-//                     ),
-//                   ],
-//                 ),
-//                 child: Column(
-//                   children: [
-//                     // Tabs
-//                     Padding(
-//                       padding: const EdgeInsets.all(16.0),
-//                       child: Row(
-//                         children: [
-//                           const Text(
-//                             'Overview',
-//                             style: TextStyle(
-//                               fontSize: 16,
-//                               fontWeight: FontWeight.w500,
-//                             ),
-//                           ),
-//                           const SizedBox(width: 24),
-//                           const Text(
-//                             'Itinerary',
-//                             style: TextStyle(
-//                               fontSize: 16,
-//                               fontWeight: FontWeight.w500,
-//                               color: Colors.blue,
-//                             ),
-//                           ),
-//                           const Spacer(),
-//                           const Text(
-//                             '\$',
-//                             style: TextStyle(
-//                               fontSize: 16,
-//                               fontWeight: FontWeight.w500,
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-                    
-//                     const Divider(height: 1),
-                    
-//                     // Date selection
-//                     SizedBox(
-//                       height: 60,
-//                       child: ListView(
-//                         scrollDirection: Axis.horizontal,
-//                         children: [
-//                           _buildDateTab('Wed 1/8', true),
-//                           _buildDateTab('Thu 1/9', false),
-//                           _buildDateTab('Fri 1/10', false),
-//                           _buildDateTab('Sat 1/11', false),
-//                         ],
-//                       ),
-//                     ),
-                    
-//                     // Itinerary content
-//                     Expanded(
-//                       child: ListView(
-//                         padding: const EdgeInsets.symmetric(vertical: 8.0),
-//                         children: [
-//                           _buildItineraryItem(
-//                             day: 'Wed 1/8',
-//                             place: 'Angkor Wat',
-//                             description: 'From the web: This iconic, sprawling temple complex is surrounded by a wide moat & features intricate stone carvings.',
-//                             imageUrl: 'assets/angkor_wat.jpg',
-//                           ),
-//                           const SizedBox(height: 16),
-//                           _buildPlaceHolder('Add a place'),
-                          
-//                           const SizedBox(height: 24),
-                          
-//                           _buildItineraryItem(
-//                             day: 'Thu 1/9',
-//                             place: 'Angkor Wat',
-//                             description: 'From the web: This iconic, sprawling temple complex is surrounded by a wide moat & features intricate stone carvings.',
-//                             imageUrl: 'assets/angkor_wat.jpg',
-//                           ),
-//                           const SizedBox(height: 16),
-//                           _buildPlaceHolder('Add a place'),
-                          
-//                           const SizedBox(height: 24),
-                          
-//                           // Recommended places section
-//                           const Padding(
-//                             padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-//                             child: Text(
-//                               'Recommended places',
-//                               style: TextStyle(
-//                                 fontSize: 16,
-//                                 fontWeight: FontWeight.w500,
-//                               ),
-//                             ),
-//                           ),
-                          
-//                           SizedBox(
-//                             height: 120,
-//                             child: ListView(
-//                               scrollDirection: Axis.horizontal,
-//                               padding: const EdgeInsets.symmetric(horizontal: 12.0),
-//                               children: [
-//                                 _buildRecommendedPlace('Royal Palace'),
-//                                 _buildRecommendedPlace('Royal Palace'),
-//                               ],
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
+  @override
+  _ItineraryPageState createState() => _ItineraryPageState();
+}
+
+class _ItineraryPageState extends State<ItineraryPage> {
+  int _selectedTabIndex = 1; 
+  final List<String> _tabs = ['Overview', 'Itinerary', 'Explore', '\$'];
+  List<DateTime> _tripDates = [];
+  int _selectedDateIndex = 0;
+  
+  @override
+  void initState() {
+    super.initState();
+    _generateTripDates();
+  }
+  
+  void _generateTripDates() {
+    _tripDates = [];
+    if (widget.trip.returnDate != null) {
+      final int dayCount = widget.trip.returnDate!.difference(widget.trip.startDate).inDays + 1;
+      for (int i = 0; i < dayCount; i++) {
+        _tripDates.add(widget.trip.startDate.add(Duration(days: i)));
+      }
+    } else {
+      // Default to 3 days if no return date
+      for (int i = 0; i < 3; i++) {
+        _tripDates.add(widget.trip.startDate.add(Duration(days: i)));
+      }
+    }
+  }
+
+  String _getDayName(DateTime date) {
+    final dayFormat = DateFormat('EEE');
+    return dayFormat.format(date);
+  }
+
+  String _getDayNumber(DateTime date) {
+    final dateFormat = DateFormat('M/d');
+    return dateFormat.format(date);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Get first non-null destination or use 'Unknown' as fallback
+    String primaryDestination = 'Unknown';
+    for (String? destination in widget.trip.selectedDestinations) {
+      if (destination != null && destination.isNotEmpty) {
+        primaryDestination = destination;
+        break;
+      }
+    }
+    
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildAppBar(primaryDestination),
+            _buildTabs(),
+            _buildDateSelector(),
+            Expanded(
+              child: _buildItineraryContent(),
+            ),
+          ],
+        ),
+      ),
       
-//       // Floating action buttons
-//       floatingActionButton: Column(
-//         mainAxisAlignment: MainAxisAlignment.end,
-//         children: [
-//           FloatingActionButton(
-//             onPressed: () {},
-//             backgroundColor: Colors.black,
-//             child: const Icon(Icons.add, color: Colors.white),
-//           ),
-//           const SizedBox(height: 16),
-//           FloatingActionButton(
-//             onPressed: () {},
-//             backgroundColor: Colors.black,
-//             child: const Icon(Icons.map, color: Colors.white),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
+    );
+  }
+
+  Widget _buildAppBar(String destination) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.home, color: Colors.black54),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              'Trip to $destination',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.share, color: Colors.black54),
+            onPressed: () {
+              // Share functionality
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.more_horiz, color: Colors.black54),
+            onPressed: () {
+              // More options
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabs() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          bottom: BorderSide(color: Colors.grey[200]!, width: 1),
+        ),
+      ),
+      child: Row(
+        children: [
+          for (int i = 0; i < _tabs.length; i++)
+            Expanded(
+              child: InkWell(
+                onTap: () {
+                  setState(() {
+                    _selectedTabIndex = i;
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: _selectedTabIndex == i
+                            ? Colors.red
+                            : Colors.transparent,
+                        width: 3,
+                      ),
+                    ),
+                  ),
+                  child: Text(
+                    _tabs[i],
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: _selectedTabIndex == i ? Colors.red : Colors.grey,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDateSelector() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      color: Colors.grey[100],
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const SizedBox(width: 12),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.edit_calendar,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    children: List.generate(
+                      _tripDates.length, 
+                      (index) => _buildDateButton(index),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDateButton(int index) {
+    final date = _tripDates[index];
+    final isSelected = index == _selectedDateIndex;
+    
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedDateIndex = index;
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white : Colors.grey[200],
+          borderRadius: BorderRadius.circular(8),
+          boxShadow: isSelected ? [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ] : null,
+        ),
+        child: Column(
+          children: [
+            Text(
+              _getDayName(date),
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              _getDayNumber(date),
+              style: TextStyle(
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildItineraryContent() {
+    final selectedDate = _tripDates[_selectedDateIndex];
+    final dayFormat = DateFormat('EEE M/d');
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                dayFormat.format(selectedDate),
+                style: const TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  // Show subheading edit dialog
+                },
+                child: Row(
+                  children: [
+                    Text(
+                      'Add subheading',
+                      style: TextStyle(
+                        color: Colors.grey[400],
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(Icons.more_vert, color: Colors.grey),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.auto_fix_high, color: Colors.blue, size: 18),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Auto-fill day',
+                    style: TextStyle(
+                      color: Colors.blue[700],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              const Text(' · ', style: TextStyle(color: Colors.grey)),
+              Row(
+                children: [
+                  const Icon(Icons.route, color: Colors.blue, size: 18),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Optimize route',
+                    style: TextStyle(
+                      color: Colors.blue[700],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.orange,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text(
+                      'PRO',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildPlaceItem(),
+      ],
+    );
+  }
+
+  Widget _buildPlaceItem() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            const Icon(Icons.location_on, color: Colors.grey),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text(
+                'Add a place',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.copy_all, color: Colors.grey),
+              onPressed: () {
+                // Duplicate functionality
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.list, color: Colors.grey),
+              onPressed: () {
+                // List view functionality
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+ 
   
-//   Widget _buildDateTab(String date, bool isSelected) {
-//     return Container(
-//       width: 90,
-//       margin: const EdgeInsets.symmetric(horizontal: 4.0),
-//       decoration: BoxDecoration(
-//         color: isSelected ? Colors.grey[300] : Colors.transparent,
-//         borderRadius: BorderRadius.circular(4.0),
-//       ),
-//       child: Center(
-//         child: Text(
-//           date,
-//           style: TextStyle(
-//             fontSize: 14,
-//             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-  
-//   Widget _buildItineraryItem({
-//     required String day,
-//     required String place,
-//     required String description,
-//     required String imageUrl,
-//   }) {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Text(
-//             day,
-//             style: const TextStyle(
-//               fontSize: 18,
-//               fontWeight: FontWeight.bold,
-//               color: Colors.blue,
-//             ),
-//           ),
-//           const SizedBox(height: 8),
-//           Row(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: [
-//               const Icon(Icons.location_on, color: Colors.blue, size: 20),
-//               const SizedBox(width: 8),
-//               Expanded(
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     Text(
-//                       place,
-//                       style: const TextStyle(
-//                         fontSize: 16,
-//                         fontWeight: FontWeight.w500,
-//                       ),
-//                     ),
-//                     const SizedBox(height: 4),
-//                     Text(
-//                       description,
-//                       style: TextStyle(
-//                         fontSize: 14,
-//                         color: Colors.grey[600],
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//               const SizedBox(width: 12),
-//               Container(
-//                 width: 80,
-//                 height: 80,
-//                 decoration: BoxDecoration(
-//                   borderRadius: BorderRadius.circular(4.0),
-//                   image: DecorationImage(
-//                     image: AssetImage(imageUrl),
-//                     fit: BoxFit.cover,
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-  
-//   Widget _buildPlaceHolder(String text) {
-//     return Container(
-//       margin: const EdgeInsets.symmetric(horizontal: 16.0),
-//       padding: const EdgeInsets.symmetric(vertical: 12.0),
-//       decoration: BoxDecoration(
-//         color: Colors.grey[200],
-//         borderRadius: BorderRadius.circular(4.0),
-//       ),
-//       child: Row(
-//         children: [
-//           const SizedBox(width: 16),
-//           const Icon(Icons.location_on, color: Colors.grey),
-//           const SizedBox(width: 8),
-//           Text(
-//             text,
-//             style: TextStyle(
-//               fontSize: 14,
-//               color: Colors.grey[600],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-  
-//   Widget _buildRecommendedPlace(String name) {
-//     return Container(
-//       width: 150,
-//       margin: const EdgeInsets.symmetric(horizontal: 4.0),
-//       decoration: BoxDecoration(
-//         border: Border.all(color: Colors.grey[300]!),
-//         borderRadius: BorderRadius.circular(8.0),
-//       ),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Expanded(
-//             child: ClipRRect(
-//               borderRadius: const BorderRadius.only(
-//                 topLeft: Radius.circular(8.0),
-//                 topRight: Radius.circular(8.0),
-//               ),
-//               child: Image.asset(
-//                 'assets/royal_palace.jpg',
-//                 fit: BoxFit.cover,
-//                 width: double.infinity,
-//               ),
-//             ),
-//           ),
-//           Padding(
-//             padding: const EdgeInsets.all(8.0),
-//             child: Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 Text(
-//                   name,
-//                   style: const TextStyle(fontSize: 12),
-//                 ),
-//                 Container(
-//                   decoration: BoxDecoration(
-//                     shape: BoxShape.circle,
-//                     border: Border.all(color: Colors.grey),
-//                   ),
-//                   child: const Icon(Icons.add, size: 16),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+}

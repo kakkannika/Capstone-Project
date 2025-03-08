@@ -285,9 +285,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
         const SizedBox(height: 12),
         
         // Add a place button for day 1
-        _buildAddPlaceButton(
-          
-        ),
+        _buildAddPlaceButton(0),
         
         const SizedBox(height: 24),
         
@@ -397,7 +395,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
         const SizedBox(height: 12),
         
         // Add a place button for day 2
-        _buildAddPlaceButton(),
+        _buildAddPlaceButton(0),
         
         const SizedBox(height: 24),
         
@@ -454,46 +452,47 @@ class _ItineraryPageState extends State<ItineraryPage> {
     );
   }
 
-  Widget _buildAddPlaceButton() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, 1),
-            spreadRadius: 0,
+  Widget _buildAddPlaceButton(int dayIndex) {
+  String date = _dates[dayIndex];
+  return Container(
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(8),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.05),
+          blurRadius: 4,
+          offset: const Offset(0, 1),
+          spreadRadius: 0,
+        ),
+      ],
+    ),
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    child: Row(
+      children: [
+        const Icon(Icons.location_on_outlined, color: Colors.grey, size: 18),
+        const SizedBox(width: 8),
+        Text(
+          'Add a place for $date',
+          style: const TextStyle(
+            color: Colors.grey,
+            fontSize: 14,
           ),
-        ],
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Row(
-        children: [
-          const Icon(Icons.location_on_outlined, color: Colors.grey, size: 18),
-          const SizedBox(width: 8),
-          const Text(
-            'Add a place',
-            style: TextStyle(
-              color: Colors.grey,
-              fontSize: 14,
-            ),
+        ),
+        const Spacer(),
+        Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(4),
           ),
-          const Spacer(),
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: const Icon(Icons.content_copy_outlined, color: Colors.grey, size: 16),
-          ),
-        ],
-      ),
-    );
-  }
+          child: const Icon(Icons.content_copy_outlined, color: Colors.grey, size: 16),
+        ),
+      ],
+    ),
+  );
+}
 
   Widget _buildRecommendedPlace(String name, String imageUrl) {
     return Expanded(

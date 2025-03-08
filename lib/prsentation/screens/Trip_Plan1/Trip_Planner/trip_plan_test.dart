@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tourism_app/data/models/Trip_Plan/trip_model.dart';
 import 'package:tourism_app/prsentation/screens/Trip_Plan1/ItineraryPage/ItineraryPage.dart';
+import 'package:tourism_app/prsentation/screens/Trip_Plan1/Trip_Planner/add_places.dart';
+
 class TripPlannerScreen extends StatefulWidget {
   final List<String?> selectedDestinations;
   final DateTime startDate;
@@ -164,117 +166,138 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   }
   
   Widget _buildHeroImage() {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        Image.network(
-          'https://lp-cms-production.imgix.net/2025-01/Cambodia-Angkor-Wat-Waj-shutterstockRF312461543-crop.jpg?auto=format&q=72&w=1440&h=810&fit=crop',
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return Container(
-              color: Colors.grey[300],
-              child: const Icon(Icons.image, size: 80, color: Colors.grey),
-            );
-          },
-        ),
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.transparent,
-                Colors.black.withOpacity(0.7),
-              ],
-            ),
+  return Stack(
+    fit: StackFit.expand,
+    children: [
+      Image.network(
+        'https://lp-cms-production.imgix.net/2025-01/Cambodia-Angkor-Wat-Waj-shutterstockRF312461543-crop.jpg?auto=format&q=72&w=1440&h=810&fit=crop',
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: Colors.grey[300],
+            child: const Icon(Icons.image, size: 80, color: Colors.grey),
+          );
+        },
+      ),
+      Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.transparent,
+              Colors.black.withOpacity(0.7),
+            ],
           ),
         ),
-        Positioned(
-          bottom: 16,
-          left: 16,
-          child: Text(
-            'Trip to ${widget.selectedDestinations.first ?? "Unknown"}',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              shadows: [
-                Shadow(
-                  offset: const Offset(1, 1),
-                  blurRadius: 3.0,
-                  color: Colors.black.withOpacity(0.5),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-  
-  Widget _buildTripInfoCard(String primaryDestination) {
+      ),
+      Positioned(
+        bottom: 16,
+        left: 16,
+        right: 16,
+            child: 
+            Text(
+                'Trip to ${widget.selectedDestinations.first ?? "Unknown"}',
+                 style: const TextStyle(
+                 color: Colors.white,
+                 fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+           ),
+            
+      ),
+    ],
+  );
+}
+Widget _buildTripInfoCard(String primaryDestination) {
   return Card(
     margin: const EdgeInsets.all(12),
     elevation: 2,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     child: Padding(
-      padding: EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.all(16),
+      child: Row(
         children: [
-          Row(
-            children: [
-              Icon(Icons.calendar_today, size: 18, color: Colors.blue),
-              SizedBox(width: 12),
-              GestureDetector(
-                onTap: _selectDate,
-                child: Text(
-                  _selectedDate == null
-                      ? 'Select trip dates'
-                      : '${DateFormat('MMM dd, yyyy').format(_selectedDate!)} - ${widget.returnDate == null ? 'Select return date' : DateFormat('MMM dd, yyyy').format(widget.returnDate!)}',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
+          // Image on the left side
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              'https://lp-cms-production.imgix.net/2025-01/Cambodia-Angkor-Wat-Waj-shutterstockRF312461543-crop.jpg?auto=format&q=72&w=1440&h=810&fit=crop',
+              width: 100,
+              height: 100,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  width: 100,
+                  height: 100,
+                  color: Colors.grey[300],
+                  child: const Icon(Icons.image, size: 50, color: Colors.grey),
+                );
+              },
+            ),
           ),
-          Divider(height: 24),
-          Row(
-            children: [
-              Icon(Icons.location_on, size: 18, color: Colors.red),
-              SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Destinations: ${widget.selectedDestinations.where((d) => d != null && d.isNotEmpty).join(', ')}',
-                  style: TextStyle(fontSize: 16),
-                ),
-              ),
-            ],
-          ),
-          if (widget.returnDate != null) Divider(height: 24),
-          if (widget.returnDate != null)
-            Row(
+          const SizedBox(width: 16),
+          // Text on the right side
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.flight_land, size: 18, color: Colors.green),
-                SizedBox(width: 12),
-                Text(
-                  'Return: ${DateFormat('MMM dd, yyyy').format(widget.returnDate!)}',
-                  style: TextStyle(fontSize: 16),
+                Row(
+                  children: [
+                    const Icon(Icons.calendar_today, size: 18, color: Colors.blue),
+                    const SizedBox(width: 12),
+                    GestureDetector(
+                      onTap: _selectDate,
+                      child: Text(
+                        _selectedDate == null
+                            ? 'Select trip dates'
+                            : '${DateFormat('MMM dd, yyyy').format(_selectedDate!)} - ${widget.returnDate == null ? 'Select return date' : DateFormat('MMM dd, yyyy').format(widget.returnDate!)}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const Divider(height: 24),
+                Row(
+                  children: [
+                    const Icon(Icons.location_on, size: 18, color: Colors.red),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Destinations: ${widget.selectedDestinations.where((d) => d != null && d.isNotEmpty).join(', ')}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ],
+                ),
+                if (widget.returnDate != null) const Divider(height: 24),
+                if (widget.returnDate != null)
+                  Row(
+                    children: [
+                      const Icon(Icons.receipt_long, size: 18, color: Colors.green),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Return: ${DateFormat('MMM dd, yyyy').format(widget.returnDate!)}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                const Divider(height: 24),
+                Row(
+                  children: [
+                    const Icon(Icons.timelapse, size: 18, color: Colors.orange),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Duration: ${_calculateDuration()} days',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ],
                 ),
               ],
             ),
-          Divider(height: 24),
-          Row(
-            children: [
-              Icon(Icons.timeline, size: 18, color: Colors.orange),
-              SizedBox(width: 12),
-              Text(
-                'Duration: ${_calculateDuration()} days',
-                style: TextStyle(fontSize: 16),
-              ),
-            ],
           ),
         ],
       ),
@@ -301,7 +324,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     builder: (context, child) {
       return Theme(
         data: ThemeData.light().copyWith(
-          colorScheme: ColorScheme.light(
+          colorScheme: const ColorScheme.light(
             primary: Colors.blue,
           ),
         ),
@@ -321,7 +344,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
   
   Widget _buildSectionCard(Widget content) {
     return Card(
-      margin: EdgeInsets.only(left: 12, right: 12, top: 8),
+      margin: const EdgeInsets.only(left: 12, right: 12, top: 8),
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: content,
@@ -332,13 +355,13 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     return InkWell(
       onTap: onToggle,
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Row(
           children: [
             AnimatedRotation(
               turns: isExpanded ? 0.25 : 0,
-              duration: Duration(milliseconds: 200),
-              child: Icon(
+              duration: const Duration(milliseconds: 200),
+              child: const Icon (
                 Icons.arrow_right,
                 color: Colors.black87,
                 size: 24,
@@ -352,118 +375,95 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            Spacer(),
-            const Icon(
+            const Spacer(),
+           GestureDetector(
+            onTap: () {
+              _showSectionOptions(context);
+            },
+            child: const Icon(
               Icons.more_horiz,
               color: Colors.black54,
               size: 20,
             ),
-          ],
-        ),
-      ),
-    );
-  }
-  
-  Widget _buildNotesSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader('Notes', isNotesExpanded, () {
-          setState(() {
-            isNotesExpanded = !isNotesExpanded;
-          });
-        }),
-        if (isNotesExpanded)
-          AnimatedContainer(
-            duration: Duration(milliseconds: 300),
-            padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: TextField(
-              maxLines: 4,
-              decoration: InputDecoration(
-                hintText: 'Write or paste general notes here, e.g. how to get there, things to bring, etc.',
-                hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Colors.blue),
-                ),
-                fillColor: Colors.grey[50],
-                filled: true,
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-  
-  Widget _buildPlaceCard(String imageUrl, String name) {
-    return Container(
-      height: 120,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 4,
-            offset: Offset(0, 2),
           ),
         ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  color: Colors.grey[300],
-                  child: Icon(Icons.image, size: 30, color: Colors.grey),
-                );
-              },
-            ),
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    Colors.black.withOpacity(0.7),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 8,
-              left: 8,
-              right: 8,
-              child: Text(
-                name,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  shadows: [
-                    Shadow(
-                      offset: Offset(1, 1),
-                      blurRadius: 2.0,
-                      color: Colors.black.withOpacity(0.5),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+            
+          
         ),
       ),
     );
   }
+  
+ Widget _buildNotesSection() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _buildSectionHeader('Notes', isNotesExpanded, () {
+        setState(() {
+          isNotesExpanded = !isNotesExpanded;
+        });
+      }),
+      if (isNotesExpanded)
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          child: TextField(
+            maxLines: 4,
+            decoration: InputDecoration(
+              hintText: 'Write or paste general notes here, e.g. how to get there, things to bring, etc.',
+              hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
+              border: InputBorder.none,
+              fillColor: Colors.grey[50],
+              filled: true,
+            ),
+          ),
+        ),
+    ],
+  );
+}
+
+//  start Pop Up screen 
+      void _showSectionOptions(BuildContext context) {
+            showModalBottomSheet(
+              context: context,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              builder: (context) {
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildOptionItem(Icons.edit, "Edit section heading", () {
+                        Navigator.pop(context);
+                        // Add action for editing section heading
+                      },Colors.blue),
+                      _buildOptionItem(Icons.color_lens, "Collapse all sections", () {
+                        Navigator.pop(context);
+                        // Add action for collapsing sections
+                      },Colors.green),
+                      _buildOptionItem(Icons.delete, "Delete section", () {
+                        Navigator.pop(context);
+                        // Add action for deleting section
+                      },Colors.red),
+                    ],
+                  ),
+                );
+              },
+            );
+          }
+
+          Widget _buildOptionItem(IconData icon, String label, VoidCallback onTap, Color color) {
+        return ListTile(
+          leading: Icon(icon, color: color),
+          title: Text(label, style: const TextStyle(fontSize: 16)),
+          onTap: onTap,
+        );
+    }
+
+    // end pop up 
+  
   
   Widget _buildAddPlaceCard(String name, String imageUrl) {
     return Container(
@@ -480,7 +480,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
             // Action for adding place
           },
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             child: Row(
               children: [
                 ClipRRect(
@@ -495,16 +495,16 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                         width: 50,
                         height: 50,
                         color: Colors.grey[300],
-                        child: Icon(Icons.image, size: 24, color: Colors.grey),
+                        child: const  Icon(Icons.image, size: 24, color: Colors.grey),
                       );
                     },
                   ),
                 ),
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     name,
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -525,84 +525,85 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     );
   }
   
-  Widget _buildRecommendedPlacesSection() {
-    // Temple image URLs
-    final String templeUrl = 'https://lp-cms-production.imgix.net/2025-01/Cambodia-Angkor-Wat-Waj-shutterstockRF312461543-crop.jpg?auto=format&q=72&w=1440&h=810&fit=crop';
-    
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionHeader('Recommended Places', isPlacesExpanded, () {
-          setState(() {
-            isPlacesExpanded = !isPlacesExpanded;
-          });
-        }),
-        if (isPlacesExpanded)
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            padding: const  EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: Column(
-              children: [
-                // Grid of temple images with more spacing and improved layout
-                Row(
-                  children: [
-                    Expanded(child: _buildPlaceCard(templeUrl, 'Angkor Wat')),
-                   const  SizedBox(width: 10),
-                    Expanded(child: _buildPlaceCard(templeUrl, 'Bayon Temple')),
-                    const SizedBox(width: 10),
-                    Expanded(child: _buildPlaceCard(templeUrl, 'Ta Prohm')),
-                  ],
-                ),
-               const  SizedBox(height: 16),
-                // Add place cards
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildAddPlaceCard('Royal Palace', templeUrl),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: _buildAddPlaceCard('Koh Rong Island', templeUrl),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    // Navigate to attractions search
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    elevation: 0,
+ 
+
+// Integrate the AddPlaceWidget into the _buildRecommendedPlacesSection method
+Widget _buildRecommendedPlacesSection() {
+  final String templeUrl = 'https://lp-cms-production.imgix.net/2025-01/Cambodia-Angkor-Wat-Waj-shutterstockRF312461543-crop.jpg?auto=format&q=72&w=1440&h=810&fit=crop';
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _buildSectionHeader('Places to Visits ', isPlacesExpanded, () {
+        setState(() {
+          isPlacesExpanded = !isPlacesExpanded;
+        });
+      }),
+      if (isPlacesExpanded)
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          child: Column(
+            children: [
+              AddPlaceWidget(
+                onAddPlace: () {
+                  // Action for adding place
+                },
+                onNotes: () {
+                  // Action for notes
+                },
+                onList: () {
+                  // Action for list
+                },
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildAddPlaceCard('Royal Palace', templeUrl),
                   ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children:  [
-                      Icon(Icons.search, size: 18),
-                      SizedBox(width: 8),
-                      Text(
-                        'BROWSE MORE ATTRACTIONS',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          letterSpacing: 0.5,
-                        ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildAddPlaceCard('Koh Rong Island', templeUrl),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  // Navigate to attractions search
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.search, size: 18),
+                    SizedBox(width: 8),
+                    Text(
+                      'BROWSE MORE ATTRACTIONS',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        letterSpacing: 0.5,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-      ],
-    );
-  }
-  
+        ),
+    ],
+  );
+}
   Widget _buildActivityItem(IconData icon, Color iconColor, String title, String subtitle) {
     return Container(
       margin: EdgeInsets.only(bottom: 8),
