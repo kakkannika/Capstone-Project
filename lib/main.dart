@@ -2,8 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/firebase_options.dart';
-//import 'package:tourism_app/presentation/screens/get_start_screen.dart';
-import 'package:tourism_app/presentation/screens/home/home_screen.dart';
+import 'package:tourism_app/presentation/screens/get_start_screen.dart';
 import 'package:tourism_app/providers/place_retrieve_service.dart';
 import 'package:tourism_app/providers/service.dart';
 
@@ -30,7 +29,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Tourism App',
         theme: ThemeData(primarySwatch: Colors.blue),
-        home: const HomeScreen(),
+        home: const GetStartedScreen(),
       ),
     );
   }

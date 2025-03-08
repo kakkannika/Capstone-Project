@@ -49,7 +49,8 @@ dependencies:
   provider: ^6.1.2
   firebase_admin: ^0.3.0+1
   file_picker: ^9.0.2
-
+  flutter_svg: ^0.22.0
+  fl_chart: ^0.70.2
 
 dev_dependencies:
   flutter_test:
@@ -88,7 +89,6 @@ flutter:
     - lib/assets/images/
     - lib/assets/place_images/
     - lib/assets/place.json
-  
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
