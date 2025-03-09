@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/presentation/budget/expense_screen.dart';
+import 'package:tourism_app/models/budget/budget.dart';
+import 'package:tourism_app/presentation/screens/budget/expense_screen.dart';
 import 'package:tourism_app/presentation/widgets/dertam_textfield.dart';
 import 'package:tourism_app/presentation/theme/theme.dart';
 import 'package:tourism_app/presentation/widgets/dertam_button.dart';
@@ -18,16 +19,34 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
   final TextEditingController _dailyBudgetController = TextEditingController();
 
   void _navigateToExpenseScreen() {
-  if (_totalBudgetController.text.isNotEmpty &&
-      _dailyBudgetController.text.isNotEmpty) {
+  if (_totalBudgetController.text.trim().isNotEmpty &&
+      _dailyBudgetController.text.trim().isNotEmpty) {
+    double totalBudget = double.tryParse(_totalBudgetController.text) ?? 0;
+    double dailyBudget = double.tryParse(_dailyBudgetController.text) ?? 0;
+
+    if (totalBudget <= 0 || dailyBudget <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text("Please enter valid budget values"),
+          backgroundColor: DertamColors.red,
+        ),
+      );
+      return;
+    }
+
+    // Create a `Budget` instance with dailyBudget
+    Budget budget = Budget(
+      total: totalBudget,
+      currency: widget.selectedCurrency,
+      dailyBudget: dailyBudget, // Pass the dailyBudget here
+      expenses: [], // Initially empty, can be set later
+      categoryLimits: {}, // Initially empty, can be set later
+    );
+
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ExpenseScreen(
-          totalBudget: _totalBudgetController.text,
-          dailyBudget: _dailyBudgetController.text,
-          selectedCurrency: widget.selectedCurrency,
-        ),
+        builder: (context) => ExpenseScreen(budget: budget),
       ),
     );
   } else {
@@ -46,7 +65,7 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
       backgroundColor: DertamColors.blueSky,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
         backgroundColor: Colors.transparent,
@@ -78,21 +97,17 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
               DertamTextfield(
                 label: "Total Budget (${widget.selectedCurrency})",
                 controller: _totalBudgetController,
-               // icon: Icons.attach_money,
+                //icon: Icons.attach_money,
                 borderColor: DertamColors.greyLight,
-                keyboardType: TextInputType.number,
-                focusedBorderColor: DertamColors.primary,
               ),
-              const SizedBox(height: DertamSpacings.s/2),
+              const SizedBox(height: DertamSpacings.s),
               DertamTextfield(
                 label: "Daily Budget (${widget.selectedCurrency})",
                 controller: _dailyBudgetController,
                 //icon: Icons.calendar_today,
                 borderColor: DertamColors.greyLight,
-                keyboardType: TextInputType.number,
-                focusedBorderColor: DertamColors.primary,
               ),
-              SizedBox(height: DertamSpacings.xxl),
+              const SizedBox(height: DertamSpacings.xxl),
               Center(
                 child: DertamButton(
                   text: "Continue",

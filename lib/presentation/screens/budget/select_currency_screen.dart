@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/presentation/budget/set_budget_screen.dart';
+import 'package:tourism_app/presentation/screens/budget/set_budget_screen.dart';
 import 'package:tourism_app/presentation/theme/theme.dart';
 import 'package:tourism_app/presentation/widgets/dertam_button.dart';
 
@@ -17,10 +17,10 @@ class _SelectCurrencyScreenState extends State<SelectCurrencyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true, // Allows background image to extend behind the app bar
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent, // Transparent app bar
-        elevation: 0, // Removes shadow
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
@@ -99,7 +99,7 @@ class _SelectCurrencyScreenState extends State<SelectCurrencyScreen> {
                               ),
                             );
                           }
-                        : () {}, // Provides an empty callback when no currency is selected
+                        : () {}, // Provide an empty callback to satisfy the VoidCallback type
                   ),
                 ),
               ],

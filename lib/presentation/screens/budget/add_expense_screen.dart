@@ -1,36 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:tourism_app/models/budget/expense.dart';
 import 'package:tourism_app/presentation/theme/theme.dart';
 import 'package:tourism_app/presentation/widgets/dertam_textfield.dart';
-
-enum ExpenseCategory { food, transport, shopping, other }
-
-extension ExpenseCategoryExtension on ExpenseCategory {
-  IconData get icon {
-    switch (this) {
-      case ExpenseCategory.food:
-        return Icons.fastfood;
-      case ExpenseCategory.transport:
-        return Icons.directions_car;
-      case ExpenseCategory.shopping:
-        return Icons.shopping_cart;
-      case ExpenseCategory.other:
-        return Icons.more_horiz;
-    }
-  }
-
-  String get label {
-    switch (this) {
-      case ExpenseCategory.food:
-        return "Food";
-      case ExpenseCategory.transport:
-        return "Transport";
-      case ExpenseCategory.shopping:
-        return "Shopping";
-      case ExpenseCategory.other:
-        return "Other";
-    }
-  }
-}
 
 class AddExpenseScreen extends StatefulWidget {
   final String selectedCurrency;
@@ -101,15 +72,19 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       return;
     }
 
-    Navigator.pop(context, {
-      "amount": "${widget.selectedCurrency} ${_totalExpense.toStringAsFixed(2)}",
-      "description": _descriptionController.text.isNotEmpty
+    // Create an Expense object
+    Expense newExpense = Expense.create(
+      amount: _totalExpense,
+      category: _selectedCategory,
+      date: _selectedDate,
+      description: _descriptionController.text.isNotEmpty
           ? _descriptionController.text
           : "No description",
-      "date": _selectedDate.toString(),
-      "category": _selectedCategory.label,
-      "people": _peopleController.text.isNotEmpty ? _peopleController.text : "1",
-    });
+      placeId: null, // Optional: You can add placeId if needed
+    );
+
+    // Pass back the Expense object
+    Navigator.pop(context, newExpense);
   }
 
   @override
@@ -186,24 +161,19 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               controller: _expenseController,
               keyboardType: TextInputType.number,
               borderColor: DertamColors.greyLight,
-              focusedBorderColor: DertamColors.primary,
               onChanged: (value) => _calculateTotalExpense(),
             ),
-    
             DertamTextfield(
               label: "Number of People",
               controller: _peopleController,
               keyboardType: TextInputType.number,
               borderColor: DertamColors.greyLight,
-              focusedBorderColor: DertamColors.primary,
               onChanged: (value) => _calculateTotalExpense(),
             ),
-            
             DertamTextfield(
               label: "Description",
               controller: _descriptionController,
               borderColor: DertamColors.greyLight,
-              focusedBorderColor: DertamColors.primary,
             ),
           ],
         ),

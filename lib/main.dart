@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/presentation/budget/select_currency_screen.dart';
+import 'package:tourism_app/presentation/screens/budget/select_currency_screen.dart';
 import 'package:tourism_app/presentation/screens/auth/get_start_screen.dart';
 
 void main() {

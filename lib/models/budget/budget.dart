@@ -4,6 +4,7 @@ import 'package:tourism_app/models/budget/expense.dart';
 class Budget {
   final double total;
   final String currency;
+  final double dailyBudget; 
   final List<Expense> expenses;
   final Map<ExpenseCategory, double> categoryLimits;
 
@@ -11,6 +12,7 @@ class Budget {
     required this.total,
     required this.currency,
     required this.expenses,
+    required this.dailyBudget,
     required this.categoryLimits,
   });
 
@@ -21,12 +23,13 @@ class Budget {
     return Budget(
       total: data['total'].toDouble(),
       currency: data['currency'],
+      dailyBudget: data['dailyBudget'].toDouble(),
       expenses: (data['expenses'] as List)
           .map((e) => Expense.fromMap(e))
           .toList(),
       categoryLimits: (data['categoryLimits'] as Map).map(
         (k, v) => MapEntry(
-          ExpenseCategory.values[k],
+          ExpenseCategory.values[int.parse(k.toString())],
           v.toDouble(),
         ),
       ),
@@ -39,7 +42,7 @@ class Budget {
       'currency': currency,
       'expenses': expenses.map((e) => e.toMap()).toList(),
       'categoryLimits': categoryLimits.map(
-        (k, v) => MapEntry(k.index, v),
+        (k, v) => MapEntry(k.index.toString(), v),
       ),
     };
   }
