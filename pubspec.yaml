@@ -50,6 +50,8 @@ dependencies:
   firebase_admin: ^0.3.0+1
   file_picker: ^9.0.2
   json_annotation: ^4.9.0
+  mocktail: ^1.0.4
+  flutter_slidable: ^4.0.0
 
 
 dev_dependencies:

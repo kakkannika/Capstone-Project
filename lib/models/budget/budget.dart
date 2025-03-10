@@ -1,5 +1,7 @@
 // Budget Models
 import 'package:tourism_app/models/budget/expend.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 class Budget {
   final double total;
@@ -17,12 +19,12 @@ class Budget {
   double get spentTotal => expenses.fold(0, (sum, e) => sum + e.amount);
   double get remaining => total - spentTotal;
 
-  factory Budget.fromMap(Map data) {
+  factory Budget.fromFirestore(DocumentSnapshot data) {
     return Budget(
       total: data['total'].toDouble(),
       currency: data['currency'],
       expenses: (data['expenses'] as List)
-          .map((e) => Expense.fromMap(e))
+          .map((e) => Expense.fromFirestore(e))
           .toList(),
       categoryLimits: (data['categoryLimits'] as Map).map(
         (k, v) => MapEntry(

@@ -1,36 +1,37 @@
-import 'package:tourism_app/models/trips/trip_activities.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' as firestore;
+import 'package:tourism_app/models/place/place.dart';
 
-class TripDay {
+class Day {
+  final String id;  // This will be 'day1', 'day2', etc.
   final int dayNumber;
-  final List<Activity> activities;
-  final double dailyBudget;
+  final List<Place> places;  // Places from main places collection
+  final List<String> placeIds;  // Store the IDs of places for this day
 
-  TripDay({
+  Day({
+    required this.id,
     required this.dayNumber,
-    required this.activities,
-    this.dailyBudget = 0.0,
+    required this.places,
+    required this.placeIds,
   });
 
-  double get dayTotalCost => activities.fold(
-    0, 
-    (sum, activity) => sum + (activity.cost ?? 0)
-  );
-
-  factory TripDay.fromMap(Map data) {
-    return TripDay(
-      dayNumber: data['dayNumber'],
-      dailyBudget: data['dailyBudget']?.toDouble() ?? 0.0,
-      activities: (data['activities'] as List)
-          .map((a) => Activity.fromMap(a))
-          .toList(),
+  factory Day.fromFirestore(
+    firestore.QueryDocumentSnapshot<Map<String, dynamic>> doc,
+    List<Place> places,
+    List<String> placeIds,
+  ) {
+    final data = doc.data();
+    return Day(
+      id: doc.id,
+      dayNumber: data['dayNumber'] as int,
+      places: places,
+      placeIds: placeIds,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'dayNumber': dayNumber,
-      'dailyBudget': dailyBudget,
-      'activities': activities.map((a) => a.toMap()).toList(),
+      'placeIds': placeIds,
     };
   }
 }

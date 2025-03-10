@@ -2,33 +2,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/presentation/screens/auth/gmail_signup_screen.dart';
-import 'package:tourism_app/presentation/screens/auth/phone_auth_screen.dart';
 import 'package:tourism_app/presentation/widgets/custome_input_field.dart';
 import 'package:tourism_app/presentation/widgets/dertam_button.dart';
-import 'package:tourism_app/providers/firebase/auth_service.dart';
+import 'package:tourism_app/repositories/firebase/auth_service.dart';
 import 'forgot_password_screen.dart';
-import 'package:tourism_app/providers/auth_service.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void handlePhoneLogin(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const PhoneAuthScreen()),
-    );
-  }
 
-
-  void handleSignin(BuildContext context) async {
-    await AuthService().signinEmail(
-      email: _emailController.text,
-      password: _passwordController.text,
-      context: context,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {

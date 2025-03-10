@@ -1,8 +1,8 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tourism_app/providers/firebase/place_retrieve_service.dart';
+import 'package:tourism_app/repositories/firebase/place_retrieve_service.dart';
 import 'package:tourism_app/models/place/place.dart';
 
 class DetailEachPlace extends StatefulWidget {

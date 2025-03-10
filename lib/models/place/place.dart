@@ -58,9 +58,14 @@ class Place {
       openingHours: data['openingHours'] ?? '',
     );
   }
+  @override
+  String toString() {
+    return 'Place{id: $id, name: $name, category: $category, imageUrls: $imageURL}';
+  }
+}       
 
-  // Helper method to convert a string to PlaceCategory enum
-}
+// Helper method to convert a string to PlaceCategory enum
+
 
 enum PlaceCategory {
   historical_place,

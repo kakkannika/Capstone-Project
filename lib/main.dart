@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/firebase_options.dart';
 import 'package:tourism_app/presentation/screens/get_start_screen.dart';
-import 'package:tourism_app/providers/firebase/place_retrieve_service.dart';
-// import 'package:tourism_app/providers/place_service.dart';
-import 'package:tourism_app/providers/firebase/auth_service.dart';
+import 'package:tourism_app/repositories/firebase/place_retrieve_service.dart';
+import 'package:tourism_app/repositories/firebase/auth_service.dart';
+import 'package:tourism_app/repositories/firebase/trip_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +25,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => AuthServiceProvider()),
         ChangeNotifierProvider(create: (context) => PlaceProvider()),
+        ChangeNotifierProvider(create: (context) => TripViewModel()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 enum ExpenseCategory { food, transportation, accommodation, tickets, shopping, other }
 
 class Expense {
@@ -17,7 +19,7 @@ class Expense {
     this.placeId,
   });
 
-  factory Expense.fromMap(Map data) {
+  factory Expense.fromFirestore(DocumentSnapshot data) {
     return Expense(
       id: data['id'],
       amount: data['amount'].toDouble(),

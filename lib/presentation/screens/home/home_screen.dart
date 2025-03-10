@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/presentation/screens/home/detail_each_place.dart';
-import 'package:tourism_app/presentation/screens/home/detail_home_page.dart';
 import 'package:tourism_app/presentation/screens/home/widget/filter_chip.dart';
 import 'package:tourism_app/presentation/widgets/dertam_searchBar.dart';
 import 'package:tourism_app/presentation/widgets/destination_card.dart';
 import 'package:tourism_app/presentation/widgets/navigationBar.dart';
-import 'package:tourism_app/providers/firebase/place_retrieve_service.dart';
-import 'package:tourism_app/providers/firebase/auth_service.dart';
+import 'package:tourism_app/repositories/firebase/place_retrieve_service.dart';
+import 'package:tourism_app/repositories/firebase/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
