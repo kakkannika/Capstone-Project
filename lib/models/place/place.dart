@@ -1,14 +1,13 @@
 // Place Model
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:tourism_app/models/place/place_category.dart';
 
 class Place {
   final String id;
   final String name;
   final String description;
   final GeoPoint location;
-  final List<String> imageURL;
-  final PlaceCategory category;
+  final String imageURL;
+  final String category;
   final double? averageRating;
   final double? entranceFees;
   final String? openingHours;
@@ -32,8 +31,8 @@ class Place {
       name: data['name'],
       description: data['description'],
       location: data['location'],
-      imageURL: List<String>.from(data['imageURL']),
-      category: PlaceCategory.values[data['category']],
+      imageURL: data['imageURL'],
+      category: data['category'],
       entranceFees: data['entranceFees']?.toDouble(),
       openingHours: data['openingHours'],
       averageRating: data['averageRating']?.toDouble(),
@@ -46,7 +45,7 @@ class Place {
       'description': description,
       'location': location,
       'imageUrls': imageURL,
-      'category': category.index,
+      'category': category,
       'entranceFee': entranceFees,
       'openingHours': openingHours,
       'averageRating': averageRating,
