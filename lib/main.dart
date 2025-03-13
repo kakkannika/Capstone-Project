@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/firebase_options.dart';
 import 'package:tourism_app/presentation/screens/get_start_screen.dart';
-import 'package:tourism_app/repositories/firebase/place_retrieve_service.dart';
-import 'package:tourism_app/repositories/firebase/auth_service.dart';
-import 'package:tourism_app/repositories/firebase/trip_provider.dart';
+import 'package:tourism_app/providers/place_provider.dart';
+// import 'package:tourism_app/providers/place_retrieve_provider.dart';
+import 'package:tourism_app/providers/auth_provider.dart';
+import 'package:tourism_app/providers/trip_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -2,7 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tourism_app/repositories/firebase/place_retrieve_service.dart';
+import 'package:tourism_app/presentation/screens/trip/screen/start_plan_screen.dart';
+import 'package:tourism_app/presentation/widgets/dertam_button.dart';
+import 'package:tourism_app/providers/place_provider.dart';
+// import 'package:tourism_app/providers/place_retrieve_provider.dart';
 import 'package:tourism_app/models/place/place.dart';
 
 class DetailEachPlace extends StatefulWidget {
@@ -159,9 +162,10 @@ class _DetailEachPlaceState extends State<DetailEachPlace> {
                                       5,
                                       (index) => Icon(
                                         Icons.star,
-                                        color: index < place!.averageRating.floor()
-                                            ? Colors.amber
-                                            : Colors.grey[300],
+                                        color:
+                                            index < place!.averageRating.floor()
+                                                ? Colors.amber
+                                                : Colors.grey[300],
                                         size: 18, // Reduced from 20 to 18
                                       ),
                                     ),
@@ -193,26 +197,15 @@ class _DetailEachPlaceState extends State<DetailEachPlace> {
                       // Start Planning Button
                       Padding(
                         padding: const EdgeInsets.all(16.0),
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: const Text(
-                              'Start Planning',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        ),
+                        child: DertamButton(
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => PlanNewTripScreen()));
+                            },
+                            text: 'Start Planning',
+                            buttonType: ButtonType.primary),
                       ),
 
                       // Information Section
@@ -303,9 +296,12 @@ class _DetailEachPlaceState extends State<DetailEachPlace> {
                           scrollDirection: Axis.horizontal,
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           children: [
-                            _buildRestaurantCard('Chez Tonton', 'Pop Street', 5.0),
-                            _buildRestaurantCard('Chez Tonton', 'Pop Street', 5.0),
-                            _buildRestaurantCard('Chez Tonton', 'Pop Street', 5.0),
+                            _buildRestaurantCard(
+                                'Chez Tonton', 'Pop Street', 5.0),
+                            _buildRestaurantCard(
+                                'Chez Tonton', 'Pop Street', 5.0),
+                            _buildRestaurantCard(
+                                'Chez Tonton', 'Pop Street', 5.0),
                           ],
                         ),
                       ),

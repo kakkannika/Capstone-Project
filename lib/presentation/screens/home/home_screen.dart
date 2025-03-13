@@ -5,8 +5,9 @@ import 'package:tourism_app/presentation/screens/home/widget/filter_chip.dart';
 import 'package:tourism_app/presentation/widgets/dertam_searchBar.dart';
 import 'package:tourism_app/presentation/widgets/destination_card.dart';
 import 'package:tourism_app/presentation/widgets/navigationBar.dart';
-import 'package:tourism_app/repositories/firebase/place_retrieve_service.dart';
-import 'package:tourism_app/repositories/firebase/auth_service.dart';
+import 'package:tourism_app/providers/place_provider.dart';
+// import 'package:tourism_app/providers/place_retrieve_provider.dart';
+import 'package:tourism_app/providers/auth_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -33,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthServiceProvider>(context);
     final currentUser = authProvider.currentUser;
-    final displayName = currentUser?.displayName ?? 
+    final displayName = currentUser?.displayName ??
         (currentUser?.email.split('@')[0] ?? 'User');
 
     return Consumer<PlaceProvider>(builder: (context, placeProvider, child) {
@@ -43,6 +44,12 @@ class _HomeScreenState extends State<HomeScreen> {
           : placeProvider.places
               .where((place) => place.category == selectedCategory)
               .toList();
+
+      // Fileter popular places
+      final popularPlaces = placeProvider.places
+          .where((place) => place.averageRating >= 4)
+          .take(6)
+          .toList();
 
       return Scaffold(
         body: SafeArea(
@@ -59,7 +66,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         radius: 20,
                         backgroundImage: currentUser?.photoUrl != null
                             ? NetworkImage(currentUser!.photoUrl!)
-                            : const AssetImage('lib/assets/images/avatar.jpg') as ImageProvider,
+                            : const AssetImage('lib/assets/images/avatar.jpg')
+                                as ImageProvider,
                       ),
                       const SizedBox(width: 12),
                       Text(
@@ -130,17 +138,26 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: 6,
+                    itemCount: popularPlaces.length,
                     itemBuilder: (context, index) {
-                      return Container(
-                        width: 280,
-                        margin: const EdgeInsets.only(right: 16),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          image: DecorationImage(
-                            image: AssetImage(
-                                'lib/assets/place_images/popular_${index + 1}.jpg'),
-                            fit: BoxFit.cover,
+                      return GestureDetector(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailEachPlace(
+                                placeId: popularPlaces[index].id),
+                          ),
+                        ),
+                        child: Container(
+                          width: 280,
+                          margin: const EdgeInsets.only(right: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            image: DecorationImage(
+                              image:
+                                  NetworkImage(popularPlaces[index].imageURL),
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       );
@@ -165,9 +182,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.all(16),
                   child: Row(
-                    children: ['all', 'museum', 'market', 'entertain_attraction','historical_place','restaurant','hotel',]
+                    children: [
+                      'all',
+                      'museum',
+                      'market',
+                      'entertain_attraction',
+                      'historical_place',
+                      'restaurant',
+                      'hotel',
+                    ]
                         .map((category) => Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4.0),
                               child: FiltersChip(
                                 label: category,
                                 isSelected: selectedCategory == category,
@@ -203,7 +229,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => DetailEachPlace(placeId: filteredPlaces[index].id),
+                            builder: (context) => DetailEachPlace(
+                                placeId: filteredPlaces[index].id),
                           ),
                         );
                       },

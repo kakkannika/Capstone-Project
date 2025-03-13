@@ -7,7 +7,7 @@ import 'package:tourism_app/presentation/screens/trip/screen/edit_trip_screen.da
 import 'package:tourism_app/presentation/screens/trip/screen/start_plan_screen.dart';
 import 'package:tourism_app/presentation/screens/trip/screen/trip_planner_screen.dart';
 import 'package:tourism_app/presentation/widgets/navigationBar.dart';
-import 'package:tourism_app/repositories/firebase/trip_provider.dart';
+import 'package:tourism_app/providers/trip_provider.dart';
 
 class TripsScreen extends StatefulWidget {
   const TripsScreen({super.key});

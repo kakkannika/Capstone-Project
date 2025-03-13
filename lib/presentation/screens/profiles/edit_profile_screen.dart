@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/presentation/widgets/dertam_dialog_button.dart';
 import 'package:tourism_app/presentation/widgets/dertam_dialog.dart';
-import 'package:tourism_app/repositories/firebase/auth_service.dart';
+import 'package:tourism_app/providers/auth_provider.dart';
 import 'package:tourism_app/theme/theme.dart';
 import 'package:tourism_app/presentation/widgets/dertam_textfield.dart';
 import 'package:tourism_app/presentation/widgets/dertam_button.dart';

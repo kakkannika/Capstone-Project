@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/models/trips/trips.dart';
-import 'package:tourism_app/repositories/firebase/trip_provider.dart';
+import 'package:tourism_app/providers/trip_provider.dart';
 
 
 

@@ -7,7 +7,7 @@ import 'package:tourism_app/models/place/place.dart';
 import 'package:tourism_app/models/trips/trip_days.dart';
 import 'package:tourism_app/models/trips/trips.dart';
 import 'package:tourism_app/presentation/screens/trip/screen/search_place_screen.dart';
-import 'package:tourism_app/repositories/firebase/trip_provider.dart';
+import 'package:tourism_app/providers/trip_provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 class ItineraryPage extends StatefulWidget {

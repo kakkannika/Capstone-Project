@@ -1,9 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum ExpenseCategory { food, transportation, accommodation, tickets, shopping, other }
+enum ExpenseCategory {
+  food,
+  transportation,
+  accommodation,
+  tickets,
+  shopping,
+  other
+}
 
 class Expense {
   final String id;
+  final double dailyBudget;
   final double amount;
   final ExpenseCategory category;
   final DateTime date;
@@ -16,6 +24,7 @@ class Expense {
     required this.category,
     required this.date,
     required this.description,
+    required this.dailyBudget,
     this.placeId,
   });
 
@@ -27,6 +36,7 @@ class Expense {
       date: data['date'].toDate(),
       description: data['description'],
       placeId: data['placeId'],
+      dailyBudget: data['dailyBudget'],
     );
   }
 

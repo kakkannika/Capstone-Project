@@ -27,7 +27,6 @@ class Place {
 
   factory Place.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-
     // Handle location which is stored as a string in format "latitude, longitude"
     GeoPoint locationGeoPoint;
     if (data['location'] is String) {
@@ -64,12 +63,3 @@ class Place {
   }
 }       
 
-// Helper method to convert a string to PlaceCategory enum
-
-
-enum PlaceCategory {
-  historical_place,
-  museum,
-  market,
-  entertain_attraction, // Add this enum value
-}

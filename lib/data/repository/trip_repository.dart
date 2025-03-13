@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:cloud_firestore/cloud_firestore.dart' as firestore;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tourism_app/models/place/place.dart';
@@ -144,6 +146,7 @@ class TripService {
           .doc(tripId)
           .collection('days')
           .doc(dayId);
+          
 
       // Get current placeIds array
       final dayDoc = await dayRef.get();

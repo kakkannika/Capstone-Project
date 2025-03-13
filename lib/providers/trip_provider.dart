@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:tourism_app/models/place/place.dart';
 import 'package:tourism_app/models/trips/trips.dart';
-import 'package:tourism_app/repositories/firebase/trip_service.dart';
-
+import 'package:tourism_app/data/repository/trip_repository.dart';
 
 class TripViewModel with ChangeNotifier {
   final TripService _tripService = TripService();
@@ -18,6 +18,10 @@ class TripViewModel with ChangeNotifier {
   Trip? get selectedTrip => _selectedTrip;
   bool get isLoading => _isLoading;
   String? get error => _error;
+  void _setError(String? errorMsg) {
+    _error = errorMsg;
+    notifyListeners();
+  }
 
   // Get a stream of trips for the current user
   Stream<List<Trip>> getTripsStream() {
@@ -48,26 +52,21 @@ class TripViewModel with ChangeNotifier {
     try {
       // Cancel any existing subscription
       _tripsSubscription?.cancel();
-      
+
       // Subscribe to the trips stream
-      _tripsSubscription = getTripsStream().listen(
-        (trips) {
-          _trips = trips;
-          _setLoading(false);
-          notifyListeners();
-        },
-        onError: (e) {
-          _error = 'Error fetching trips: $e';
-          _setLoading(false);
-          notifyListeners();
-          print(_error);
-        }
-      );
+      _tripsSubscription = getTripsStream().listen((trips) {
+        _trips = trips;
+        _setLoading(false);
+        notifyListeners();
+      }, onError: (e) {
+        _setLoading(false);
+        notifyListeners();
+        _setError('Error fetching trips : $e');
+      });
     } catch (e) {
-      _error = 'Error setting up trips stream: $e';
       _setLoading(false);
       notifyListeners();
-      print(_error);
+      _setError('Error setting up trips stream: $e');
     }
   }
 
@@ -85,8 +84,7 @@ class TripViewModel with ChangeNotifier {
     try {
       _trips = await _tripService.getTripsForCurrentUser();
     } catch (e) {
-      _error = 'Error fetching trips: $e';
-      print(_error);
+      _setError('Error fetching trips : $e');
     } finally {
       _setLoading(false);
     }
@@ -110,8 +108,7 @@ class TripViewModel with ChangeNotifier {
       await fetchTripsForCurrentUser(); // Refresh the trip list
       return tripId;
     } catch (e) {
-      _error = 'Error creating trip: $e';
-      print(_error);
+      _setError('Error creating trip: $e');
       return null;
     } finally {
       _setLoading(false);
@@ -121,14 +118,12 @@ class TripViewModel with ChangeNotifier {
   // Select a trip to view/edit
   Future<void> selectTrip(String tripId) async {
     _setLoading(true);
-    _error = null;
-
+    _setError(null);
     try {
       _selectedTrip = await _tripService.getTripById(tripId);
       notifyListeners();
     } catch (e) {
-      _error = 'Error selecting trip: $e';
-      print(_error);
+      _setError('Error selecting trip: $e');
     } finally {
       _setLoading(false);
     }
@@ -146,8 +141,8 @@ class TripViewModel with ChangeNotifier {
         dayId: dayId,
       );
     } catch (e) {
-      _error = 'Error fetching places for day: $e';
-      print(_error);
+      _setError('Error fetching places for day: $e');
+
       return [];
     }
   }
@@ -156,27 +151,26 @@ class TripViewModel with ChangeNotifier {
   Future<void> addPlaceToDay({
     required String dayId,
     required String placeId,
+    required VoidCallback onSuccess,
   }) async {
     if (_selectedTrip == null) {
       throw Exception('No trip selected');
     }
 
     _setLoading(true);
-    _error = null;
-
+    _setError(null);
     try {
       await _tripService.addPlaceToDay(
         tripId: _selectedTrip!.id,
         dayId: dayId,
         placeId: placeId,
       );
-      
+      onSuccess();
+
       // We don't need to refresh the entire trip here
       // The UI will update automatically through the StreamBuilder
     } catch (e) {
-      _error = 'Error adding place to day: $e';
-      print(_error);
-      rethrow; // Rethrow to allow the UI to handle the error
+      throw Exception('Error adding place to day: $e');
     } finally {
       _setLoading(false);
     }
@@ -192,8 +186,7 @@ class TripViewModel with ChangeNotifier {
     }
 
     _setLoading(true);
-    _error = null;
-
+    _setError(null);
     try {
       await _tripService.removePlaceFromDay(
         tripId: _selectedTrip!.id,
@@ -202,8 +195,7 @@ class TripViewModel with ChangeNotifier {
       );
       await selectTrip(_selectedTrip!.id); // Refresh the selected trip
     } catch (e) {
-      _error = 'Error removing place from day: $e';
-      print(_error);
+      _setError('Error removing place from day: $e');
     } finally {
       _setLoading(false);
     }
@@ -226,40 +218,37 @@ class TripViewModel with ChangeNotifier {
         startDate: startDate,
         endDate: endDate,
       );
-      
+
       // Refresh the trips list
       await fetchTripsForCurrentUser();
-      
+
       // If this is the currently selected trip, refresh it
       if (_selectedTrip != null && _selectedTrip!.id == tripId) {
         await selectTrip(tripId);
       }
     } catch (e) {
-      _error = 'Error updating trip: $e';
-      print(_error);
+      _setError('Error updating trip: $e');
     } finally {
       _setLoading(false);
     }
   }
-  
+
   // Delete a trip
   Future<void> deleteTrip(String tripId) async {
     _setLoading(true);
-    _error = null;
-
+    _setError(null);
     try {
       await _tripService.deleteTrip(tripId);
-      
+
       // Refresh the trips list
       await fetchTripsForCurrentUser();
-      
+
       // If this was the selected trip, clear it
       if (_selectedTrip != null && _selectedTrip!.id == tripId) {
         clearSelectedTrip();
       }
     } catch (e) {
-      _error = 'Error deleting trip: $e';
-      print(_error);
+      _setError('Error deleting trip: $e');
     } finally {
       _setLoading(false);
     }

@@ -18,7 +18,8 @@ class DertamColors {
   static Color black = Colors.black;
   static Color grey = Colors.grey;
   static Color orange = Colors.orange;
-  
+  static Color blueSky = const Color.fromARGB(255, 200, 233, 252);
+
   static Color get backGroundColor {
     return DertamColors.primary;
   }

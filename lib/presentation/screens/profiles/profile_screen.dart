@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tourism_app/repositories/firebase/auth_service.dart';
+import 'package:tourism_app/models/trips/trips.dart';
+import 'package:tourism_app/presentation/screens/trip/screen/trip_planner_screen.dart';
+import 'package:tourism_app/providers/auth_provider.dart';
 import 'package:tourism_app/presentation/widgets/dertam_tap.dart';
+import 'package:tourism_app/providers/trip_provider.dart';
 import 'widget/trips_list.dart';
 import 'package:tourism_app/presentation/widgets/dertam_dialog_button.dart';
 import 'widget/trips_item.dart';
@@ -12,18 +15,33 @@ import 'edit_profile_screen.dart';
 import 'setting_screen.dart';
 // Import AuthServiceProvider
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     // Access the auth provider to get current user
     final authProvider = Provider.of<AuthServiceProvider>(context);
+
+    // final tripForCurrentUser =
+    //     Provider.of<TripViewModel>(context, listen: false);
+
     final currentUser = authProvider.currentUser;
 
     // Get user display name or email
     final userName = currentUser?.displayName ?? 'User';
     final userEmail = currentUser?.email ?? 'No email';
+
+    // @override
+    // void initState() {
+    //   super.initState();
+    //   tripForCurrentUser.fetchTripsForCurrentUser();
+    // }
 
     return DefaultTabController(
       length: 2, // Number of tabs
@@ -67,43 +85,86 @@ class ProfileScreen extends StatelessWidget {
               child: DertamTabs(
                 tabs: const ['Trips', 'History'],
                 children: [
-                  TripList(
-                    title: 'Trips',
-                    trips: [
-                      TripItem(
-                        title: 'Trip to Siem Reap',
-                        places: '1 place',
-                        status: 'Planning',
-                        imagePath: 'lib/assets/place_images/AngKor_wat.jpg',
-                        onTap: _goToTripDetails,
-                      ),
-                      TripItem(
-                        title: 'Trip to Bali',
-                        places: '2 places',
-                        status: 'Upcoming',
-                        imagePath: 'lib/assets/place_images/AngKor.jpg',
-                        onTap: _goToTripDetails,
-                      ),
-                    ],
+                  // Trip tap
+                  Consumer<TripViewModel>(
+                    builder: (context, tripProvider, child) {
+                      if (tripProvider.error != null) {
+                        return Center(
+                            child: Text('Error: ${tripProvider.error}'));
+                      }
+                      final upcommingTrips = tripProvider.trips
+                          .where((trip) => trip.endDate.isAfter(DateTime.now()))
+                          .toList();
+
+                      if (upcommingTrips.isEmpty) {
+                        return Center(
+                          child: Text(
+                              'No upcomming trips. Please plan your trips with dertam'),
+                        );
+                      }
+                      return TripList(
+                        title: 'Trips',
+                        trips: upcommingTrips.map((trip) {
+                          final numberOfPlaces = trip.days.fold<int>(
+                              0, (sum, day) => sum + day.places.length);
+
+                          final status = trip.startDate.isAfter(DateTime.now())
+                              ? 'Planning'
+                              : 'Ongoing';
+
+                          return TripItem(
+                            title: trip.tripName,
+                            places:
+                                '$numberOfPlaces ${numberOfPlaces == 1 ? 'place' : 'places'}',
+                            status: status,
+                            imagePath: trip.days.isNotEmpty &&
+                                    trip.days.first.places.isNotEmpty &&
+                                    trip.days.first.places.first.imageURL
+                                        .isNotEmpty
+                                ? trip.days.first.places.first.imageURL
+                                : 'lib/assets/place_images/AngKor_wat.jpg',
+                            onTap: () => _goToTripDetails(trip),
+                          );
+                        }).toList(),
+                      );
+                    },
                   ),
-                  TripList(
-                    title: 'History',
-                    trips: [
-                      TripItem(
-                        title: 'Kampot Trip',
-                        places: '3 places',
-                        status: 'Completed',
-                        imagePath: 'lib/assets/place_images/AngKor.jpg',
-                        onTap: _goToTripDetails,
-                      ),
-                      TripItem(
-                        title: 'Koh Rong Tour',
-                        places: '2 places',
-                        status: 'Completed',
-                        imagePath: 'lib/assets/place_images/AngKor_wat.jpg',
-                        onTap: _goToTripDetails,
-                      ),
-                    ],
+                  // History Tap
+                  Consumer<TripViewModel>(
+                    builder: (context, tripProvider, child) {
+                      if (tripProvider.error != null) {
+                        return Center(
+                            child: Text('Error: ${tripProvider.error}'));
+                      }
+                      final completeTrips = tripProvider.trips
+                          .where(
+                              (trip) => trip.endDate.isBefore(DateTime.now()))
+                          .toList();
+                      if (completeTrips.isEmpty) {
+                        return Center(
+                          child: Text('No complete trips yet'),
+                        );
+                      }
+                      return TripList(
+                        title: 'History',
+                        trips: completeTrips.map((trip) {
+                          final numberOfPlaces = trip.days.fold<int>(
+                              0, (sum, day) => sum + day.places.length);
+                          return TripItem(
+                              title: trip.tripName,
+                              places:
+                                  ' $numberOfPlaces ${numberOfPlaces == 1 ? 'place' : 'places'}',
+                              status: 'Completed',
+                              imagePath: trip.days.isNotEmpty &&
+                                      trip.days.first.places.isNotEmpty &&
+                                      trip.days.first.places.first.imageURL
+                                          .isNotEmpty
+                                  ? trip.days.first.places.first.imageURL
+                                  : 'lib/assets/place_images/AngKor.jpg',
+                              onTap: () => _goToTripDetails(trip));
+                        }).toList(),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -192,7 +253,20 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void _goToTripDetails() => debugPrint('Navigate to Trip Details');
+  void _goToTripDetails(Trip trip) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TripPlannerScreen(
+          tripId: trip.id,
+          tripName: trip.tripName,
+          startDate: trip.startDate,
+          returnDate: trip.endDate,
+          selectedDestinations: const [], // Not needed when viewing existing trip
+        ),
+      ),
+    );
+  }
 
   void _logout(BuildContext context) {
     // Get the auth provider and call signOut

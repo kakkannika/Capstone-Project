@@ -9,9 +9,12 @@ class TripList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    return ListView.builder(
       padding: const EdgeInsets.all(16),
-      children: trips,
+      itemCount: trips.length,
+      itemBuilder: (context, index) {
+        return trips[index];
+      },
     );
   }
 }
