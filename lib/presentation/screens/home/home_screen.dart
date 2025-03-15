@@ -1,5 +1,8 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tourism_app/presentation/screens/chat_bot/chat_screen.dart';
 import 'package:tourism_app/presentation/screens/home/detail_each_place.dart';
 import 'package:tourism_app/presentation/screens/home/widget/filter_chip.dart';
 import 'package:tourism_app/presentation/widgets/dertam_searchBar.dart';
@@ -244,6 +247,37 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         bottomNavigationBar: const Navigationbar(),
+        // Floating Action Button
+        floatingActionButton: Container(
+          margin: const EdgeInsets.only(bottom: 20, right: 16),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3), // Shadow color
+                spreadRadius: 2,
+                blurRadius: 8,
+                offset: const Offset(2, 4), // Changes position of shadow
+              ),
+            ],
+          ),
+          child: FloatingActionButton(
+            onPressed: () {
+              print("Chatbot button clicked");
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ChatScreen()));
+              // Add navigation or functionality here
+            },
+            backgroundColor: Colors.white,
+            shape: const CircleBorder(),
+            elevation: 0, // Set to 0 to use the custom shadow
+            child: Image.asset(
+              'lib/assets/images/chatbot.jpg', // Replace with the actual asset path
+              width: 40, // Adjust size as needed
+              height: 40,
+            ),
+          ),
+        ),
       );
     });
   }

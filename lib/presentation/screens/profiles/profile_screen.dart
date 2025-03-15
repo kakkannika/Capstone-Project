@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/models/trips/trips.dart';
+import 'package:tourism_app/presentation/screens/auth/reset_password_screen.dart';
 import 'package:tourism_app/presentation/screens/trip/screen/trip_planner_screen.dart';
 import 'package:tourism_app/providers/auth_provider.dart';
 import 'package:tourism_app/presentation/widgets/dertam_tap.dart';
@@ -236,9 +237,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           OptionTile(
             icon: Icons.lock_outline,
             title: 'Reset Password',
-            onTap: () {
-              // Navigate to reset password screen or show reset password dialog
-              // Use the authProvider to reset password if you implement this
+            onTap: () async {
+              await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ForgotPasswordScreen()));
             },
           ),
           OptionTile(
