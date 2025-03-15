@@ -23,6 +23,9 @@ class ExpenseScreen extends StatefulWidget {
 }
 
 class _ExpenseScreenState extends State<ExpenseScreen> {
+  // Set to track removed expense IDs
+  final Set<String> _removedExpenseIds = {};
+  
   @override
   void initState() {
     super.initState();
@@ -67,6 +70,68 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     );
   }
 
+  // Handle expense removal
+  void _removeExpense(Budget budget, Expense expense) {
+    // Store expense details for potential undo
+    final removedExpense = expense;
+    final String description = expense.description.isNotEmpty 
+        ? expense.description 
+        : "Expense";
+    
+    // Add to removed expenses set
+    setState(() {
+      _removedExpenseIds.add(expense.id);
+    });
+    
+    // Show snackbar with undo option before removing from Firestore
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('item removed'),
+        action: SnackBarAction(
+          label: 'UNDO',
+          onPressed: () {
+            // Remove from the removed set to restore in UI
+            setState(() {
+              _removedExpenseIds.remove(expense.id);
+            });
+            // Cancel the snackbar
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+        duration: const Duration(seconds: 3),
+        onVisible: () {
+          // When snackbar is visible, start a timer to remove from Firestore
+          Future.delayed(const Duration(seconds: 3), () {
+            // Only remove from Firestore if still in removed set
+            if (_removedExpenseIds.contains(expense.id)) {
+              Provider.of<BudgetViewModel>(context, listen: false).removeExpense(
+                budgetId: budget.id,
+                expenseId: expense.id,
+              ).then((success) {
+                if (!success) {
+                  // If removal failed, show error and restore in UI
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to remove expense. Please try again.'),
+                      backgroundColor: Colors.red,
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                  
+                  // Remove from removed expenses set
+                  setState(() {
+                    _removedExpenseIds.remove(expense.id);
+                  });
+                }
+              });
+            }
+          });
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,8 +167,12 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
           double totalBudgetValue = budget.total;
           double totalSpent = budget.spentTotal;
           double dailyBudget = budget.dailyBudget;
-          List<Expense> expenses = budget.expenses;
-
+          
+          // Filter out removed expenses
+          List<Expense> expenses = budget.expenses
+              .where((expense) => !_removedExpenseIds.contains(expense.id))
+              .toList();
+          
           // Sort expenses by date (newest first)
           expenses.sort((a, b) => b.date.compareTo(a.date));
 
@@ -173,32 +242,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                             ),
                             direction: DismissDirection.endToStart,
                             onDismissed: (direction) {
-                              // Remove the expense
-                              Provider.of<BudgetViewModel>(context, listen: false).removeExpense(
-                                budgetId: budget.id,
-                                expenseId: expense.id,
-                              );
-                              
-                              // Show a snackbar
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('${expense.description} removed'),
-                                  action: SnackBarAction(
-                                    label: 'UNDO',
-                                    onPressed: () {
-                                      // Add the expense back
-                                      Provider.of<BudgetViewModel>(context, listen: false).addExpense(
-                                        budgetId: budget.id,
-                                        amount: expense.amount,
-                                        category: expense.category,
-                                        date: expense.date,
-                                        description: expense.description,
-                                        placeId: expense.placeId,
-                                      );
-                                    },
-                                  ),
-                                ),
-                              );
+                              _removeExpense(budget, expense);
                             },
                             child: Card(
                               margin: const EdgeInsets.only(bottom: 8),
