@@ -25,6 +25,7 @@ class TripService {
     required String tripName,
     required DateTime startDate,
     required DateTime endDate,
+    String? budgetId,
   }) async {
     try {
       final userId = getCurrentUserId();
@@ -36,6 +37,7 @@ class TripService {
         'tripName': tripName,
         'startDate': firestore.Timestamp.fromDate(startDate),
         'endDate': firestore.Timestamp.fromDate(endDate),
+        'budgetId': budgetId,
       });
 
       // Create days subcollection with specific IDs (day1, day2, etc.)
@@ -51,7 +53,7 @@ class TripService {
       return tripRef.id;
     } catch (e) {
       print('Error creating trip: $e');
-      rethrow;
+      throw Exception('Failed to create trip: $e');
     }
   }
 
@@ -380,5 +382,46 @@ class TripService {
           return Trip.fromFirestore(tripDoc, days);
         });
   }
-}
 
+  // Update a trip's budget ID
+  Future<void> updateTripBudgetId({
+    required String tripId,
+    required String budgetId,
+  }) async {
+    try {
+      await _firestore.collection('trips').doc(tripId).update({
+        'budgetId': budgetId,
+      });
+    } catch (e) {
+      print('Error updating trip budget ID: $e');
+      throw Exception('Failed to update trip budget ID: $e');
+    }
+  }
+
+  // Remove a trip's budget ID
+  Future<void> removeTripBudgetId(String tripId) async {
+    try {
+      await _firestore.collection('trips').doc(tripId).update({
+        'budgetId': firestore.FieldValue.delete(),
+      });
+    } catch (e) {
+      print('Error removing trip budget ID: $e');
+      throw Exception('Failed to remove trip budget ID: $e');
+    }
+  }
+
+  // Get a trip's budget ID
+  Future<String?> getTripBudgetId(String tripId) async {
+    try {
+      final doc = await _firestore.collection('trips').doc(tripId).get();
+      if (doc.exists) {
+        final data = doc.data();
+        return data?['budgetId'] as String?;
+      }
+      return null;
+    } catch (e) {
+      print('Error getting trip budget ID: $e');
+      throw Exception('Failed to get trip budget ID: $e');
+    }
+  }
+}

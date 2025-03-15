@@ -38,11 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final userName = currentUser?.displayName ?? 'User';
     final userEmail = currentUser?.email ?? 'No email';
 
-    // @override
-    // void initState() {
-    //   super.initState();
-    //   tripForCurrentUser.fetchTripsForCurrentUser();
-    // }
+   
 
     return DefaultTabController(
       length: 2, // Number of tabs

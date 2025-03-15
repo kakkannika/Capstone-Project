@@ -59,7 +59,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                     child: Text(
                       widget.tripName,
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 25,
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
                       ),

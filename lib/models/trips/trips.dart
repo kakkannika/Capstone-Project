@@ -8,6 +8,7 @@ class Trip {
   final DateTime startDate;
   final DateTime endDate;
   final List<Day> days;
+  final String? budgetId;
 
   Trip({
     required this.id,
@@ -16,6 +17,7 @@ class Trip {
     required this.startDate,
     required this.endDate,
     required this.days,
+    this.budgetId,
   });
 
   factory Trip.fromFirestore(
@@ -30,6 +32,7 @@ class Trip {
       startDate: (data['startDate'] as firestore.Timestamp).toDate(),
       endDate: (data['endDate'] as firestore.Timestamp).toDate(),
       days: days,
+      budgetId: data['budgetId'] as String?,
     );
   }
 
@@ -39,6 +42,7 @@ class Trip {
       'tripName': tripName,
       'startDate': firestore.Timestamp.fromDate(startDate),
       'endDate': firestore.Timestamp.fromDate(endDate),
+      'budgetId': budgetId,
     };
   }
 
@@ -66,5 +70,29 @@ class Trip {
     } catch (e) {
       return null;
     }
+  }
+
+  // Check if the trip has a budget
+  bool get hasBudget => budgetId != null && budgetId!.isNotEmpty;
+
+  // Create a copy of this trip with updated fields
+  Trip copyWith({
+    String? id,
+    String? userId,
+    String? tripName,
+    DateTime? startDate,
+    DateTime? endDate,
+    List<Day>? days,
+    String? budgetId,
+  }) {
+    return Trip(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      tripName: tripName ?? this.tripName,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      days: days ?? this.days,
+      budgetId: budgetId ?? this.budgetId,
+    );
   }
 }

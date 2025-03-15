@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/firebase_options.dart';
 import 'package:tourism_app/presentation/screens/get_start_screen.dart';
+import 'package:tourism_app/providers/budget_provider.dart';
 import 'package:tourism_app/providers/place_provider.dart';
 // import 'package:tourism_app/providers/place_retrieve_provider.dart';
 import 'package:tourism_app/providers/auth_provider.dart';
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => AuthServiceProvider()),
         ChangeNotifierProvider(create: (context) => PlaceProvider()),
         ChangeNotifierProvider(create: (context) => TripViewModel()),
+        ChangeNotifierProvider(create: (context)=> BudgetViewModel()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

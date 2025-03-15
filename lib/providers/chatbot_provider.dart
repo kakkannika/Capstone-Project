@@ -29,7 +29,7 @@ class CustomChatbotService {
       // Debug: Print the raw response from the API
       print('API Response: ${response.body}');
 
-      // Check if the response status is 200 (OK)
+      // Check if the response status is 200 true
       if (response.statusCode == 200) {
         // Parse the JSON response from the chatbot
         final data = jsonDecode(response.body);
