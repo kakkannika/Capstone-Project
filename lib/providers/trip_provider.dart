@@ -95,6 +95,7 @@ class TripViewModel with ChangeNotifier {
     required String tripName,
     required DateTime startDate,
     required DateTime endDate,
+    String? budgetId,
   }) async {
     _setLoading(true);
     _error = null;
@@ -104,6 +105,7 @@ class TripViewModel with ChangeNotifier {
         tripName: tripName,
         startDate: startDate,
         endDate: endDate,
+        budgetId: budgetId,
       );
       await fetchTripsForCurrentUser(); // Refresh the trip list
       return tripId;
@@ -263,6 +265,68 @@ class TripViewModel with ChangeNotifier {
   void clearSelectedTrip() {
     _selectedTrip = null;
     notifyListeners();
+  }
+
+  // Update a trip's budget ID
+  Future<bool> updateTripBudgetId({
+    required String tripId,
+    required String budgetId,
+  }) async {
+    try {
+      _setLoading(true);
+      _error = null;
+      
+      await _tripService.updateTripBudgetId(
+        tripId: tripId,
+        budgetId: budgetId,
+      );
+      
+      // Update the selected trip if it's the one being modified
+      if (_selectedTrip?.id == tripId) {
+        _selectedTrip = _selectedTrip!.copyWith(budgetId: budgetId);
+        notifyListeners();
+      }
+      
+      _setLoading(false);
+      return true;
+    } catch (e) {
+      _setLoading(false);
+      _setError('Failed to update trip budget ID: $e');
+      return false;
+    }
+  }
+
+  // Remove a trip's budget ID
+  Future<bool> removeTripBudgetId(String tripId) async {
+    try {
+      _setLoading(true);
+      _error = null;
+      
+      await _tripService.removeTripBudgetId(tripId);
+      
+      // Update the selected trip if it's the one being modified
+      if (_selectedTrip?.id == tripId) {
+        _selectedTrip = _selectedTrip!.copyWith(budgetId: null);
+        notifyListeners();
+      }
+      
+      _setLoading(false);
+      return true;
+    } catch (e) {
+      _setLoading(false);
+      _setError('Failed to remove trip budget ID: $e');
+      return false;
+    }
+  }
+
+  // Get a trip's budget ID
+  Future<String?> getTripBudgetId(String tripId) async {
+    try {
+      return await _tripService.getTripBudgetId(tripId);
+    } catch (e) {
+      _setError('Failed to get trip budget ID: $e');
+      return null;
+    }
   }
 
   @override

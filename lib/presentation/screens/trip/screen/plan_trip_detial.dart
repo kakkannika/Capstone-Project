@@ -6,7 +6,10 @@ import 'package:provider/provider.dart';
 import 'package:tourism_app/models/place/place.dart';
 import 'package:tourism_app/models/trips/trip_days.dart';
 import 'package:tourism_app/models/trips/trips.dart';
+import 'package:tourism_app/presentation/screens/budget/expense_screen.dart';
+import 'package:tourism_app/presentation/screens/budget/select_currency_screen.dart';
 import 'package:tourism_app/presentation/screens/trip/screen/search_place_screen.dart';
+import 'package:tourism_app/providers/budget_provider.dart';
 import 'package:tourism_app/providers/trip_provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -27,6 +30,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
   int _selectedIndex = 1; // Set initial index to 1 for Itinerary
   int _selectedDayIndex = 0; // Track the selected day tab
   Day? _selectedDay; // Track the currently selected day
+  bool _isLoadingBudget = false;
 
   @override
   void initState() {
@@ -35,6 +39,52 @@ class _ItineraryPageState extends State<ItineraryPage> {
     if (widget.tripId != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.read<TripViewModel>().selectTrip(widget.tripId!);
+      });
+    }
+  }
+
+  // Navigate to budget screen based on whether the trip has a budget or not
+  void _navigateToBudgetScreen(Trip trip) async {
+    setState(() {
+      _isLoadingBudget = true;
+    });
+
+    try {
+      final budgetProvider = Provider.of<BudgetViewModel>(context, listen: false);
+      
+      // Check if the trip has a budget
+      if (trip.hasBudget) {
+        // Navigate to expense screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ExpenseScreen(
+              budgetId: trip.budgetId!,
+              tripId: trip.id,
+            ),
+          ),
+        );
+      } else {
+        // Navigate to select currency screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SelectCurrencyScreen(
+              tripId: trip.id,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() {
+        _isLoadingBudget = false;
       });
     }
   }
@@ -135,10 +185,14 @@ class _ItineraryPageState extends State<ItineraryPage> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   FloatingActionButton(
-                    onPressed: () {},
+                    onPressed: _isLoadingBudget 
+                        ? null 
+                        : () => _navigateToBudgetScreen(trip),
                     backgroundColor: const Color(0xFF0D3E4C),
-                    heroTag: 'map',
-                    child: const Icon(Icons.map, color: Colors.white),
+                    heroTag: 'Budget',
+                    child: _isLoadingBudget 
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Icon(Icons.money, color: Colors.white),
                   ),
                   const SizedBox(height: 16),
                   FloatingActionButton(

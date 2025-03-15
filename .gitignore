@@ -1,3 +1,10 @@
+# Ignore everything
+*
+# Except for lib directory and pubspec.yaml file
+!/lib
+!/lib/*
+!/pubspec.yaml
+
 # Miscellaneous
 *.class
 *.log
