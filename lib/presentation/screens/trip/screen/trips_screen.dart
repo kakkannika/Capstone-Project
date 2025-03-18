@@ -26,7 +26,7 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
     
     // Start listening to trips stream
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<TripViewModel>(context, listen: false).startListeningToTrips();
+      Provider.of<TripProvider>(context, listen: false).startListeningToTrips();
     });
   }
 
@@ -34,7 +34,7 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
   void dispose() {
     _tabController.dispose();
     // Stop listening to trips stream
-    Provider.of<TripViewModel>(context, listen: false).stopListeningToTrips();
+    Provider.of<TripProvider>(context, listen: false).stopListeningToTrips();
     super.dispose();
   }
 
@@ -65,7 +65,7 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
         ),
       ),
       body: StreamBuilder<List<Trip>>(
-        stream: Provider.of<TripViewModel>(context, listen: false).getTripsStream(),
+        stream: Provider.of<TripProvider>(context, listen: false).getTripsStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
@@ -369,7 +369,7 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
 
     // If the trip was updated successfully, refresh the trips list
     if (result == true) {
-      Provider.of<TripViewModel>(context, listen: false).startListeningToTrips();
+      Provider.of<TripProvider>(context, listen: false).startListeningToTrips();
     }
   }
 
@@ -402,7 +402,7 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
     });
 
     try {
-      final tripProvider = Provider.of<TripViewModel>(context, listen: false);
+      final tripProvider = Provider.of<TripProvider>(context, listen: false);
       await tripProvider.deleteTrip(trip.id);
       
       if (mounted) {

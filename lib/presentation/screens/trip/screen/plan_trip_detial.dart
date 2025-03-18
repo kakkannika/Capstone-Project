@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -39,7 +39,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
     // If tripId is provided, load the trip data
     if (widget.tripId != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<TripViewModel>().selectTrip(widget.tripId!);
+        context.read<TripProvider>().selectTrip(widget.tripId!);
       });
     }
   }
@@ -51,8 +51,8 @@ class _ItineraryPageState extends State<ItineraryPage> {
     });
 
     try {
-      Provider.of<BudgetViewModel>(context, listen: false);
-      
+      Provider.of<BudgetProvider>(context, listen: false);
+
       // Check if the trip has a budget
       if (trip.hasBudget) {
         // Navigate to expense screen
@@ -98,7 +98,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
 
     return StreamBuilder<List<Trip>>(
         stream:
-            Provider.of<TripViewModel>(context, listen: false).getTripsStream(),
+            Provider.of<TripProvider>(context, listen: false).getTripsStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting &&
               !snapshot.hasData) {
@@ -130,7 +130,6 @@ class _ItineraryPageState extends State<ItineraryPage> {
                 backgroundColor: Colors.white,
                 elevation: 0,
                 automaticallyImplyLeading: false, // Remove auto back button
-                
               ),
               body: Column(
                 children: [
@@ -173,12 +172,12 @@ class _ItineraryPageState extends State<ItineraryPage> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   FloatingActionButton(
-                    onPressed: _isLoadingBudget 
-                        ? null 
+                    onPressed: _isLoadingBudget
+                        ? null
                         : () => _navigateToBudgetScreen(trip),
                     backgroundColor: const Color(0xFF0D3E4C),
                     heroTag: 'Budget',
-                    child: _isLoadingBudget 
+                    child: _isLoadingBudget
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Icon(Icons.money, color: Colors.white),
                   ),
@@ -202,7 +201,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
   }
 
   void _navigateToSearchPlace(Day day) async {
-    final tripProvider = context.read<TripViewModel>();
+    final tripProvider = context.read<TripProvider>();
     if (tripProvider.selectedTrip == null) return;
     await Navigator.push(
       context,
@@ -326,7 +325,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
   }
 
   Widget _buildDayContent(Day day) {
-    final tripProvider = context.read<TripViewModel>();
+    final tripProvider = context.read<TripProvider>();
     final trip = tripProvider.selectedTrip!;
     final date = trip.startDate.add(Duration(days: day.dayNumber - 1));
     final dateStr = DateFormat('EEE d/M').format(date);
@@ -445,7 +444,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
         children: [
           SlidableAction(
             onPressed: (context) {
-              _deletePlace(place.id, currentDay!.id);
+              _deletePlaceFromTrip(place.id, currentDay!.id);
             },
             backgroundColor: Colors.red,
             foregroundColor: Colors.white,
@@ -597,93 +596,92 @@ class _ItineraryPageState extends State<ItineraryPage> {
           ),
         ),
         const SizedBox(height: 12),
-        Row(
-          children: [
-            _buildRecommendedPlace(
-                'Royal Palaces', 'assets/images/royal_palace.jpg'),
-            const SizedBox(width: 16),
-            _buildRecommendedPlace(
-                'Angkor Wat', 'assets/images/angkor_wat.jpg'),
-          ],
-        ),
+        // Row(
+        //   children: [
+        //     _buildRecommendedPlace(
+        //         'Royal Palaces', 'assets/images/royal_palace.jpg'),
+        //     const SizedBox(width: 16),
+        //     _buildRecommendedPlace(
+        //         'Angkor Wat', 'assets/images/angkor_wat.jpg'),
+        //   ],
+        // ),
       ],
     );
   }
 
-  Widget _buildRecommendedPlace(String name, String imageUrl) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          // In a real app, this would navigate to place details or add it directly
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey[300]!),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Stack(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Image
-                  Container(
-                    height: 80,
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(8),
-                        topRight: Radius.circular(8),
-                      ),
-                      image: DecorationImage(
-                        image: AssetImage(imageUrl),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
+  // Widget _buildRecommendedPlace(String name, String imageUrl) {
+  //   return Expanded(
+  //     child: GestureDetector(
+  //       onTap: () {
+  //         // In a real app, this would navigate to place details or add it directly
+  //       },
+  //       child: Container(
+  //         decoration: BoxDecoration(
+  //           border: Border.all(color: Colors.grey[300]!),
+  //           borderRadius: BorderRadius.circular(8),
+  //         ),
+  //         child: Stack(
+  //           children: [
+  //             Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 // Image
+  //                 Container(
+  //                   height: 80,
+  //                   decoration: BoxDecoration(
+  //                     borderRadius: const BorderRadius.only(
+  //                       topLeft: Radius.circular(8),
+  //                       topRight: Radius.circular(8),
+  //                     ),
+  //                     image: DecorationImage(
+  //                       image: AssetImage(imageUrl),
+  //                       fit: BoxFit.cover,
+  //                     ),
+  //                   ),
+  //                 ),
 
-                  // Title
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      name,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
+  //                 // Title
+  //                 Padding(
+  //                   padding: const EdgeInsets.all(8.0),
+  //                   child: Text(
+  //                     name,
+  //                     style: const TextStyle(
+  //                       fontWeight: FontWeight.bold,
+  //                       fontSize: 12,
+  //                     ),
+  //                     maxLines: 1,
+  //                     overflow: TextOverflow.ellipsis,
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
 
-              // Add button
-              Positioned(
-                right: 8,
-                top: 8,
-                child: Container(
-                  width: 24,
-                  height: 24,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Center(
-                    child: Icon(Icons.add, size: 16),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  //             // Add button
+  //             Positioned(
+  //               right: 8,
+  //               top: 8,
+  //               child: Container(
+  //                 width: 24,
+  //                 height: 24,
+  //                 decoration: const BoxDecoration(
+  //                   color: Colors.white,
+  //                   shape: BoxShape.circle,
+  //                 ),
+  //                 child: const Center(
+  //                   child: Icon(Icons.add, size: 16),
+  //                 ),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  // Method to delete a place from a day
-  Future<void> _deletePlace(String placeId, String dayId) async {
+  Future<void> _deletePlaceFromTrip(String placeId, String dayId) async {
     try {
-      final tripProvider = context.read<TripViewModel>();
+      final tripProvider = context.read<TripProvider>();
       final trip = tripProvider.selectedTrip;
 
       if (trip == null) {
@@ -704,6 +702,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
         ),
       );
 
+      // Just call the method and let the stream update the UI
       await tripProvider.removePlaceFromDay(
         dayId: dayId,
         placeId: placeId,

@@ -136,7 +136,7 @@ class _SearchPlaceScreenState extends State<SearchPlaceScreen> {
   }
 
   Widget _buildPlaceListItem(Place place) {
-    return Consumer<TripViewModel>(
+    return Consumer<TripProvider>(
       builder: (context, tripProvider, child) {
         return InkWell(
           onTap: () => tripProvider.addPlaceToDay(

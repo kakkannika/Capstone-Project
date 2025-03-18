@@ -5,9 +5,8 @@ import 'package:tourism_app/models/place/place.dart';
 import 'package:tourism_app/models/trips/trips.dart';
 import 'package:tourism_app/data/repository/trip_repository.dart';
 
-class TripViewModel with ChangeNotifier {
+class TripProvider with ChangeNotifier {
   final TripService _tripService = TripService();
-
   List<Trip> _trips = [];
   Trip? _selectedTrip;
   bool _isLoading = false;
@@ -144,12 +143,12 @@ class TripViewModel with ChangeNotifier {
       );
     } catch (e) {
       _setError('Error fetching places for day: $e');
-
+      notifyListeners();
       return [];
     }
   }
 
-  // Add a place to a specific day
+  // For addPlaceToDay
   Future<void> addPlaceToDay({
     required String dayId,
     required String placeId,
@@ -167,18 +166,21 @@ class TripViewModel with ChangeNotifier {
         dayId: dayId,
         placeId: placeId,
       );
-      onSuccess();
 
-      // We don't need to refresh the entire trip here
-      // The UI will update automatically through the StreamBuilder
+      // Refresh the selected trip immediately
+      await selectTrip(_selectedTrip!.id);
+
+      // Then call the success callback
+      onSuccess();
+      _setLoading(false);
     } catch (e) {
-      throw Exception('Error adding place to day: $e');
+      _setError('Error adding place to day: $e');
     } finally {
       _setLoading(false);
     }
   }
 
-  // Remove a place from a day
+// For removePlaceFromDay
   Future<void> removePlaceFromDay({
     required String dayId,
     required String placeId,
@@ -195,7 +197,10 @@ class TripViewModel with ChangeNotifier {
         dayId: dayId,
         placeId: placeId,
       );
-      await selectTrip(_selectedTrip!.id); // Refresh the selected trip
+      _setLoading(false);
+
+      // Just refresh the selected trip - don't call notifyListeners first
+      await selectTrip(_selectedTrip!.id);
     } catch (e) {
       _setError('Error removing place from day: $e');
     } finally {
@@ -220,7 +225,7 @@ class TripViewModel with ChangeNotifier {
         startDate: startDate,
         endDate: endDate,
       );
-
+      notifyListeners();
       // Refresh the trips list
       await fetchTripsForCurrentUser();
 
@@ -275,18 +280,18 @@ class TripViewModel with ChangeNotifier {
     try {
       _setLoading(true);
       _error = null;
-      
+
       await _tripService.updateTripBudgetId(
         tripId: tripId,
         budgetId: budgetId,
       );
-      
+
       // Update the selected trip if it's the one being modified
       if (_selectedTrip?.id == tripId) {
         _selectedTrip = _selectedTrip!.copyWith(budgetId: budgetId);
         notifyListeners();
       }
-      
+
       _setLoading(false);
       return true;
     } catch (e) {
@@ -301,15 +306,15 @@ class TripViewModel with ChangeNotifier {
     try {
       _setLoading(true);
       _error = null;
-      
+
       await _tripService.removeTripBudgetId(tripId);
-      
+
       // Update the selected trip if it's the one being modified
       if (_selectedTrip?.id == tripId) {
         _selectedTrip = _selectedTrip!.copyWith(budgetId: null);
         notifyListeners();
       }
-      
+
       _setLoading(false);
       return true;
     } catch (e) {

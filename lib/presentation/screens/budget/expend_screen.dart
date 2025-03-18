@@ -33,7 +33,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     super.initState();
     // Start listening to the budget stream
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<BudgetViewModel>(context, listen: false)
+      Provider.of<BudgetProvider>(context, listen: false)
           .startListeningToBudget(widget.tripId);
     });
   }
@@ -102,7 +102,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
           Future.delayed(const Duration(seconds: 3), () {
             // Only remove from Firestore if still in removed set
             if (_removedExpenseIds.contains(expense.id)) {
-              Provider.of<BudgetViewModel>(context, listen: false).removeExpense(
+              Provider.of<BudgetProvider>(context, listen: false).removeExpense(
                 budgetId: budget.id,
                 expenseId: expense.id,
               ).then((success) {
@@ -146,7 +146,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
         ),
       ),
       body: StreamBuilder<Budget?>(
-        stream: Provider.of<BudgetViewModel>(context).getBudgetByTripIdStream(widget.tripId),
+        stream: Provider.of<BudgetProvider>(context).getBudgetByTripIdStream(widget.tripId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
@@ -295,7 +295,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
         },
       ),
       floatingActionButton: StreamBuilder<Budget?>(
-        stream: Provider.of<BudgetViewModel>(context).getBudgetByTripIdStream(widget.tripId),
+        stream: Provider.of<BudgetProvider>(context).getBudgetByTripIdStream(widget.tripId),
         builder: (context, snapshot) {
           if (!snapshot.hasData || snapshot.data == null) {
             return const SizedBox.shrink();

@@ -27,8 +27,8 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => AuthServiceProvider()),
         ChangeNotifierProvider(create: (context) => PlaceProvider()),
-        ChangeNotifierProvider(create: (context) => TripViewModel()),
-        ChangeNotifierProvider(create: (context)=> BudgetViewModel()),
+        ChangeNotifierProvider(create: (context) => TripProvider()),
+        ChangeNotifierProvider(create: (context)=> BudgetProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

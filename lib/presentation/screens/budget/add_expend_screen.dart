@@ -17,12 +17,12 @@ class AddExpenseScreen extends StatefulWidget {
   final String tripId;
 
   const AddExpenseScreen({
-    Key? key,
+    super.key,
     required this.selectedCurrency,
     required this.remainingBudget,
     required this.budgetId,
     required this.tripId,
-  }) : super(key: key);
+  });
 
   @override
   _AddExpenseScreenState createState() => _AddExpenseScreenState();
@@ -54,7 +54,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     });
 
     try {
-      final tripProvider = Provider.of<TripViewModel>(context, listen: false);
+      final tripProvider = Provider.of<TripProvider>(context, listen: false);
       
       // Listen to the trip stream
       tripProvider.getTripByIdStream(widget.tripId).listen((trip) {
@@ -147,7 +147,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
     try {
       // Use the BudgetViewModel to add the expense directly to Firestore
-      final budgetProvider = Provider.of<BudgetViewModel>(context, listen: false);
+      final budgetProvider = Provider.of<BudgetProvider>(context, listen: false);
       
       final success = await budgetProvider.addExpense(
         budgetId: widget.budgetId,

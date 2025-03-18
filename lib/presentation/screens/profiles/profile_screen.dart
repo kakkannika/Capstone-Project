@@ -83,7 +83,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 tabs: const ['Trips', 'History'],
                 children: [
                   // Trip tap
-                  Consumer<TripViewModel>(
+                  Consumer<TripProvider>(
                     builder: (context, tripProvider, child) {
                       if (tripProvider.error != null) {
                         return Center(
@@ -111,15 +111,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                           return TripItem(
                             title: trip.tripName,
-                            places:
-                                '$numberOfPlaces ${numberOfPlaces == 1 ? 'place' : 'places'}',
+                            places:'$numberOfPlaces ${numberOfPlaces == 1 ? 'place' : 'places'}',
                             status: status,
-                            imagePath: trip.days.isNotEmpty &&
-                                    trip.days.first.places.isNotEmpty &&
-                                    trip.days.first.places.first.imageURL
-                                        .isNotEmpty
-                                ? trip.days.first.places.first.imageURL
-                                : 'lib/assets/place_images/AngKor_wat.jpg',
+                            imagePath: (trip.days.isNotEmpty &&
+                                        trip.days.first.places.isNotEmpty &&
+                                        trip.days.first.places.first.imageURL.isNotEmpty)
+                                    ? trip.days.first.places.first.imageURL
+                                    : 'lib/assets/place_images/AngKor_wat.jpg',
+
                             onTap: () => _goToTripDetails(trip),
                           );
                         }).toList(),
@@ -127,7 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                   ),
                   // History Tap
-                  Consumer<TripViewModel>(
+                  Consumer<TripProvider>(
                     builder: (context, tripProvider, child) {
                       if (tripProvider.error != null) {
                         return Center(

@@ -1,274 +1,283 @@
+// // ignore_for_file: deprecated_member_use
+
 // import 'package:flutter/material.dart';
+// import 'package:provider/provider.dart';
+// import 'package:tourism_app/presentation/screens/chat_bot/chat_screen.dart';
+// import 'package:tourism_app/presentation/screens/home/detail_each_place.dart';
+// import 'package:tourism_app/presentation/screens/home/widget/filter_chip.dart';
+// import 'package:tourism_app/presentation/widgets/dertam_searchBar.dart';
 // import 'package:tourism_app/presentation/widgets/destination_card.dart';
-// import 'package:tourism_app/theme/theme.dart';
-// import 'detail_each_place.dart';
+// import 'package:tourism_app/presentation/widgets/navigationBar.dart';
+// import 'package:tourism_app/providers/place_provider.dart';
+// // import 'package:tourism_app/providers/place_retrieve_provider.dart';
+// import 'package:tourism_app/providers/auth_provider.dart';
 
-// class DetailScreen extends StatefulWidget {
-//   final String title;
-//   final String imagePath;
-//   final double rating;
-
-//   const DetailScreen({
-//     super.key,
-//     required this.title,
-//     required this.imagePath,
-//     required this.rating,
-//   });
+// class HomeScreen extends StatefulWidget {
+//   const HomeScreen({super.key});
 
 //   @override
-//   State<DetailScreen> createState() => _DetailScreenState();
+//   State<HomeScreen> createState() => _HomeScreenState();
 // }
 
-// class _DetailScreenState extends State<DetailScreen> {
-//   final TextEditingController _searchController = TextEditingController();
-  
+// class _HomeScreenState extends State<HomeScreen> {
+//   String selectedCategory = 'all'; // Stores selected category
+
+//   void onSearchChanged(String text) {}
+
+//   void onBackPressed() {}
 
 //   @override
 //   void initState() {
 //     super.initState();
-//     // Add listener to rebuild when text changes
-//     _searchController.addListener(() {
-//       setState(() {});
-//     });
-//   }
-
-//   @override
-//   void dispose() {
-//     _searchController.dispose();
-//     super.dispose();
+//     // Fetch data when the screen is initialized
+//     Provider.of<PlaceProvider>(context, listen: false).fetchAllPlaces();
 //   }
 
 //   @override
 //   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Stack(
-//         children: [
-//           // Hero image
-//           Image.asset(
-//             widget.imagePath,
-//             width: double.infinity,
-//             height: 400,
-//             fit: BoxFit.cover,
-//           ),
+//     final authProvider = Provider.of<AuthServiceProvider>(context);
+//     final currentUser = authProvider.currentUser;
+//     final displayName = currentUser?.displayName ??
+//         (currentUser?.email.split('@')[0] ?? 'User');
 
-//           // Back button and title
-//           Positioned(
-//             top: 40,
-//             left: 0,
-//             right: 0,
-//             child: Padding(
-//               padding: const EdgeInsets.symmetric(horizontal: 16),
-//               child: Row(
-//                 children: [
-//                   IconButton(
-//                     icon: const Icon(Icons.arrow_back, color: Colors.white),
-//                     onPressed: () {
-//                       Navigator.of(context).pop();
-//                     },
-//                   ),
-//                   const SizedBox(width: 8),
-//                   Text(
-//                     widget.title,
-//                     style: const TextStyle(
-//                       color: Colors.white,
-//                       fontSize: 24,
-//                       fontWeight: FontWeight.bold,
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
+//     return Consumer<PlaceProvider>(builder: (context, placeProvider, child) {
+//       // Filter places based on selected category
+//       final filteredPlaces = selectedCategory == 'all'
+//           ? placeProvider.places
+//           : placeProvider.places
+//               .where((place) => place.category == selectedCategory)
+//               .toList();
 
-//           // Content
-//           SingleChildScrollView(
-//             padding: const EdgeInsets.only(top: 280),
-//             child: Container(
-//               decoration: BoxDecoration(
-//                 color: DertamColors.white,
-//                 borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-//               ),
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   // Updated Search Bar
-//                   Padding(
-//                     padding: const EdgeInsets.all(16),
-//                     child: TextField(
-//                       controller: _searchController,
-//                       decoration: InputDecoration(
-//                         hintText: 'Search destination',
-//                         prefixIcon: const Icon(Icons.search),
-//                         suffixIcon: _searchController.text.isNotEmpty
-//                             ? IconButton(
-//                                 icon: const Icon(Icons.close),
-//                                 onPressed: () {
-//                                   _searchController.clear();
-//                                 },
-//                               )
-//                             : null,
-//                         filled: true,
-//                         fillColor: Colors.grey[200],
-//                         border: OutlineInputBorder(
-//                           borderRadius: BorderRadius.circular(30),
-//                           borderSide: BorderSide.none,
+//       // Fileter popular places
+//       final popularPlaces = placeProvider.places
+//           .where((place) => place.averageRating >= 4)
+//           .take(6)
+//           .toList();
+
+//       return Scaffold(
+//         body: SafeArea(
+//           child: SingleChildScrollView(
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 // Header Section
+//                 Padding(
+//                   padding: const EdgeInsets.all(16.0),
+//                   child: Row(
+//                     children: [
+//                       CircleAvatar(
+//                         radius: 20,
+//                         backgroundImage: currentUser?.photoUrl != null
+//                             ? NetworkImage(currentUser!.photoUrl!)
+//                             : const AssetImage('lib/assets/images/avatar.jpg')
+//                                 as ImageProvider,
+//                       ),
+//                       const SizedBox(width: 12),
+//                       Text(
+//                         'Hello, $displayName',
+//                         style: const TextStyle(
+//                           fontSize: 18,
+//                           fontWeight: FontWeight.w500,
 //                         ),
 //                       ),
-//                     ),
+//                       const Spacer(),
+//                       IconButton(
+//                         icon: const Icon(Icons.notifications_outlined),
+//                         onPressed: () {},
+//                       ),
+//                       IconButton(
+//                         icon: const Icon(Icons.language),
+//                         onPressed: () {},
+//                       ),
+//                     ],
 //                   ),
+//                 ),
 
-//                   // Events section
-//                   Padding(
+//                 // Hero Image & Search Bar
+//                 Stack(
+//                   children: [
+//                     Image.asset(
+//                       'lib/assets/place_images/Angkor_wat.jpg',
+//                       width: double.infinity,
+//                       height: 300,
+//                       fit: BoxFit.cover,
+//                     ),
+//                     Positioned(
+//                       left: 16,
+//                       right: 16,
+//                       bottom: 16,
+//                       child: TamSearchbar(
+//                         onBackPressed: onBackPressed,
+//                         onSearchChanged: onSearchChanged,
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+
+//                 // Popular Destination Section
+//                 Padding(
+//                   padding: const EdgeInsets.all(16.0),
+//                   child: Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                     children: [
+//                       const Text(
+//                         'Popular Destinations',
+//                         style: TextStyle(
+//                           fontSize: 20,
+//                           fontWeight: FontWeight.bold,
+//                         ),
+//                       ),
+//                       TextButton(
+//                         onPressed: () {},
+//                         child: const Text('See all'),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+
+//                 // Popular Destination Cards
+//                 SizedBox(
+//                   height: 150,
+//                   child: ListView.builder(
+//                     scrollDirection: Axis.horizontal,
 //                     padding: const EdgeInsets.symmetric(horizontal: 16),
-//                     child: Row(
-//                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                       children: [
-//                         Text(
-//                           'Events in ${widget.title}',
-//                           style: const TextStyle(
-//                             fontSize: 20,
-//                             fontWeight: FontWeight.bold,
+//                     itemCount: popularPlaces.length,
+//                     itemBuilder: (context, index) {
+//                       return GestureDetector(
+//                         onTap: () => Navigator.push(
+//                           context,
+//                           MaterialPageRoute(
+//                             builder: (context) => DetailEachPlace(
+//                                 placeId: popularPlaces[index].id),
 //                           ),
 //                         ),
-//                         TextButton(
-//                           onPressed: () {},
-//                           child: const Text('See all'),
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-
-//                   // Events horizontal list
-//                   SizedBox(
-//                     height: 180,
-//                     child: ListView.builder(
-//                       scrollDirection: Axis.horizontal,
-//                       padding: const EdgeInsets.symmetric(horizontal: 16),
-//                       itemCount: 2,
-//                       itemBuilder: (context, index) {
-//                         return Container(
+//                         child: Container(
 //                           width: 280,
 //                           margin: const EdgeInsets.only(right: 16),
 //                           decoration: BoxDecoration(
 //                             borderRadius: BorderRadius.circular(12),
 //                             image: DecorationImage(
-//                               image: AssetImage(
-//                                   'lib/assets/events/event_${index + 1}.jpg'),
+//                               image:
+//                                   NetworkImage(popularPlaces[index].imageURL),
 //                               fit: BoxFit.cover,
 //                             ),
 //                           ),
-//                           child: Stack(
-//                             children: [
-//                               Positioned(
-//                                 left: 12,
-//                                 bottom: 12,
-//                                 child: ElevatedButton(
-//                                   onPressed: () {},
-//                                   style: ElevatedButton.styleFrom(
-//                                     backgroundColor: Colors.blue,
-//                                     foregroundColor: Colors.white,
-//                                     shape: RoundedRectangleBorder(
-//                                       borderRadius: BorderRadius.circular(8),
-//                                     ),
-//                                     padding: const EdgeInsets.symmetric(
-//                                       horizontal: 24,
-//                                       vertical: 8,
-//                                     ),
-//                                   ),
-//                                   child: const Text('view'),
-//                                 ),
+//                         ),
+//                       );
+//                     },
+//                   ),
+//                 ),
+
+//                 // Explore Destination Section
+//                 const Padding(
+//                   padding: EdgeInsets.all(16.0),
+//                   child: Text(
+//                     'Explore Destination',
+//                     style: TextStyle(
+//                       fontSize: 20,
+//                       fontWeight: FontWeight.bold,
+//                     ),
+//                   ),
+//                 ),
+
+//                 // Category Filter Chips
+//                 SingleChildScrollView(
+//                   scrollDirection: Axis.horizontal,
+//                   padding: const EdgeInsets.all(16),
+//                   child: Row(
+//                     children: [
+//                       'all',
+//                       'museum',
+//                       'market',
+//                       'entertain_attraction',
+//                       'historical_place',
+//                       'restaurant',
+//                       'hotel',
+//                     ]
+//                         .map((category) => Padding(
+//                               padding:
+//                                   const EdgeInsets.symmetric(horizontal: 4.0),
+//                               child: FiltersChip(
+//                                 label: category,
+//                                 isSelected: selectedCategory == category,
+//                                 onTap: () {
+//                                   setState(() {
+//                                     selectedCategory = category;
+//                                   });
+//                                 },
 //                               ),
-//                             ],
+//                             ))
+//                         .toList(),
+//                   ),
+//                 ),
+
+//                 // Destination Grid View
+//                 GridView.builder(
+//                   shrinkWrap: true,
+//                   physics: const NeverScrollableScrollPhysics(),
+//                   padding: const EdgeInsets.symmetric(horizontal: 16),
+//                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+//                     crossAxisCount: 2,
+//                     childAspectRatio: 1.1,
+//                     crossAxisSpacing: 16,
+//                     mainAxisSpacing: 16,
+//                   ),
+//                   itemCount: filteredPlaces.length,
+//                   itemBuilder: (context, index) {
+//                     return DestinationCard(
+//                       image: filteredPlaces[index].imageURL,
+//                       title: filteredPlaces[index].name,
+//                       rating: filteredPlaces[index].averageRating,
+//                       onTap: () {
+//                         Navigator.push(
+//                           context,
+//                           MaterialPageRoute(
+//                             builder: (context) => DetailEachPlace(
+//                                 placeId: filteredPlaces[index].id),
 //                           ),
 //                         );
 //                       },
-//                     ),
-//                   ),
+//                     );
+//                   },
+//                 ),
 
-//                   const SizedBox(height: 16),
-
-//                   // Location name
-//                   Padding(
-//                     padding: const EdgeInsets.symmetric(horizontal: 16),
-//                     child: Text(
-//                       widget.title,
-//                       style: const TextStyle(
-//                         fontSize: 20,
-//                         fontWeight: FontWeight.bold,
-//                       ),
-//                     ),
-//                   ),
-
-//                   // Categories
-//                   SingleChildScrollView(
-//                     scrollDirection: Axis.horizontal,
-//                     padding: const EdgeInsets.all(16),
-//                     child: Row(
-//                       children: [
-//                         _buildCategoryChip('All', true),
-//                         _buildCategoryChip('Museum', false),
-//                         _buildCategoryChip('Temple', false),
-//                         _buildCategoryChip('Mountain', false),
-//                         _buildCategoryChip('History', false),
-//                       ],
-//                     ),
-//                   ),
-
-//                   // Attractions grid
-//                   GridView.builder(
-//                     shrinkWrap: true,
-//                     physics: const NeverScrollableScrollPhysics(),
-//                     padding: const EdgeInsets.all(16),
-//                     gridDelegate:
-//                         const SliverGridDelegateWithFixedCrossAxisCount(
-//                       crossAxisCount: 2,
-//                       childAspectRatio: 0.85,
-//                       crossAxisSpacing: 16,
-//                       mainAxisSpacing: 16,
-//                     ),
-//                     itemCount: 6,
-//                     itemBuilder: (context, index) {
-//                       return _buildAttractionCard('Waterfall');
-//                     },
-//                   ),
-//                 ],
-//               ),
+//                 const SizedBox(height: 80),
+//               ],
 //             ),
 //           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   Widget _buildCategoryChip(String label, bool isSelected) {
-//     return Container(
-//       margin: const EdgeInsets.only(right: 8),
-//       child: FilterChip(
-//         label: Text(label),
-//         selected: isSelected,
-//         onSelected: (bool selected) {},
-//         backgroundColor: isSelected ? Colors.blue : Colors.grey[200],
-//         labelStyle: TextStyle(
-//           color: isSelected ? Colors.white : Colors.black,
 //         ),
-//       ),
-//     );
-//   }
-  
-
-//   Widget _buildAttractionCard(String name) {
-//     return DestinationCard(
-//       image: 'lib/assets/place_images/Angkor_wat.jpg',
-//       title: name,
-//       rating: widget.rating,
-//       onTap: () {
-//         Navigator.push(
-//           context,
-//           MaterialPageRoute(
-//             builder: (context) => DetailEachPlace(placeId: .currentUser!.uid,),
+//         bottomNavigationBar: const Navigationbar(),
+//         // Floating Action Button
+//         floatingActionButton: Container(
+//           margin: const EdgeInsets.only(bottom: 20, right: 16),
+//           decoration: BoxDecoration(
+//             shape: BoxShape.circle,
+//             boxShadow: [
+//               BoxShadow(
+//                 color: Colors.black.withOpacity(0.3), // Shadow color
+//                 spreadRadius: 2,
+//                 blurRadius: 8,
+//                 offset: const Offset(2, 4), // Changes position of shadow
+//               ),
+//             ],
 //           ),
-//         );
-//       },
-//     );
+//           child: FloatingActionButton(
+//             onPressed: () {
+//               Navigator.push(context,
+//                   MaterialPageRoute(builder: (context) => ChatScreen()));
+//               // Add navigation or functionality here
+//             },
+//             backgroundColor: Colors.white,
+//             shape: const CircleBorder(),
+//             elevation: 0, // Set to 0 to use the custom shadow
+//             child: Image.asset(
+//               'lib/assets/images/chatbot.jpg', // Replace with the actual asset path
+//               width: 40, // Adjust size as needed
+//               height: 40,
+//             ),
+//           ),
+//         ),
+//       );
+//     });
 //   }
 // }

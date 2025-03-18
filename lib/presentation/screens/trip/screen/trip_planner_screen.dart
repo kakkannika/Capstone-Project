@@ -32,7 +32,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
     // If coming from profile screen, ensure trip is loaded
     if (widget.tripId != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.read<TripViewModel>().selectTrip(widget.tripId!);
+        context.read<TripProvider>().selectTrip(widget.tripId!);
       });
     }
   }
@@ -73,7 +73,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
             Expanded(
               child: widget.tripId != null
                   ? StreamBuilder<List<Trip>>(
-                      stream: Provider.of<TripViewModel>(context, listen: false).getTripsStream(),
+                      stream: Provider.of<TripProvider>(context, listen: false).getTripsStream(),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
                           return const Center(child: CircularProgressIndicator());

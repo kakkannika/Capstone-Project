@@ -84,7 +84,7 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
   Future<void> _createTrip() async {
     if (!_formKey.currentState!.validate() || !isFormValid()) return;
 
-    final tripProvider = context.read<TripViewModel>();
+    final tripProvider = context.read<TripProvider>();
     try {
       final tripId = await tripProvider.createTrip(
         tripName: _tripNameController.text,
@@ -127,7 +127,7 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final tripProvider = context.watch<TripViewModel>();
+    final tripProvider = context.watch<TripProvider>();
 
     return Scaffold(
       backgroundColor: Colors.grey[100],

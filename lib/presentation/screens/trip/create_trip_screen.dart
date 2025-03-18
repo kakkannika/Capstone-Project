@@ -25,7 +25,8 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
   Future<void> _selectDate(BuildContext context, bool isStartDate) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: isStartDate ? DateTime.now() : (_startDate ?? DateTime.now()),
+      initialDate:
+          isStartDate ? DateTime.now() : (_startDate ?? DateTime.now()),
       firstDate: isStartDate ? DateTime.now() : (_startDate ?? DateTime.now()),
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
@@ -48,7 +49,7 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
   Future<void> _createTrip() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final tripProvider = context.read<TripViewModel>();
+    final tripProvider = context.read<TripProvider>();
     try {
       final tripId = await tripProvider.createTrip(
         tripName: _tripNameController.text,
@@ -73,7 +74,7 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final tripProvider = context.watch<TripViewModel>();
+    final tripProvider = context.watch<TripProvider>();
 
     return Scaffold(
       appBar: AppBar(
@@ -103,9 +104,9 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
               const SizedBox(height: 20),
               ListTile(
                 title: const Text('Start Date'),
-                subtitle: Text(_startDate == null 
-                  ? 'Select start date'
-                  : DateFormat('MMM dd, yyyy').format(_startDate!)),
+                subtitle: Text(_startDate == null
+                    ? 'Select start date'
+                    : DateFormat('MMM dd, yyyy').format(_startDate!)),
                 trailing: const Icon(Icons.calendar_today),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -124,9 +125,9 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
               const SizedBox(height: 20),
               ListTile(
                 title: const Text('End Date'),
-                subtitle: Text(_endDate == null 
-                  ? 'Select end date'
-                  : DateFormat('MMM dd, yyyy').format(_endDate!)),
+                subtitle: Text(_endDate == null
+                    ? 'Select end date'
+                    : DateFormat('MMM dd, yyyy').format(_endDate!)),
                 trailing: const Icon(Icons.calendar_today),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -161,7 +162,8 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
                         if (_startDate == null || _endDate == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Please select both start and end dates'),
+                              content: Text(
+                                  'Please select both start and end dates'),
                             ),
                           );
                           return;
@@ -185,4 +187,4 @@ class _CreateTripScreenState extends State<CreateTripScreen> {
       ),
     );
   }
-} 
+}

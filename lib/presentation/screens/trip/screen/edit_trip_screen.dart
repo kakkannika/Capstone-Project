@@ -106,7 +106,7 @@ class _EditTripScreenState extends State<EditTripScreen> {
     });
 
     try {
-      final tripProvider = Provider.of<TripViewModel>(context, listen: false);
+      final tripProvider = Provider.of<TripProvider>(context, listen: false);
       
       // Only update fields that have changed
       final String? newName = _tripNameController.text != widget.trip.tripName ? _tripNameController.text : null;

@@ -4,7 +4,7 @@ import 'package:tourism_app/data/repository/budget_repository.dart';
 import 'package:tourism_app/models/budget/budget.dart';
 import 'package:tourism_app/models/budget/expend.dart';
 
-class BudgetViewModel with ChangeNotifier {
+class BudgetProvider with ChangeNotifier {
   final BudgetService _budgetService = BudgetService();
 
   Budget? _selectedBudget;
@@ -84,7 +84,6 @@ class BudgetViewModel with ChangeNotifier {
     try {
       _setLoading(true);
       _error = null;
-      
       final budgetId = await _budgetService.createBudget(
         tripId: tripId,
         total: total,

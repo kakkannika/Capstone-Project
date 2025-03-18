@@ -53,7 +53,7 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
     });
 
     try {
-      final tripProvider = Provider.of<TripViewModel>(context, listen: false);
+      final tripProvider = Provider.of<TripProvider>(context, listen: false);
       
       // Listen to the trip stream
       tripProvider.getTripByIdStream(widget.tripId).listen((trip) {
@@ -137,8 +137,8 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
 
     try {
       // Create the budget in Firestore
-      final budgetProvider = Provider.of<BudgetViewModel>(context, listen: false);
-      final tripProvider = Provider.of<TripViewModel>(context, listen: false);
+      final budgetProvider = Provider.of<BudgetProvider>(context, listen: false);
+      final tripProvider = Provider.of<TripProvider>(context, listen: false);
       
       final budgetId = await budgetProvider.createBudget(
         tripId: widget.tripId,
