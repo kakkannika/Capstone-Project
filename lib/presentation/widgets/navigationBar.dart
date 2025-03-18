@@ -23,15 +23,14 @@ class Navigationbar extends StatelessWidget {
             // Profile tab index
             Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (context) => const ProfileScreen()),
+              MaterialPageRoute(builder: (context) => const ProfileScreen()),
             );
           }
         },
         destinations: const [
           NavigationDestination(icon: Icon(Iconsax.home), label: 'Home'),
           NavigationDestination(icon: Icon(Iconsax.folder), label: 'Trip Plan'),
-          NavigationDestination(icon: Icon(Iconsax.money), label: 'Budget'),
+          NavigationDestination(icon: Icon(Iconsax.heart), label: 'Favorite'),
           NavigationDestination(icon: Icon(Iconsax.user), label: 'Profile'),
         ],
       ),
