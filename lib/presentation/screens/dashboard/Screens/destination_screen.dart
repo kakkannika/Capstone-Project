@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tourism_app/models/place/place.dart';
 import 'package:tourism_app/models/place/place_category.dart';
-import 'package:tourism_app/presentation/screens/dashboard/Screens/main_screen.dart';
-import 'package:tourism_app/presentation/screens/dashboard/widgets/header.dart';
 import 'package:tourism_app/presentation/widgets/dertam_button.dart';
 import 'package:tourism_app/providers/placecrud.dart';
 import 'package:tourism_app/theme/theme.dart';
 
 class DestinationScreen extends StatefulWidget {
-  final ScreenType screenType;
-  const DestinationScreen({super.key, required this.screenType});
+  final Place? place; // Optional place parameter for editing
+
+  const DestinationScreen({
+    super.key,
+    this.place,
+  });
 
   @override
   State<DestinationScreen> createState() => _DestinationScreenState();
@@ -34,6 +36,25 @@ class _DestinationScreenState extends State<DestinationScreen> {
 
   bool _isLoading = false;
   String? _createdPlaceId;
+  bool _isEditing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _isEditing = widget.place != null;
+    if (_isEditing) {
+      // Populate form fields with existing place data
+      _nameController.text = widget.place!.name;
+      _descriptionController.text = widget.place!.description;
+      _imageURLController.text = widget.place!.imageURL;
+      _categoryController.text = widget.place!.category;
+      _ratingController.text = widget.place!.averageRating?.toString() ?? '';
+      _feesController.text = widget.place!.entranceFees?.toString() ?? '';
+      _hoursController.text = widget.place!.openingHours ?? '';
+      _latitudeController.text = widget.place!.location.latitude.toString();
+      _longitudeController.text = widget.place!.location.longitude.toString();
+    }
+  }
 
   @override
   void dispose() {
@@ -49,17 +70,15 @@ class _DestinationScreenState extends State<DestinationScreen> {
     super.dispose();
   }
 
-  Future<void> _addPlace() async {
+  Future<void> _savePlace() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
-        _createdPlaceId = null;
       });
 
       try {
-        // Create Place object
-        final newPlace = Place(
-          id: '', // Empty ID since Firestore will generate one
+        final place = Place(
+          id: _isEditing ? widget.place!.id : '',
           name: _nameController.text,
           description: _descriptionController.text,
           location: GeoPoint(
@@ -68,21 +87,47 @@ class _DestinationScreenState extends State<DestinationScreen> {
           ),
           imageURL: _imageURLController.text,
           category: _categoryController.text,
-          averageRating: double.parse(_ratingController.text),
-          entranceFees: double.parse(_feesController.text),
+          entranceFees: double.tryParse(_feesController.text),
           openingHours: _hoursController.text,
+          averageRating: double.tryParse(_ratingController.text),
         );
 
-        // Add place to Firestore
-        final placeId = await _placeCrudService.addPlace(newPlace);
+        if (_isEditing) {
+          await _placeCrudService.updatePlace(place);
+        } else {
+          await _placeCrudService.addPlace(place);
+        }
+
+        // Reset form after successful save
+        if (!_isEditing) {
+          _resetForm();
+        }
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_isEditing
+                ? 'Place updated successfully!'
+                : 'Place added successfully!'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
 
         setState(() {
           _isLoading = false;
-          if (placeId != null) {
-            _createdPlaceId = placeId;
-          }
         });
       } catch (e) {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Error ${_isEditing ? 'updating' : 'adding'} place: ${e.toString()}'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
+          ),
+        );
+
         setState(() {
           _isLoading = false;
         });
@@ -93,21 +138,36 @@ class _DestinationScreenState extends State<DestinationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: DertamColors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.all(DertamSpacings.m),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Header(
-                currentScreen: widget.screenType,
-              ),
               SizedBox(height: DertamSpacings.m),
               Form(
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    SizedBox(height: DertamSpacings.m),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.arrow_back),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                        SizedBox(width: DertamSpacings.s),
+                        Text(
+                          _isEditing ? 'Edit Place' : 'Add New Place',
+                          style: DertamTextStyles.heading,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: DertamSpacings.m),
                     InputTextField(
                         label: 'Place Name', controller: _nameController),
                     InputTextField(
@@ -160,7 +220,7 @@ class _DestinationScreenState extends State<DestinationScreen> {
                               padding: EdgeInsets.symmetric(horizontal: 8),
                               child: DertamButton(
                                 onPressed: _savePlace,
-                                text: 'Save',
+                                text: _isEditing ? 'Update' : 'Save',
                                 buttonType: ButtonType.primary,
                               ),
                             ),
@@ -191,33 +251,30 @@ class _DestinationScreenState extends State<DestinationScreen> {
     );
   }
 
-  void _savePlace() async {
-    if (_formKey.currentState!.validate()) {
-      final newPlace = Place(
-        id: '',
-        name: _nameController.text,
-        description: _descriptionController.text,
-        location: GeoPoint(0, 0),
-        imageURL: _imageURLController.text,
-        category: _categoryController.text,
-        entranceFees: double.tryParse(_feesController.text),
-        openingHours: _hoursController.text,
-        averageRating: 0.0,
-      );
-      await _placeCrudService.addPlace(newPlace);
-    }
-  }
-
   void _resetForm() {
-    _nameController.clear();
-    _descriptionController.clear();
-    _feesController.clear();
-    _hoursController.clear();
-    _imageURLController.clear();
-    _categoryController.clear();
-    _ratingController.clear();
-    _latitudeController.clear();
-    _longitudeController.clear();
+    if (_isEditing && widget.place != null) {
+      // Reset to original values if editing
+      _nameController.text = widget.place!.name;
+      _descriptionController.text = widget.place!.description;
+      _imageURLController.text = widget.place!.imageURL;
+      _categoryController.text = widget.place!.category;
+      _ratingController.text = widget.place!.averageRating?.toString() ?? '';
+      _feesController.text = widget.place!.entranceFees?.toString() ?? '';
+      _hoursController.text = widget.place!.openingHours ?? '';
+      _latitudeController.text = widget.place!.location.latitude.toString();
+      _longitudeController.text = widget.place!.location.longitude.toString();
+    } else {
+      // Clear all fields if adding new
+      _nameController.clear();
+      _descriptionController.clear();
+      _feesController.clear();
+      _hoursController.clear();
+      _imageURLController.clear();
+      _categoryController.clear();
+      _ratingController.clear();
+      _latitudeController.clear();
+      _longitudeController.clear();
+    }
     setState(() {
       selectedCategory = null;
     });
@@ -238,109 +295,53 @@ class InputTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8),
-      child: TextFormField(
-        controller: controller,
-        maxLines: maxLines,
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: DertamTextStyles.body.copyWith(
-            color: DertamColors.textNormal,
-          ),
-          filled: true,
-          fillColor: DertamColors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: DertamColors.primary, width: 2),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: Offset(0, 2), // changes position of shadow
+            ),
+          ],
+        ),
+        child: TextFormField(
+          controller: controller,
+          maxLines: maxLines,
+          decoration: InputDecoration(
+            labelText: label,
+            labelStyle: DertamTextStyles.body.copyWith(
+              color: DertamColors.textNormal,
+            ),
+            filled: true,
+            fillColor: DertamColors.white,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: Colors.grey.withOpacity(0.2),
+                width: 1,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: Colors.grey.withOpacity(0.2),
+                width: 1,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: DertamColors.primary,
+                width: 2,
+              ),
+            ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           ),
         ),
       ),
     );
   }
 }
-
-// class DropDownMenu extends StatelessWidget {
-//   final String label;
-//   final List<PlaceCategory> items;
-//   final void Function(PlaceCategory?) onChanged;
-//   final PlaceCategory? value;
-
-//   const DropDownMenu({
-//     super.key,
-//     required this.label,
-//     required this.items,
-//     required this.onChanged,
-//     this.value,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: EdgeInsets.symmetric(vertical: 8),
-//       child: SizedBox(
-//         width: 300, // Adjust width as needed
-//         child: DropdownButtonFormField<PlaceCategory>(
-//           value: value,
-//           decoration: InputDecoration(
-//             labelText: label,
-//             labelStyle: DertamTextStyles.body.copyWith(
-//               color: DertamColors.textNormal,
-//             ),
-//             filled: true,
-//             fillColor: DertamColors.white,
-//             border: OutlineInputBorder(
-//               borderRadius: BorderRadius.circular(10),
-//             ),
-//             enabledBorder: OutlineInputBorder(
-//               borderRadius: BorderRadius.circular(10),
-//             ),
-//             focusedBorder: OutlineInputBorder(
-//               borderRadius: BorderRadius.circular(10),
-//               borderSide: BorderSide(color: DertamColors.primary, width: 2),
-//             ),
-//             contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-//           ),
-//           dropdownColor: Colors.white,
-//           style: DertamTextStyles.body.copyWith(
-//             color: DertamColors.textNormal,
-//           ),
-//           items: items.map((PlaceCategory category) {
-//             return DropdownMenuItem<PlaceCategory>(
-//               value: category,
-//               child: Text(
-//                 _formatCategoryName(category.name),
-//                 style: DertamTextStyles.body.copyWith(
-//                   color: DertamColors.textNormal,
-//                 ),
-//               ),
-//             );
-//           }).toList(),
-//           selectedItemBuilder: (BuildContext context) {
-//             return items.map<Widget>((PlaceCategory category) {
-//               return Text(
-//                 _formatCategoryName(category.name),
-//                 style: DertamTextStyles.body.copyWith(
-//                   color: DertamColors.textNormal,
-//                   fontWeight: FontWeight.w500,
-//                 ),
-//               );
-//             }).toList();
-//           },
-//           onChanged: onChanged,
-//           menuMaxHeight: 300,
-//         ),
-//       ),
-//     );
-//   }
-
-//   String _formatCategoryName(String name) {
-//     return name
-//         .split('_')
-//         .map((word) =>
-//             word.isEmpty ? '' : '${word[0].toUpperCase()}${word.substring(1)}')
-//         .join(' ');
-//   }
-// }

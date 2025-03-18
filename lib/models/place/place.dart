@@ -26,13 +26,26 @@ class Place {
 
   factory Place.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data() as Map;
+
+    GeoPoint locationPoint;
+    if (data['location'] is String) {
+      final List<String> coordinates = data['location'].toString().split(',');
+      final double lat = double.parse(coordinates[0].trim());
+      final double lng = double.parse(coordinates[1].trim());
+      locationPoint = GeoPoint(lat, lng);
+    } else if (data['location'] is GeoPoint) {
+      locationPoint = data['location'];
+    } else {
+      locationPoint = GeoPoint(0, 0);
+    }
+
     return Place(
       id: doc.id,
-      name: data['name'],
-      description: data['description'],
-      location: data['location'],
-      imageURL: data['imageURL'],
-      category: data['category'],
+      name: data['name'] ?? '',
+      description: data['description'] ?? '',
+      location: locationPoint,
+      imageURL: data['imageURL'] ?? '',
+      category: data['category'] ?? '',
       entranceFees: data['entranceFees']?.toDouble(),
       openingHours: data['openingHours'],
       averageRating: data['averageRating']?.toDouble(),
@@ -44,9 +57,9 @@ class Place {
       'name': name,
       'description': description,
       'location': location,
-      'imageUrls': imageURL,
+      'imageURL': imageURL,
       'category': category,
-      'entranceFee': entranceFees,
+      'entranceFees': entranceFees,
       'openingHours': openingHours,
       'averageRating': averageRating,
     };

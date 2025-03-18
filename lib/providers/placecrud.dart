@@ -34,7 +34,7 @@ class PlaceCrudService extends ChangeNotifier {
   }
 
   // Update an existing place
-  Future<bool> updatePlace(Place place) async {
+  Future<String?> updatePlace(Place place) async {
     try {
       await _firestore.collection(collectionName).doc(place.id).update({
         'name': place.name,
@@ -48,10 +48,10 @@ class PlaceCrudService extends ChangeNotifier {
       });
 
       notifyListeners();
-      return true;
+      return place.id;
     } catch (e) {
       print('Error updating place: $e');
-      return false;
+      return null;
     }
   }
 

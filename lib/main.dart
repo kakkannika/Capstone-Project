@@ -1,16 +1,14 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tourism_app/firebase_options.dart';
 import 'package:tourism_app/presentation/screens/get_start_screen.dart';
 import 'package:tourism_app/providers/place_retrieve_service.dart';
 import 'package:tourism_app/providers/service.dart';
+import 'package:tourism_app/providers/placecrud.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp();
   runApp(
     const MyApp(),
   );
@@ -24,6 +22,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => AuthServiceProvider()),
         ChangeNotifierProvider(create: (context) => PlaceProvider()),
+        ChangeNotifierProvider(create: (context) => PlaceCrudService()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
