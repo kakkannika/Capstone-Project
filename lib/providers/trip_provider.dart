@@ -3,10 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:tourism_app/models/place/place.dart';
 import 'package:tourism_app/models/trips/trips.dart';
-import 'package:tourism_app/data/repository/trip_repository.dart';
+import 'package:tourism_app/repository/firebase/trip_firebase_repository.dart';
 
 class TripProvider with ChangeNotifier {
-  final TripService _tripService = TripService();
+  final TripFirebaseRepository _tripService = TripFirebaseRepository();
   List<Trip> _trips = [];
   Trip? _selectedTrip;
   bool _isLoading = false;
@@ -333,6 +333,7 @@ class TripProvider with ChangeNotifier {
       return null;
     }
   }
+  
 
   @override
   void dispose() {

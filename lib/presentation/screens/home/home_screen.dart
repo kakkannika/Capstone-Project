@@ -22,7 +22,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String selectedCategory = 'all'; // Stores selected category
 
-  void onSearchChanged(String text) {}
+  void onSearchChanged(String text) {
+
+  }
 
   void onBackPressed() {}
 
@@ -108,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       bottom: 16,
                       child: TamSearchbar(
                         onBackPressed: onBackPressed,
-                        onSearchChanged: onSearchChanged,
+                        onSearchChanged: (text) => placeProvider.searchPlace(text),
                       ),
                     ),
                   ],

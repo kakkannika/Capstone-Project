@@ -5,7 +5,6 @@ import 'package:tourism_app/firebase_options.dart';
 import 'package:tourism_app/presentation/screens/get_start_screen.dart';
 import 'package:tourism_app/providers/budget_provider.dart';
 import 'package:tourism_app/providers/place_provider.dart';
-// import 'package:tourism_app/providers/place_retrieve_provider.dart';
 import 'package:tourism_app/providers/auth_provider.dart';
 import 'package:tourism_app/providers/trip_provider.dart';
 

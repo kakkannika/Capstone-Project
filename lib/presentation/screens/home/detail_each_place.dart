@@ -2,7 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tourism_app/data/repository/place_repository.dart';
+import 'package:tourism_app/presentation/googlemap/map_screen.dart';
+import 'package:tourism_app/repository/firebase/place_firebase_repository.dart';
 import 'package:tourism_app/presentation/screens/trip/screen/start_plan_screen.dart';
 import 'package:tourism_app/presentation/widgets/dertam_button.dart';
 import 'package:tourism_app/providers/place_provider.dart';
@@ -165,7 +166,8 @@ class _DetailEachPlaceState extends State<DetailEachPlace> {
                             right: 20,
                             child: ElevatedButton.icon(
                               onPressed: () {
-                                _openMapWithLocation(place!.location);
+                                _openMapWithLocation(
+                                    context, place!.location, place!.name);
                               },
                               icon: const Icon(Icons.map_outlined),
                               label: const Text('Route'),
@@ -304,7 +306,8 @@ class _DetailEachPlaceState extends State<DetailEachPlace> {
                                 const SizedBox(width: 8),
                                 TextButton(
                                   onPressed: () {
-                                    _openMapWithLocation(place!.location);
+                                    _openMapWithLocation(
+                                        context, place!.location, place!.name);
                                   },
                                   child: const Text('View on Google Maps'),
                                 ),
@@ -455,14 +458,17 @@ class _DetailEachPlaceState extends State<DetailEachPlace> {
   }
 
   // Helper method to open Google Maps with a location
-  void _openMapWithLocation(GeoPoint location) {
-    // Implement map opening functionality
-    // You can use url_launcher package to open Google Maps
-    print(
-        'Opening map at location: ${location.latitude}, ${location.longitude}');
-    // Example using url_launcher:
-    // final url = 'https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}';
-    // launch(url);
+  void _openMapWithLocation(
+      BuildContext context, GeoPoint location, String placeName) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MapNavigationScreen(
+          destinationLocation: location,
+          destinationName: placeName,
+        ),
+      ),
+    );
   }
 
   // Helper method to navigate to another place detail page
@@ -760,7 +766,7 @@ extension PlaceProviderExtension on PlaceProvider {
       GeoPoint location, double radiusInKm) async {
     try {
       // Get the repository
-      final repository = PlaceRepository();
+      final repository = PlaceFirebaseRepository();
 
       // Get all places
       final List<Place> allPlaces = await repository.fetchAllPlaces();

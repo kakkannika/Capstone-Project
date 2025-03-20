@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:tourism_app/data/repository/budget_repository.dart';
+import 'package:tourism_app/repository/firebase/budget_firebase_repository.dart';
 import 'package:tourism_app/models/budget/budget.dart';
 import 'package:tourism_app/models/budget/expend.dart';
 
 class BudgetProvider with ChangeNotifier {
-  final BudgetService _budgetService = BudgetService();
+  final BudgetFirebaseRepository _budgetService = BudgetFirebaseRepository();
 
   Budget? _selectedBudget;
   bool _isLoading = false;
@@ -31,13 +31,13 @@ class BudgetProvider with ChangeNotifier {
     try {
       _setLoading(true);
       _error = null;
-      
+
       final budget = await _budgetService.getBudgetByTripId(tripId);
-      
+
       if (budget != null) {
         _selectedBudget = budget;
       }
-      
+
       _setLoading(false);
       return budget;
     } catch (e) {
@@ -56,10 +56,10 @@ class BudgetProvider with ChangeNotifier {
   void startListeningToBudget(String tripId) {
     _setLoading(true);
     _error = null;
-    
+
     // Cancel any existing subscription
     _budgetSubscription?.cancel();
-    
+
     // Start a new subscription
     _budgetSubscription = _budgetService.getBudgetByTripIdStream(tripId).listen(
       (budget) {
@@ -90,7 +90,7 @@ class BudgetProvider with ChangeNotifier {
         currency: currency,
         dailyBudget: dailyBudget,
       );
-      
+
       _setLoading(false);
       return budgetId;
     } catch (e) {
@@ -110,14 +110,14 @@ class BudgetProvider with ChangeNotifier {
     try {
       _setLoading(true);
       _error = null;
-      
+
       await _budgetService.updateBudget(
         budgetId: budgetId,
         total: total,
         currency: currency,
         dailyBudget: dailyBudget,
       );
-      
+
       _setLoading(false);
       return true;
     } catch (e) {
@@ -139,7 +139,7 @@ class BudgetProvider with ChangeNotifier {
     try {
       _setLoading(true);
       _error = null;
-      
+
       final expense = Expense.create(
         amount: amount,
         category: category,
@@ -147,12 +147,12 @@ class BudgetProvider with ChangeNotifier {
         description: description,
         placeId: placeId,
       );
-      
+
       await _budgetService.addExpense(
         budgetId: budgetId,
         expense: expense,
       );
-      
+
       _setLoading(false);
       return true;
     } catch (e) {
@@ -170,12 +170,12 @@ class BudgetProvider with ChangeNotifier {
     try {
       _setLoading(true);
       _error = null;
-      
+
       await _budgetService.updateExpense(
         budgetId: budgetId,
         updatedExpense: updatedExpense,
       );
-      
+
       _setLoading(false);
       return true;
     } catch (e) {
@@ -193,12 +193,12 @@ class BudgetProvider with ChangeNotifier {
     try {
       _setLoading(true);
       _error = null;
-      
+
       await _budgetService.removeExpense(
         budgetId: budgetId,
         expenseId: expenseId,
       );
-      
+
       _setLoading(false);
       return true;
     } catch (e) {
@@ -213,13 +213,13 @@ class BudgetProvider with ChangeNotifier {
     try {
       _setLoading(true);
       _error = null;
-      
+
       await _budgetService.deleteBudget(budgetId);
-      
+
       if (_selectedBudget?.id == budgetId) {
         _selectedBudget = null;
       }
-      
+
       _setLoading(false);
       return true;
     } catch (e) {
@@ -234,4 +234,4 @@ class BudgetProvider with ChangeNotifier {
     _budgetSubscription?.cancel();
     super.dispose();
   }
-} 
+}

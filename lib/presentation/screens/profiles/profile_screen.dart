@@ -38,8 +38,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final userName = currentUser?.displayName ?? 'User';
     final userEmail = currentUser?.email ?? 'No email';
 
-   
-
     return DefaultTabController(
       length: 2, // Number of tabs
       child: Scaffold(
@@ -111,14 +109,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                           return TripItem(
                             title: trip.tripName,
-                            places:'$numberOfPlaces ${numberOfPlaces == 1 ? 'place' : 'places'}',
+                            places:
+                                '$numberOfPlaces ${numberOfPlaces == 1 ? 'place' : 'places'}',
                             status: status,
                             imagePath: (trip.days.isNotEmpty &&
-                                        trip.days.first.places.isNotEmpty &&
-                                        trip.days.first.places.first.imageURL.isNotEmpty)
-                                    ? trip.days.first.places.first.imageURL
-                                    : 'lib/assets/place_images/AngKor_wat.jpg',
-
+                                    trip.days.first.places.isNotEmpty &&
+                                    trip.days.first.places.first.imageURL
+                                        .isNotEmpty)
+                                ? trip.days.first.places.first.imageURL
+                                : 'lib/assets/place_images/AngKor_wat.jpg',
                             onTap: () => _goToTripDetails(trip),
                           );
                         }).toList(),
@@ -187,7 +186,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           DertamDialogButton(
             text: 'Logout',
             onPressed: () {
-              Navigator.pop(context);
               Navigator.pop(context);
               _logout(context);
             },

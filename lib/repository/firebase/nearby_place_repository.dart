@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:tourism_app/data/repository/place_repository.dart';
+import 'package:tourism_app/repository/firebase/place_firebase_repository.dart';
 import 'dart:math';
 import 'package:tourism_app/models/place/place.dart';
 
-extension PlaceRepositoryExtension on PlaceRepository {
+extension PlaceRepositoryExtension on PlaceFirebaseRepository {
   // Calculate distance between two GeoPoints in kilometers using Haversine formula
   double _calculateDistance(GeoPoint point1, GeoPoint point2) {
     const double earthRadius = 6371; // Earth's radius in kilometers

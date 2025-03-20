@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/data/repository/place_repository.dart';
+import 'package:tourism_app/repository/firebase/place_firebase_repository.dart';
 import 'package:tourism_app/models/place/place.dart';
 
 class PlaceProvider extends ChangeNotifier {
-  final PlaceRepository _placeRepository = PlaceRepository();
+  final PlaceFirebaseRepository _placeRepository = PlaceFirebaseRepository();
 
   List<Place> _places = [];
   bool _isLoading = false;

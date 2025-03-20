@@ -22,7 +22,7 @@ class _ChatScreenState extends State<ChatScreen> {
   // Initialize chatbot service
   final CustomChatbotService _chatbotService = CustomChatbotService(
     apiUrl:
-        'https://3b92-36-37-169-49.ngrok-free.app/chat', // Replace with your actual endpoint
+        'https://f211-203-95-199-47.ngrok-free.app/chat', // Replace with your actual endpoint
   );
 
   void _sendMessage(String message) {

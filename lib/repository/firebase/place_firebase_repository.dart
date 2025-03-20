@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:tourism_app/repository/place_repository.dart';
 import 'package:tourism_app/models/place/place.dart';
 
-class PlaceRepository {
+class PlaceFirebaseRepository extends PlaceRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final String collectionName = 'places';
 
   // Fetching all places
+  @override
   Future<List<Place>> fetchAllPlaces() async {
     try {
       QuerySnapshot querySnapshot =
@@ -17,7 +19,7 @@ class PlaceRepository {
   }
 
   // Get places by ID
-
+  @override
   Future<Place?> getPlaceById(String placeId) async {
     try {
       DocumentSnapshot doc =
@@ -32,6 +34,7 @@ class PlaceRepository {
   }
 
   // Get place by category
+  @override
   Future<List<Place>> fetchPlacesByCategory(String category) async {
     try {
       QuerySnapshot querySnapshot = await _firestore
@@ -45,6 +48,7 @@ class PlaceRepository {
   }
 
   // Get popular place
+  @override
   Future<List<Place>> fetchHightlyRatedPlaces(double minRating) async {
     try {
       QuerySnapshot querySnapshot = await _firestore
@@ -58,6 +62,7 @@ class PlaceRepository {
   }
 
   //
+  @override
   Future<List<Place>> searchPlaces(String query) async {
     try {
       // Convert query to lowercase for case-insensitive search
@@ -85,7 +90,7 @@ class PlaceRepository {
       throw Exception('Error searching places: $e');
     }
   }
-  
+
   // Future<void> addPlaceToTripDay( firestore.DocumentReference dayRef, String placeId) async {
   //   try {
   //     // Get current placeIds array
@@ -106,7 +111,6 @@ class PlaceRepository {
   //     throw Exception('Error adding place to day: $e');
   //   }
   // }
-
 
   // Future<void> removePlaceFromTripDay(
   //     firestore.DocumentReference dayRef, String placeId) async {

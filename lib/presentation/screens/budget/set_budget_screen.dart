@@ -95,7 +95,6 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
       _dailyBudget = totalBudget / numberOfDays;
     });
   }
-
   void _navigateToExpenseScreen(String budgetId) {
     Navigator.pushReplacement(
       context,

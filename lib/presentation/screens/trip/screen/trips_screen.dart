@@ -16,14 +16,15 @@ class TripsScreen extends StatefulWidget {
   _TripsScreenState createState() => _TripsScreenState();
 }
 
-class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStateMixin {
+class _TripsScreenState extends State<TripsScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    
+
     // Start listening to trips stream
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<TripProvider>(context, listen: false).startListeningToTrips();
@@ -44,13 +45,11 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
       appBar: AppBar(
         title: const Text(
           'My Trips',
-
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
           ),
         ),
-      
         backgroundColor: Colors.white,
         elevation: 0,
         bottom: TabBar(
@@ -65,18 +64,18 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
         ),
       ),
       body: StreamBuilder<List<Trip>>(
-        stream: Provider.of<TripProvider>(context, listen: false).getTripsStream(),
+        stream:
+            Provider.of<TripProvider>(context, listen: true).getTripsStream(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting &&
+              !snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
-          
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
-          
           final trips = snapshot.data ?? [];
-          
+
           final upcomingTrips = trips.where((trip) {
             return trip.endDate.isAfter(DateTime.now());
           }).toList();
@@ -84,18 +83,19 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
           final pastTrips = trips.where((trip) {
             return trip.endDate.isBefore(DateTime.now());
           }).toList();
-          
+
           return TabBarView(
             controller: _tabController,
             children: [
               // Upcoming Trips Tab
               upcomingTrips.isEmpty
-                  ? _buildEmptyState('No upcoming trips', 'Plan a new trip to get started!')
+                  ? _buildEmptyState(
+                      'No upcoming trips', 'Plan a new trip to get started!')
                   : _buildTripsList(upcomingTrips),
-
               // Past Trips Tab
               pastTrips.isEmpty
-                  ? _buildEmptyState('No past trips', 'Your completed trips will appear here.')
+                  ? _buildEmptyState(
+                      'No past trips', 'Your completed trips will appear here.')
                   : _buildTripsList(pastTrips),
             ],
           );
@@ -145,7 +145,8 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const PlanNewTripScreen()),
+                MaterialPageRoute(
+                    builder: (context) => const PlanNewTripScreen()),
               );
             },
             style: ElevatedButton.styleFrom(
@@ -171,24 +172,22 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
   }
 
   Widget _buildTripCard(Trip trip) {
-    final numberOfPlaces = trip.days.fold<int>(
-      0, 
-      (sum, day) => sum + day.places.length
-    );
-    
-    final status = trip.startDate.isAfter(DateTime.now()) 
-        ? 'Planning' 
+    final numberOfPlaces =
+        trip.days.fold<int>(0, (sum, day) => sum + day.places.length);
+
+    final status = trip.startDate.isAfter(DateTime.now())
+        ? 'Planning'
         : trip.endDate.isBefore(DateTime.now())
             ? 'Completed'
             : 'Ongoing';
-    
+
     final daysLeft = trip.startDate.difference(DateTime.now()).inDays;
-    final String timeInfo = status == 'Planning' 
+    final String timeInfo = status == 'Planning'
         ? 'Starts in $daysLeft days'
         : status == 'Completed'
             ? 'Ended ${DateTime.now().difference(trip.endDate).inDays} days ago'
             : '${trip.endDate.difference(DateTime.now()).inDays} days left';
-    
+
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(
@@ -212,11 +211,13 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
                   topRight: Radius.circular(12),
                 ),
                 image: DecorationImage(
-                  image: trip.days.isNotEmpty && 
-                         trip.days.first.places.isNotEmpty && 
-                         trip.days.first.places.first.imageURL.isNotEmpty
+                  image: trip.days.isNotEmpty &&
+                          trip.days.first.places.isNotEmpty &&
+                          trip.days.first.places.first.imageURL.isNotEmpty
                       ? NetworkImage(trip.days.first.places.first.imageURL)
-                      : const AssetImage('lib/assets/place_images/AngKor_wat.jpg') as ImageProvider,
+                      : const AssetImage(
+                              'lib/assets/place_images/AngKor_wat.jpg')
+                          as ImageProvider,
                   fit: BoxFit.cover,
                 ),
               ),
@@ -224,7 +225,8 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
                 alignment: Alignment.topRight,
                 child: Container(
                   margin: const EdgeInsets.all(12),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: _getStatusColor(status),
                     borderRadius: BorderRadius.circular(20),
@@ -239,7 +241,7 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
                 ),
               ),
             ),
-            
+
             // Trip Details
             Padding(
               padding: const EdgeInsets.all(16),
@@ -256,7 +258,8 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                      const Icon(Icons.calendar_today,
+                          size: 16, color: Colors.grey),
                       const SizedBox(width: 4),
                       Text(
                         '${_formatDate(trip.startDate)} - ${_formatDate(trip.endDate)}',
@@ -345,7 +348,8 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
               ),
               ListTile(
                 leading: const Icon(Icons.delete, color: Colors.red),
-                title: const Text('Delete Trip', style: TextStyle(color: Colors.red)),
+                title: const Text('Delete Trip',
+                    style: TextStyle(color: Colors.red)),
                 onTap: () {
                   Navigator.pop(context); // Close the bottom sheet
                   _showDeleteConfirmation(trip);
@@ -378,7 +382,8 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Delete Trip'),
-        content: Text('Are you sure you want to delete "${trip.tripName}"? This action cannot be undone.'),
+        content: Text(
+            'Are you sure you want to delete "${trip.tripName}"? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -398,13 +403,12 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
   }
 
   Future<void> _deleteTrip(Trip trip) async {
-    setState(() {
-    });
+    setState(() {});
 
     try {
       final tripProvider = Provider.of<TripProvider>(context, listen: false);
       await tripProvider.deleteTrip(trip.id);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -424,9 +428,8 @@ class _TripsScreenState extends State<TripsScreen> with SingleTickerProviderStat
       }
     } finally {
       if (mounted) {
-        setState(() {
-        });
+        setState(() {});
       }
     }
   }
-} 
+}
