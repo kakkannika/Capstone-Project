@@ -38,70 +38,113 @@ class _MapNavigationScreenState extends State<MapNavigationScreen> {
   }
 
   Future<void> _getCurrentLocation() async {
-    bool serviceEnabled;
-    PermissionStatus permissionGranted;
-    LocationData locationData;
+    try {
+      bool serviceEnabled;
+      PermissionStatus permissionGranted;
+      LocationData locationData;
 
-    // Check if location service is enabled
-    serviceEnabled = await _locationService.serviceEnabled();
-    if (!serviceEnabled) {
-      serviceEnabled = await _locationService.requestService();
+      // Check if location service is enabled
+      serviceEnabled = await _locationService.serviceEnabled();
       if (!serviceEnabled) {
-        return;
+        serviceEnabled = await _locationService.requestService();
+        if (!serviceEnabled) {
+          print("Location services not enabled");
+          setState(() {
+            _isLoading = false;
+            _distance = 'Location services not enabled';
+          });
+          return;
+        }
       }
-    }
 
-    // Check if permission is granted
-    permissionGranted = await _locationService.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await _locationService.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) {
-        return;
+      // Check if permission is granted
+      permissionGranted = await _locationService.hasPermission();
+      if (permissionGranted == PermissionStatus.denied) {
+        permissionGranted = await _locationService.requestPermission();
+        if (permissionGranted != PermissionStatus.granted) {
+          print("Location permission denied");
+          setState(() {
+            _isLoading = false;
+            _distance = 'Location permission denied';
+          });
+          return;
+        }
       }
-    }
 
-    locationData = await _locationService.getLocation();
-    setState(() {
-      _currentLocation =
-          LatLng(locationData.latitude!, locationData.longitude!);
-      _getDirections();
-    });
+      print("Getting location...");
+      locationData = await _locationService.getLocation();
+      print("Location received: ${locationData.latitude}, ${locationData.longitude}");
+      
+      setState(() {
+        _currentLocation =
+            LatLng(locationData.latitude!, locationData.longitude!);
+      });
+      
+      // Add a marker for current location initially
+      _markers.add(
+        Marker(
+          markerId: const MarkerId('currentLocation'),
+          position: _currentLocation!,
+          infoWindow: const InfoWindow(title: 'Your Location'),
+        ),
+      );
+
+      // Add a marker for destination
+      final LatLng destinationLatLng = LatLng(
+        widget.destinationLocation.latitude,
+        widget.destinationLocation.longitude
+      );
+      
+      _markers.add(
+        Marker(
+          markerId: const MarkerId('destination'),
+          position: destinationLatLng,
+          infoWindow: InfoWindow(title: widget.destinationName),
+        ),
+      );
+      
+      setState(() {}); // Refresh to show markers
+      
+      // Get directions after a short delay
+      Future.delayed(const Duration(milliseconds: 500), () {
+        _getDirections();
+      });
+      
+    } catch (e) {
+      print("Error getting location: $e");
+      setState(() {
+        _isLoading = false;
+        _distance = 'Error: ${e.toString().substring(0, e.toString().length > 30 ? 30 : e.toString().length)}';
+      });
+    }
   }
 
   Future<void> _getDirections() async {
     if (_currentLocation == null) return;
 
-    // Convert GeoPoint to LatLng
-    final LatLng destinationLatLng = LatLng(widget.destinationLocation.latitude,
-        widget.destinationLocation.longitude);
+    try {
+      // Convert GeoPoint to LatLng
+      final LatLng destinationLatLng = LatLng(widget.destinationLocation.latitude,
+          widget.destinationLocation.longitude);
 
-    // Add markers
-    _markers.add(
-      Marker(
-        markerId: const MarkerId('currentLocation'),
-        position: _currentLocation!,
-        infoWindow: const InfoWindow(title: 'Your Location'),
-      ),
-    );
+      print("Fetching directions from $_currentLocation to $destinationLatLng");
+      
+      // Clear previous polylines if any
+      setState(() {
+        _polylines.clear();
+      });
+      
+      // Get directions
+      final directions = await _directionsService.getDirections(
+        origin: _currentLocation!,
+        destination: destinationLatLng,
+      );
 
-    _markers.add(
-      Marker(
-        markerId: const MarkerId('destination'),
-        position: destinationLatLng,
-        infoWindow: InfoWindow(title: widget.destinationName),
-      ),
-    );
+      print("Directions received successfully with route data");
 
-    // Get directions
-    final directions = await _directionsService.getDirections(
-      origin: _currentLocation!,
-      destination: destinationLatLng,
-    );
+      // Create a polyline
+      final List<LatLng> polylineCoordinates = directions['polylineCoordinates'];
 
-    // Create a polyline
-    final List<LatLng> polylineCoordinates = directions['polylineCoordinates'];
-
-    if (polylineCoordinates.isNotEmpty) {
       setState(() {
         _polylines.add(
           Polyline(
@@ -119,6 +162,52 @@ class _MapNavigationScreenState extends State<MapNavigationScreen> {
 
       // Adjust camera to show the route
       _fitBounds(polylineCoordinates);
+      
+    } catch (e) {
+      print("Error getting directions: $e");
+      
+      // Show error and fallback to straight line
+      final LatLng destinationLatLng = LatLng(
+        widget.destinationLocation.latitude,
+        widget.destinationLocation.longitude
+      );
+      
+      setState(() {
+        // Create a straight line as fallback
+        _polylines.add(
+          Polyline(
+            polylineId: const PolylineId('fallback_route'),
+            points: [_currentLocation!, destinationLatLng],
+            color: Colors.red,
+            width: 3,
+            patterns: [PatternItem.dash(10), PatternItem.gap(5)], // Dashed line
+          ),
+        );
+        
+        _isLoading = false;
+        _distance = 'Route unavailable';
+        _duration = 'Check internet and API key';
+      });
+      
+      // Show a snackbar with the error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not get route: ${e.toString().split(':').last}'),
+          duration: const Duration(seconds: 5),
+          action: SnackBarAction(
+            label: 'Retry',
+            onPressed: () {
+              setState(() {
+                _isLoading = true;
+              });
+              _getDirections();
+            },
+          ),
+        ),
+      );
+      
+      // Zoom to show both markers
+      _fitMarkers();
     }
   }
 
@@ -128,7 +217,7 @@ class _MapNavigationScreenState extends State<MapNavigationScreen> {
     double minLat = points[0].latitude;
     double maxLat = points[0].latitude;
     double minLng = points[0].longitude;
-    double maxLng = points[0].longitude;
+    double maxLng = points[0].longitude;  
 
     for (var point in points) {
       if (point.latitude < minLat) minLat = point.latitude;
@@ -149,11 +238,57 @@ class _MapNavigationScreenState extends State<MapNavigationScreen> {
     );
   }
 
+  // Add method to fit map to markers when we can't get a proper route
+  Future<void> _fitMarkers() async {
+    if (_markers.isEmpty) return;
+    
+    final GoogleMapController controller = await _controller.future;
+    
+    double minLat = 90;
+    double maxLat = -90;
+    double minLng = 180;
+    double maxLng = -180;
+    
+    for (final marker in _markers) {
+      if (marker.position.latitude < minLat) minLat = marker.position.latitude;
+      if (marker.position.latitude > maxLat) maxLat = marker.position.latitude;
+      if (marker.position.longitude < minLng) minLng = marker.position.longitude;
+      if (marker.position.longitude > maxLng) maxLng = marker.position.longitude;
+    }
+    
+    // Add some padding
+    minLat -= 0.05;
+    maxLat += 0.05;
+    minLng -= 0.05;
+    maxLng += 0.05;
+    
+    controller.animateCamera(
+      CameraUpdate.newLatLngBounds(
+        LatLngBounds(
+          southwest: LatLng(minLat, minLng),
+          northeast: LatLng(maxLat, maxLng),
+        ),
+        100, // padding
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.destinationName),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              setState(() {
+                _isLoading = true;
+              });
+              _getCurrentLocation();
+            },
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -162,18 +297,21 @@ class _MapNavigationScreenState extends State<MapNavigationScreen> {
               : GoogleMap(
                   onMapCreated: (GoogleMapController controller) {
                     _controller.complete(controller);
+                    print("Map created successfully in main app!");
                     setState(() {
                       _isLoading = false; // Update UI only after map is ready
                     });
                   },
                   initialCameraPosition: CameraPosition(
-                    target: _currentLocation ?? LatLng(0, 0), // Ensure valid default
-                    zoom: 15,
+                    target: _currentLocation ?? const LatLng(-6.2088, 106.8456), // Default to Jakarta if null
+                    zoom: 12.0,
                   ),
                   markers: _markers,
                   polylines: _polylines,
+                  mapType: MapType.normal,
                   myLocationEnabled: true,
                   myLocationButtonEnabled: true,
+                  zoomControlsEnabled: true,
                 ),
           if (!_isLoading)
             Positioned(
