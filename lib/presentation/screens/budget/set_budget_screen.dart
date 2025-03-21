@@ -92,17 +92,7 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
       _dailyBudget = budgetProvider.calculateDailyBudget(totalBudget, _numberOfDays);
     });
   }
-  void _navigateToExpenseScreen(String budgetId) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ExpenseScreen(
-          budgetId: budgetId,
-          tripId: widget.tripId,
-        ),
-      ),
-    );
-  }
+  
 
   // Save the budget to Firestore
   Future<void> _saveBudget() async {
@@ -152,7 +142,15 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
 
       if (budgetId != null) {
         if (mounted) {
-          Navigator.pop(context, budgetId);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ExpenseScreen(
+                budgetId: budgetId,
+                tripId: widget.tripId,
+              ),
+            ),
+          );
         }
       } else {
         if (mounted) {

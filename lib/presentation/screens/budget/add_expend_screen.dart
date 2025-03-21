@@ -39,7 +39,6 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   int _selectedDayIndex = 0;
   DateTime _selectedDate = DateTime.now();
   double _availableBudgetForSelectedDay = 0.0;
-  bool _hasShownOverBudgetWarning = false; // Track if we've shown the warning
 
   @override
   void initState() {
@@ -206,26 +205,25 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       return;
     }
     
-    // Check if expense exceeds the daily budget for the selected day
-    if (_totalExpense > _availableBudgetForSelectedDay) {
-      // First time warning - show dialog
-      if (!_hasShownOverBudgetWarning) {
-        bool shouldContinue = await _showBudgetExceededDialog();
-        if (!shouldContinue) {
-          return;
-        }
-        
-        // Set flag to prevent showing the dialog again
-        _hasShownOverBudgetWarning = true;
-      }
-    }
+    final budgetProvider = Provider.of<BudgetProvider>(context, listen: false);
     
-    // Check if expense exceeds total remaining budget
-    if (_totalExpense > widget.remainingBudget) {
-      bool shouldContinue = await _showTotalBudgetExceededDialog();
+    // Check if expense exceeds ANY budget limit (daily or total)
+    bool isOverBudget = _totalExpense > _availableBudgetForSelectedDay || _totalExpense > widget.remainingBudget;
+    
+    // Debug flag state
+    print("Is over budget: $isOverBudget");
+    print("Has shown warning: ${budgetProvider.hasShownOverBudgetWarning}");
+    
+    // Only show the warning dialog once per session
+    if (isOverBudget && !budgetProvider.hasShownOverBudgetWarning) {
+      bool shouldContinue = await _showBudgetExceededDialog();
       if (!shouldContinue) {
         return;
       }
+      
+      // Set flag in provider to prevent showing the dialog again
+      budgetProvider.setOverBudgetWarningShown(true);
+      print("Warning flag now set to: ${budgetProvider.hasShownOverBudgetWarning}");
     }
 
     setState(() {
@@ -234,7 +232,6 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
     try {
       // Use the BudgetProvider to add the expense to Firestore
-      final budgetProvider = Provider.of<BudgetProvider>(context, listen: false);
       final success = await budgetProvider.addExpense(
         budgetId: widget.budgetId,
         amount: _totalExpense,
@@ -270,75 +267,78 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     }
   }
   
-  // Show confirmation dialog when exceeding daily budget
+  // Show confirmation dialog when exceeding budget
   Future<bool> _showBudgetExceededDialog() async {
+    String budgetType = "";
+    double budgetAmount = 0.0;
+    
+    // Determine which budget is exceeded for better message
+    if (_totalExpense > widget.remainingBudget) {
+      budgetType = "total";
+      budgetAmount = widget.remainingBudget;
+    } else {
+      budgetType = "daily";
+      budgetAmount = _availableBudgetForSelectedDay;
+    }
+    
     return await showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Budget Exceeded"),
+          title: Text(
+            "Budget Exceeded",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           content: SingleChildScrollView(
-            child: ListBody(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text("This expense exceeds your daily budget of ${widget.selectedCurrency} ${_availableBudgetForSelectedDay.toStringAsFixed(2)}"),
-                SizedBox(height: 8),
-                Text("Are you sure you want to continue?"),
+                Text(
+                  "This expense exceeds your $budgetType budget of ${widget.selectedCurrency} ${budgetAmount.toStringAsFixed(2)}",
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(height: 12),
+                Text(
+                  "Are you sure you want to continue?",
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(height: 12),
+                Text(
+                  "Note: You won't be asked again for this session.",
+                  style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontSize: 12,
+                    color: DertamColors.grey,
+                  ),
+                ),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: Text("Cancel"),
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-            ),
-            TextButton(
-              child: Text("Continue Anyway"),
-              style: TextButton.styleFrom(
-                foregroundColor: DertamColors.red,
+              child: Text(
+                "Cancel",
+                style: TextStyle(
+                  color: Colors.purple,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-            ),
-          ],
-        );
-      },
-    ) ?? false;
-  }
-  
-  // Show confirmation dialog when exceeding total budget
-  Future<bool> _showTotalBudgetExceededDialog() async {
-    return await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Total Budget Exceeded"),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text("This expense exceeds your remaining total budget of ${widget.selectedCurrency} ${widget.remainingBudget.toStringAsFixed(2)}"),
-                SizedBox(height: 8),
-                Text("Your total budget will be negative if you continue."),
-                SizedBox(height: 8),
-                Text("Are you sure you want to continue?"),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text("Cancel"),
-              onPressed: () {
                 Navigator.of(context).pop(false);
               },
             ),
             TextButton(
-              child: Text("Continue Anyway"),
-              style: TextButton.styleFrom(
-                foregroundColor: DertamColors.red,
+              child: Text(
+                "Continue Anyway",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               onPressed: () {
                 Navigator.of(context).pop(true);

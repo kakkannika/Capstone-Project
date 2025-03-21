@@ -97,7 +97,7 @@ class _SelectCurrencyScreenState extends State<SelectCurrencyScreen> {
                     buttonType: ButtonType.primary,
                     onPressed: selectedCurrency != null
                         ? () {
-                            Navigator.push(
+                            Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => SetBudgetScreen(

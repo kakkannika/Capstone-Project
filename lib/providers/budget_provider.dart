@@ -14,10 +14,20 @@ class BudgetProvider with ChangeNotifier {
   bool _isLoading = false;
   String? _error;
   StreamSubscription<Budget?>? _budgetSubscription;
+  
+  // Use static to ensure it persists across instances and rebuilds
+  static bool _hasShownOverBudgetWarning = false;
 
   Budget? get selectedBudget => _selectedBudget;
   bool get isLoading => _isLoading;
   String? get error => _error;
+  bool get hasShownOverBudgetWarning => _hasShownOverBudgetWarning;
+  
+  // Method to set the flag when warning has been shown
+  void setOverBudgetWarningShown(bool value) {
+    _hasShownOverBudgetWarning = value;
+    // No need to notify listeners since this doesn't affect UI directly
+  }
 
   void _setLoading(bool loading) {
     _isLoading = loading;
@@ -111,6 +121,12 @@ class BudgetProvider with ChangeNotifier {
     return _budgetService.getBudgetByTripIdStream(tripId);
   }
 
+  // Add a method to reset the warning flag (useful for testing)
+  void resetOverBudgetWarning() {
+    _hasShownOverBudgetWarning = false;
+    print("Over budget warning flag has been reset");
+  }
+
   // Start listening to a budget stream for a specific trip
   void startListeningToBudget(String tripId) {
     _setLoading(true);
@@ -118,7 +134,10 @@ class BudgetProvider with ChangeNotifier {
 
     // Cancel any existing subscription
     _budgetSubscription?.cancel();
-
+    
+    // Don't reset the warning flag - we want it to persist across all trips in a session
+    // _hasShownOverBudgetWarning = false; - removing this line
+    
     // Start a new subscription
     _budgetSubscription = _budgetService.getBudgetByTripIdStream(tripId).listen(
       (budget) {
