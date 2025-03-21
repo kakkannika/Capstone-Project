@@ -39,6 +39,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   int _selectedDayIndex = 0;
   DateTime _selectedDate = DateTime.now();
   double _availableBudgetForSelectedDay = 0.0;
+  bool _hasShownOverBudgetWarning = false; // Track if we've shown the warning
 
   @override
   void initState() {
@@ -207,24 +208,24 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     
     // Check if expense exceeds the daily budget for the selected day
     if (_totalExpense > _availableBudgetForSelectedDay) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Expense exceeds your daily budget for this day."),
-          backgroundColor: DertamColors.red,
-        ),
-      );
-      return;
+      // First time warning - show dialog
+      if (!_hasShownOverBudgetWarning) {
+        bool shouldContinue = await _showBudgetExceededDialog();
+        if (!shouldContinue) {
+          return;
+        }
+        
+        // Set flag to prevent showing the dialog again
+        _hasShownOverBudgetWarning = true;
+      }
     }
     
     // Check if expense exceeds total remaining budget
     if (_totalExpense > widget.remainingBudget) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Expense exceeds your total remaining budget."),
-          backgroundColor: DertamColors.red,
-        ),
-      );
-      return;
+      bool shouldContinue = await _showTotalBudgetExceededDialog();
+      if (!shouldContinue) {
+        return;
+      }
     }
 
     setState(() {
@@ -267,6 +268,86 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         _isLoading = false;
       });
     }
+  }
+  
+  // Show confirmation dialog when exceeding daily budget
+  Future<bool> _showBudgetExceededDialog() async {
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Budget Exceeded"),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text("This expense exceeds your daily budget of ${widget.selectedCurrency} ${_availableBudgetForSelectedDay.toStringAsFixed(2)}"),
+                SizedBox(height: 8),
+                Text("Are you sure you want to continue?"),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            TextButton(
+              child: Text("Continue Anyway"),
+              style: TextButton.styleFrom(
+                foregroundColor: DertamColors.red,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
+    ) ?? false;
+  }
+  
+  // Show confirmation dialog when exceeding total budget
+  Future<bool> _showTotalBudgetExceededDialog() async {
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Total Budget Exceeded"),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text("This expense exceeds your remaining total budget of ${widget.selectedCurrency} ${widget.remainingBudget.toStringAsFixed(2)}"),
+                SizedBox(height: 8),
+                Text("Your total budget will be negative if you continue."),
+                SizedBox(height: 8),
+                Text("Are you sure you want to continue?"),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            TextButton(
+              child: Text("Continue Anyway"),
+              style: TextButton.styleFrom(
+                foregroundColor: DertamColors.red,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
+    ) ?? false;
   }
 
   // Build day dropdown with proper date handling

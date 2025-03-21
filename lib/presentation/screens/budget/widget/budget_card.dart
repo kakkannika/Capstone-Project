@@ -69,6 +69,7 @@ class BudgetCard extends StatelessWidget {
                 valueColor: AlwaysStoppedAnimation<Color>(
                   spent > budget ? DertamColors.red : DertamColors.primary,
                 ),
+                minHeight: spent > budget ? 2 : null, // Make the line slightly thicker when over budget
               ),
             ],
           ),
