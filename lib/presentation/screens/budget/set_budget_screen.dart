@@ -29,6 +29,7 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
   bool _isLoading = false;
   Trip? _trip;
   double _dailyBudget = 0.0;
+  int _numberOfDays = 0;
 
   @override
   void initState() {
@@ -60,6 +61,7 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
         if (trip != null) {
           setState(() {
             _trip = trip;
+            _numberOfDays = trip.days.length;
             _updateDailyBudget();
           });
         }
@@ -84,15 +86,10 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
     
     double totalBudget = double.tryParse(_totalBudgetController.text) ?? 0;
     
-    // Calculate number of days in the trip
-    int numberOfDays = _trip!.days.length;
-    
-    // If there are no days or invalid number, default to 1 to avoid division by zero
-    if (numberOfDays <= 0) numberOfDays = 1;
-    
-    // Calculate daily budget
+    // Use the budget provider to calculate daily budget
+    final budgetProvider = Provider.of<BudgetProvider>(context, listen: false);
     setState(() {
-      _dailyBudget = totalBudget / numberOfDays;
+      _dailyBudget = budgetProvider.calculateDailyBudget(totalBudget, _numberOfDays);
     });
   }
   void _navigateToExpenseScreen(String budgetId) {
@@ -107,11 +104,12 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
     );
   }
 
+  // Save the budget to Firestore
   Future<void> _saveBudget() async {
-    if (_totalBudgetController.text.trim().isEmpty) {
+    if (_totalBudgetController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text("Please enter a total budget"),
+          content: Text("Please enter a total budget."),
           backgroundColor: DertamColors.red,
         ),
       );
@@ -119,11 +117,10 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
     }
 
     double totalBudget = double.tryParse(_totalBudgetController.text) ?? 0;
-
     if (totalBudget <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text("Please enter a valid budget value"),
+          content: Text("Please enter a valid budget amount."),
           backgroundColor: DertamColors.red,
         ),
       );
@@ -135,45 +132,53 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
     });
 
     try {
-      // Create the budget in Firestore
       final budgetProvider = Provider.of<BudgetProvider>(context, listen: false);
-      final tripProvider = Provider.of<TripProvider>(context, listen: false);
+      
+      // Use the budget provider to calculate daily budget
+      double dailyBudget = budgetProvider.calculateDailyBudget(totalBudget, _numberOfDays);
+      
+      // Debug information - remove in production
+      print("Creating budget with:");
+      print("Total budget: $totalBudget");
+      print("Daily budget: $dailyBudget");
+      print("Number of days: $_numberOfDays");
       
       final budgetId = await budgetProvider.createBudget(
         tripId: widget.tripId,
         total: totalBudget,
         currency: widget.selectedCurrency,
-        dailyBudget: _dailyBudget,
+        dailyBudget: dailyBudget,
       );
-      
+
       if (budgetId != null) {
-        // Update the trip with the budget ID
-        await tripProvider.updateTripBudgetId(
-          tripId: widget.tripId,
-          budgetId: budgetId,
-        );
-        
-        // Navigate to the expense screen
-        _navigateToExpenseScreen(budgetId);
+        if (mounted) {
+          Navigator.pop(context, budgetId);
+        }
       } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Failed to set budget. Please try again."),
+              backgroundColor: DertamColors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text("Failed to create budget"),
+            content: Text("Error: $e"),
             backgroundColor: DertamColors.red,
           ),
         );
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error: $e"),
-          backgroundColor: DertamColors.red,
-        ),
-      );
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -220,6 +225,41 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
                       keyboardType: TextInputType.number,
                       borderColor: DertamColors.greyLight,
                     ),
+                    
+                    // Display daily budget calculation
+                    if (_trip != null && _trip!.days.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: DertamSpacings.m),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Trip Duration: $_numberOfDays days",
+                              style: DertamTextStyles.body.copyWith(
+                                color: DertamColors.grey,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "Daily Budget: ${widget.selectedCurrency} ${_dailyBudget.toStringAsFixed(2)}",
+                              style: DertamTextStyles.body.copyWith(
+                                color: DertamColors.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "Note: Your daily budget will be available day by day as your trip progresses.",
+                              style: DertamTextStyles.body.copyWith(
+                                color: DertamColors.grey,
+                                fontSize: 12,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     
                     const Spacer(),
                     Center(

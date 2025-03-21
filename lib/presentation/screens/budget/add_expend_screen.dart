@@ -38,6 +38,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   Trip? _trip;
   int _selectedDayIndex = 0;
   DateTime _selectedDate = DateTime.now();
+  double _availableBudgetForSelectedDay = 0.0;
 
   @override
   void initState() {
@@ -55,6 +56,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
     try {
       final tripProvider = Provider.of<TripProvider>(context, listen: false);
+      final budgetProvider = Provider.of<BudgetProvider>(context, listen: false);
       
       // Listen to the trip stream
       tripProvider.getTripByIdStream(widget.tripId).listen((trip) {
@@ -64,10 +66,19 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             // Set the default selected date to the first day of the trip
             if (trip.days.isNotEmpty) {
               _selectedDate = trip.startDate.add(Duration(days: _selectedDayIndex));
+              
+              // Update available budget for selected day
+              if (budgetProvider.selectedBudget != null) {
+                _updateAvailableBudget();
+              }
             }
           });
         }
       });
+      
+      // Start listening to budget updates
+      budgetProvider.startListeningToBudget(widget.tripId);
+      
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -84,6 +95,33 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         });
       }
     }
+  }
+
+  // Update available budget based on selected day
+  void _updateAvailableBudget() {
+    if (_trip == null) return;
+    
+    final budgetProvider = Provider.of<BudgetProvider>(context, listen: false);
+    final budget = budgetProvider.selectedBudget;
+    
+    if (budget == null) return;
+    
+    setState(() {
+      // Make sure we're using the actual daily budget from the budget object
+      _availableBudgetForSelectedDay = budget.dailyBudget;
+      
+      // If daily budget is zero but total budget exists, calculate it
+      if (_availableBudgetForSelectedDay <= 0 && budget.total > 0 && _trip!.days.isNotEmpty) {
+        _availableBudgetForSelectedDay = budgetProvider.calculateDailyBudget(budget.total, _trip!.days.length);
+        print("Fixed zero daily budget: $_availableBudgetForSelectedDay");
+      }
+      
+      // Debug info - remove in production
+      print("Daily budget set to: ${budget.dailyBudget}");
+      print("Available budget set to: $_availableBudgetForSelectedDay");
+      print("Total budget: ${budget.total}");
+      print("Number of days: ${_trip!.days.length}");
+    });
   }
 
   // Calculate total expense based on expense amount and number of people
@@ -104,7 +142,32 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     if (_trip == null) return "Day ${dayIndex + 1}";
     
     final date = _trip!.startDate.add(Duration(days: dayIndex));
-    return "${DateFormat('EEE').format(date)} ${DateFormat('dd/MM').format(date)}";
+    final today = DateTime.now();
+    final isToday = date.year == today.year && date.month == today.month && date.day == today.day;
+    
+    String formattedDate = "${DateFormat('EEE').format(date)} ${DateFormat('dd/MM').format(date)}";
+    
+    // Add "Today" label if it's today's date
+    if (isToday) {
+      formattedDate += " (Today)";
+    }
+    
+    return formattedDate;
+  }
+
+  // Get the date status (Today, Future, Past)
+  String _getDateStatus(DateTime date) {
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day);
+    final checkDate = DateTime(date.year, date.month, date.day);
+    
+    if (checkDate.isAtSameMomentAs(todayDate)) {
+      return "Today";
+    } else if (checkDate.isAfter(todayDate)) {
+      return "Future";
+    } else {
+      return "Past";
+    }
   }
 
   // Add expense logic with validation
@@ -130,11 +193,34 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       );
       return;
     }
-
-    if (_totalExpense <= 0 || _totalExpense > widget.remainingBudget) {
+    
+    // Check if expense amount is valid
+    if (_totalExpense <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Invalid amount. Ensure it's within budget."),
+          content: Text("Please enter a valid expense amount."),
+          backgroundColor: DertamColors.red,
+        ),
+      );
+      return;
+    }
+    
+    // Check if expense exceeds the daily budget for the selected day
+    if (_totalExpense > _availableBudgetForSelectedDay) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Expense exceeds your daily budget for this day."),
+          backgroundColor: DertamColors.red,
+        ),
+      );
+      return;
+    }
+    
+    // Check if expense exceeds total remaining budget
+    if (_totalExpense > widget.remainingBudget) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Expense exceeds your total remaining budget."),
           backgroundColor: DertamColors.red,
         ),
       );
@@ -146,9 +232,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     });
 
     try {
-      // Use the BudgetViewModel to add the expense directly to Firestore
+      // Use the BudgetProvider to add the expense to Firestore
       final budgetProvider = Provider.of<BudgetProvider>(context, listen: false);
-      
       final success = await budgetProvider.addExpense(
         budgetId: widget.budgetId,
         amount: _totalExpense,
@@ -184,6 +269,130 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     }
   }
 
+  // Build day dropdown with proper date handling
+  Widget _buildDayDropdown() {
+    if (_trip == null || _trip!.days.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Select Day",
+          style: DertamTextStyles.body.copyWith(
+            color: DertamColors.grey,
+            fontSize: 12,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: DertamColors.greyLight),
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<int>(
+              isExpanded: true,
+              value: _selectedDayIndex,
+              icon: const Icon(Icons.arrow_drop_down, color: Colors.black),
+              iconSize: 24,
+              elevation: 16,
+              style: DertamTextStyles.body.copyWith(
+                color: Colors.black,
+                fontWeight: FontWeight.w500,
+              ),
+              dropdownColor: Colors.white,
+              onChanged: (int? newValue) {
+                if (newValue != null) {
+                  DateTime newDate = _trip!.startDate.add(Duration(days: newValue));
+                  
+                  setState(() {
+                    _selectedDayIndex = newValue;
+                    _selectedDate = newDate;
+                    _updateAvailableBudget();
+                  });
+                }
+              },
+              items: List.generate(_trip!.days.length, (index) {
+                DateTime date = _trip!.startDate.add(Duration(days: index));
+                String dateStatus = _getDateStatus(date);
+                
+                return DropdownMenuItem<int>(
+                  value: index,
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_today, 
+                        size: 18, 
+                        color: DertamColors.primary,
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _formatDayForDropdown(index),
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (dateStatus == "Future")
+                        Text(
+                          "(Future)",
+                          style: TextStyle(
+                            color: DertamColors.grey,
+                            fontSize: 12,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              }),
+            ),
+          ),
+        ),
+        
+        // Show info text about daily budgets and available budget
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Daily budget: ${widget.selectedCurrency} ${Provider.of<BudgetProvider>(context).selectedBudget?.dailyBudget.toStringAsFixed(2) ?? '0.00'}",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: DertamColors.grey,
+                ),
+              ),
+              SizedBox(height: 4),
+              Text(
+                "Available for ${_getDateStatus(_selectedDate) == 'Today' ? 'today' : _getDateStatus(_selectedDate) == 'Future' ? 'future day' : 'past day'}: ${widget.selectedCurrency} ${_availableBudgetForSelectedDay.toStringAsFixed(2)}",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: _availableBudgetForSelectedDay > 0 ? DertamColors.green : DertamColors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -215,6 +424,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -228,61 +438,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   
                   // Day Dropdown
                   if (_trip != null && _trip!.days.isNotEmpty)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: DertamColors.greyLight),
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<int>(
-                          isExpanded: true,
-                          value: _selectedDayIndex,
-                          icon: const Icon(Icons.arrow_drop_down, color: Colors.black),
-                          iconSize: 24,
-                          elevation: 16,
-                          style: DertamTextStyles.body.copyWith(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          dropdownColor: Colors.white,
-                          onChanged: (int? newValue) {
-                            if (newValue != null) {
-                              setState(() {
-                                _selectedDayIndex = newValue;
-                                _selectedDate = _trip!.startDate.add(Duration(days: newValue));
-                              });
-                            }
-                          },
-                          items: List.generate(_trip!.days.length, (index) {
-                            return DropdownMenuItem<int>(
-                              value: index,
-                              child: Row(
-                                children: [
-                                  Icon(Icons.calendar_today, size: 18, color: DertamColors.primary),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    _formatDayForDropdown(index),
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }),
-                        ),
-                      ),
-                    ),
+                    _buildDayDropdown(),
                   
                   SizedBox(height: DertamSpacings.m),
                   
