@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class DirectionsService {
-  final String apiKey = 'AIzaSyCVi7I8qcB6vhknGMRFzT8RmgMo8_LQMDg';
+  final String apiKey = 'AIzaSyBAeKngtUoBtDDR6wSAV2SDn27YJIyeZ9o';
 
   Future<Map<String, dynamic>> getDirections({
     required LatLng origin,
