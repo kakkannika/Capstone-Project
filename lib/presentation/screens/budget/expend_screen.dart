@@ -712,6 +712,25 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
           List<Expense> filteredExpenses = expenses
               .where((expense) => _expenseMatchesFilter(expense))
               .toList();
+              
+          // Sort expenses based on selected filter
+          if (_selectedFilter == 'upcoming') {
+            // Sort upcoming expenses by date (nearest to furthest)
+            filteredExpenses.sort((a, b) => a.date.compareTo(b.date));
+          } else if (_selectedFilter == 'today') {
+            // For today's expenses, sort by most recently created first
+            // First try to sort by complete timestamp - date AND time
+            filteredExpenses.sort((a, b) {
+              // Compare complete timestamps (including hours, minutes, seconds)
+              int dateCompare = b.date.compareTo(a.date);
+              if (dateCompare != 0) {
+                // If the dates have different hours/minutes, sort by that
+                return dateCompare;
+              }
+              // If timestamps are identical, fall back to ID comparison
+              return b.id.compareTo(a.id);
+            });
+          }
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -833,13 +852,25 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                         color: isToday ? DertamColors.primary.withOpacity(0.1) : isUpcoming ? DertamColors.primary.withOpacity(0.1) : DertamColors.grey.withOpacity(0.1),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
-                                      child: Text(
-                                        _formatDate(expense.date),
-                                        style: TextStyle(
-                                          color: isToday ? DertamColors.primary : isUpcoming ? DertamColors.primary : DertamColors.grey,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            _formatDate(expense.date),
+                                            style: TextStyle(
+                                              color: isToday ? DertamColors.primary : isUpcoming ? DertamColors.primary : DertamColors.grey,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            DateFormat('HH:mm').format(expense.date),
+                                            style: TextStyle(
+                                              color: isToday ? DertamColors.primary.withOpacity(0.7) : isUpcoming ? DertamColors.primary.withOpacity(0.7) : DertamColors.grey.withOpacity(0.7),
+                                              fontSize: 10,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],

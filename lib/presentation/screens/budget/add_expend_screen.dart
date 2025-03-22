@@ -289,7 +289,14 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           id: widget.expense!.id,
           amount: _totalExpense,
           category: _selectedCategory,
-          date: _selectedDate,
+          date: DateTime(
+            _selectedDate.year,
+            _selectedDate.month,
+            _selectedDate.day,
+            DateTime.now().hour,
+            DateTime.now().minute,
+            DateTime.now().second,
+          ),
           description: _descriptionController.text.isNotEmpty
               ? _descriptionController.text
               : "No description",
@@ -306,7 +313,14 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           budgetId: widget.budgetId,
           amount: _totalExpense,
           category: _selectedCategory,
-          date: _selectedDate,
+          date: DateTime(
+            _selectedDate.year,
+            _selectedDate.month,
+            _selectedDate.day,
+            DateTime.now().hour,
+            DateTime.now().minute,
+            DateTime.now().second,
+          ),
           description: _descriptionController.text.isNotEmpty
               ? _descriptionController.text
               : "No description",
@@ -477,7 +491,6 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               },
               items: List.generate(_trip!.days.length, (index) {
                 DateTime date = _trip!.startDate.add(Duration(days: index));
-                String dateStatus = _getDateStatus(date);
                 
                 return DropdownMenuItem<int>(
                   value: index,
