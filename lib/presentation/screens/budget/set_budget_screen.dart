@@ -26,10 +26,12 @@ class SetBudgetScreen extends StatefulWidget {
 
 class _SetBudgetScreenState extends State<SetBudgetScreen> {
   final TextEditingController _totalBudgetController = TextEditingController();
+  final TextEditingController _dailyBudgetController = TextEditingController();
   bool _isLoading = false;
   Trip? _trip;
   double _dailyBudget = 0.0;
   int _numberOfDays = 0;
+  bool _dailyBudgetManuallyEdited = false;
 
   @override
   void initState() {
@@ -38,12 +40,26 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
 
     // Add listener to total budget controller to update daily budget
     _totalBudgetController.addListener(_updateDailyBudget);
+    
+    // Add listener to daily budget controller to track manual edits
+    _dailyBudgetController.addListener(() {
+      // Mark as manually edited if the value differs from the calculated one
+      if (!_dailyBudgetManuallyEdited) {
+        double manualValue = double.tryParse(_dailyBudgetController.text) ?? 0;
+        if (manualValue != _dailyBudget && manualValue > 0) {
+          setState(() {
+            _dailyBudgetManuallyEdited = true;
+          });
+        }
+      }
+    });
   }
 
   @override
   void dispose() {
     _totalBudgetController.removeListener(_updateDailyBudget);
     _totalBudgetController.dispose();
+    _dailyBudgetController.dispose();
     super.dispose();
   }
 
@@ -88,8 +104,14 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
     
     // Use the budget provider to calculate daily budget
     final budgetProvider = Provider.of<BudgetProvider>(context, listen: false);
+    
+    // Only update the controller if the user hasn't manually edited it
     setState(() {
       _dailyBudget = budgetProvider.calculateDailyBudget(totalBudget, _numberOfDays);
+      
+      if (!_dailyBudgetManuallyEdited) {
+        _dailyBudgetController.text = _dailyBudget > 0 ? _dailyBudget.toStringAsFixed(2) : '';
+      }
     });
   }
   
@@ -107,10 +129,22 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
     }
 
     double totalBudget = double.tryParse(_totalBudgetController.text) ?? 0;
+    double dailyBudget = double.tryParse(_dailyBudgetController.text) ?? 0;
+    
     if (totalBudget <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Please enter a valid budget amount."),
+          backgroundColor: DertamColors.red,
+        ),
+      );
+      return;
+    }
+    
+    if (dailyBudget <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please enter a valid daily budget amount."),
           backgroundColor: DertamColors.red,
         ),
       );
@@ -123,9 +157,6 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
 
     try {
       final budgetProvider = Provider.of<BudgetProvider>(context, listen: false);
-      
-      // Use the budget provider to calculate daily budget
-      double dailyBudget = budgetProvider.calculateDailyBudget(totalBudget, _numberOfDays);
       
       // Debug information - remove in production
       print("Creating budget with:");
@@ -238,17 +269,42 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              "Daily Budget: ${widget.selectedCurrency} ${_dailyBudget.toStringAsFixed(2)}",
-                              style: DertamTextStyles.body.copyWith(
-                                color: DertamColors.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            const SizedBox(height: 16),
+                            DertamTextfield(
+                              label: "Daily Budget (${widget.selectedCurrency})",
+                              controller: _dailyBudgetController,
+                              keyboardType: TextInputType.number,
+                              borderColor: DertamColors.greyLight,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                TextButton.icon(
+                                  icon: Icon(
+                                    Icons.refresh,
+                                    color: DertamColors.primary,
+                                    size: 18,
+                                  ),
+                                  label: Text(
+                                    "Reset to auto-calculated",
+                                    style: TextStyle(
+                                      color: DertamColors.primary,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    // Reset to auto-calculated value
+                                    setState(() {
+                                      _dailyBudgetManuallyEdited = false;
+                                      _updateDailyBudget();
+                                    });
+                                  },
+                                ),
+                              ],
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              "Note: Your daily budget will be available day by day as your trip progresses.",
+                              "Note: Daily budget is automatically calculated but you can adjust it manually if needed.",
                               style: DertamTextStyles.body.copyWith(
                                 color: DertamColors.grey,
                                 fontSize: 12,

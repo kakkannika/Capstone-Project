@@ -490,7 +490,6 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 }
               },
               items: List.generate(_trip!.days.length, (index) {
-                DateTime date = _trip!.startDate.add(Duration(days: index));
                 
                 return DropdownMenuItem<int>(
                   value: index,
