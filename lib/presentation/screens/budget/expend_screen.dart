@@ -71,6 +71,23 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     );
   }
 
+  void _navigateToEditExpense(Budget budget, Expense expense) async {
+    // Navigate to AddExpenseScreen in edit mode
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddExpenseScreen(
+          selectedCurrency: budget.currency,
+          remainingBudget: budget.remaining + expense.amount, // Add back this expense's amount
+          budgetId: budget.id,
+          tripId: widget.tripId,
+          expense: expense, // Pass the expense for editing
+          isEditing: true,
+        ),
+      ),
+    );
+  }
+
   String _formatDate(DateTime date) {
     // Format date as "Day of week dd/MM" (e.g., "Mon 01/04")
     return "${DateFormat('EEE').format(date)} ${DateFormat('dd/MM').format(date)}";
@@ -388,6 +405,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                               margin: const EdgeInsets.only(bottom: 8),
                               color: isToday ? Colors.white : Colors.white.withOpacity(0.7),
                               child: ListTile(
+                                onTap: () => _navigateToEditExpense(budget, expense),
                                 leading: CircleAvatar(
                                   backgroundColor: isToday 
                                       ? DertamColors.primary.withOpacity(0.2)

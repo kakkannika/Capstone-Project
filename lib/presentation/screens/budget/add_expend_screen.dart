@@ -15,6 +15,8 @@ class AddExpenseScreen extends StatefulWidget {
   final double remainingBudget;
   final String budgetId;
   final String tripId;
+  final Expense? expense; // Optional expense for editing
+  final bool isEditing; // Flag to indicate edit mode
 
   const AddExpenseScreen({
     super.key,
@@ -22,6 +24,8 @@ class AddExpenseScreen extends StatefulWidget {
     required this.remainingBudget,
     required this.budgetId,
     required this.tripId,
+    this.expense, // Optional parameter
+    this.isEditing = false, // Default to add mode
   });
 
   @override
@@ -44,8 +48,26 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   void initState() {
     super.initState();
     _fetchTripData();
+    
+    // Initialize with default values
     _peopleController.text = "1"; // Default to 1 person
-    _calculateTotalExpense();
+    
+    // If editing, prefill form with expense data
+    if (widget.isEditing && widget.expense != null) {
+      // Set expense amount (divided by people count if needed)
+      _expenseController.text = widget.expense!.amount.toString();
+      _descriptionController.text = widget.expense!.description;
+      _selectedCategory = widget.expense!.category;
+      _selectedDate = widget.expense!.date;
+      
+      // We're assuming amount is per person × peopleCount
+      // If you store the people count, you'd need to set it here
+      
+      // Calculate total based on prefilled values
+      _calculateTotalExpense();
+    } else {
+      _calculateTotalExpense();
+    }
   }
 
   // Fetch trip data to get days
@@ -63,14 +85,37 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         if (trip != null && mounted) {
           setState(() {
             _trip = trip;
-            // Set the default selected date to the first day of the trip
-            if (trip.days.isNotEmpty) {
-              _selectedDate = trip.startDate.add(Duration(days: _selectedDayIndex));
+            
+            // If editing, find the corresponding day index based on the expense date
+            if (widget.isEditing && widget.expense != null && trip.days.isNotEmpty) {
+              // Find the day index that matches the expense date
+              final expenseDate = DateTime(
+                widget.expense!.date.year, 
+                widget.expense!.date.month, 
+                widget.expense!.date.day
+              );
+              final tripStartDate = DateTime(
+                trip.startDate.year, 
+                trip.startDate.month, 
+                trip.startDate.day
+              );
               
-              // Update available budget for selected day
-              if (budgetProvider.selectedBudget != null) {
-                _updateAvailableBudget();
+              // Calculate days difference
+              final difference = expenseDate.difference(tripStartDate).inDays;
+              
+              // Set day index if it's within the valid range
+              if (difference >= 0 && difference < trip.days.length) {
+                _selectedDayIndex = difference;
+                _selectedDate = trip.startDate.add(Duration(days: _selectedDayIndex));
               }
+            } else if (trip.days.isNotEmpty) {
+              // Normal flow for adding new expense
+              _selectedDate = trip.startDate.add(Duration(days: _selectedDayIndex));
+            }
+            
+            // Update available budget for selected day
+            if (budgetProvider.selectedBudget != null) {
+              _updateAvailableBudget();
             }
           });
         }
@@ -170,7 +215,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     }
   }
 
-  // Add expense logic with validation
+  // Add or update expense logic with validation
   Future<void> _addExpense() async {
     if (_expenseController.text.isEmpty || _peopleController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -207,23 +252,28 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     
     final budgetProvider = Provider.of<BudgetProvider>(context, listen: false);
     
-    // Check if expense exceeds ANY budget limit (daily or total)
-    bool isOverBudget = _totalExpense > _availableBudgetForSelectedDay || _totalExpense > widget.remainingBudget;
+    // Check if expense exceeds ANY budget limit (daily or total) - Only for new expenses
+    bool isOverBudget = false;
     
-    // Debug flag state
-    print("Is over budget: $isOverBudget");
-    print("Has shown warning: ${budgetProvider.hasShownOverBudgetWarning}");
-    
-    // Only show the warning dialog once per session
-    if (isOverBudget && !budgetProvider.hasShownOverBudgetWarning) {
-      bool shouldContinue = await _showBudgetExceededDialog();
-      if (!shouldContinue) {
-        return;
-      }
+    if (!widget.isEditing) {
+      // For new expenses, check if it exceeds budget limits
+      isOverBudget = _totalExpense > _availableBudgetForSelectedDay || _totalExpense > widget.remainingBudget;
       
-      // Set flag in provider to prevent showing the dialog again
-      budgetProvider.setOverBudgetWarningShown(true);
-      print("Warning flag now set to: ${budgetProvider.hasShownOverBudgetWarning}");
+      // Only show the warning dialog once per session
+      if (isOverBudget && !budgetProvider.hasShownOverBudgetWarning) {
+        // Debug flag state
+        print("Is over budget: $isOverBudget");
+        print("Has shown warning: ${budgetProvider.hasShownOverBudgetWarning}");
+        
+        bool shouldContinue = await _showBudgetExceededDialog();
+        if (!shouldContinue) {
+          return;
+        }
+        
+        // Set flag in provider to prevent showing the dialog again
+        budgetProvider.setOverBudgetWarningShown(true);
+        print("Warning flag now set to: ${budgetProvider.hasShownOverBudgetWarning}");
+      }
     }
 
     setState(() {
@@ -231,16 +281,37 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     });
 
     try {
-      // Use the BudgetProvider to add the expense to Firestore
-      final success = await budgetProvider.addExpense(
-        budgetId: widget.budgetId,
-        amount: _totalExpense,
-        category: _selectedCategory,
-        date: _selectedDate,
-        description: _descriptionController.text.isNotEmpty
-            ? _descriptionController.text
-            : "No description",
-      );
+      bool success;
+      
+      if (widget.isEditing && widget.expense != null) {
+        // Update existing expense
+        final updatedExpense = Expense(
+          id: widget.expense!.id,
+          amount: _totalExpense,
+          category: _selectedCategory,
+          date: _selectedDate,
+          description: _descriptionController.text.isNotEmpty
+              ? _descriptionController.text
+              : "No description",
+          placeId: widget.expense!.placeId, // Preserve existing placeId
+        );
+        
+        success = await budgetProvider.updateExpense(
+          budgetId: widget.budgetId,
+          updatedExpense: updatedExpense,
+        );
+      } else {
+        // Add new expense
+        success = await budgetProvider.addExpense(
+          budgetId: widget.budgetId,
+          amount: _totalExpense,
+          category: _selectedCategory,
+          date: _selectedDate,
+          description: _descriptionController.text.isNotEmpty
+              ? _descriptionController.text
+              : "No description",
+        );
+      }
       
       if (success) {
         // Return to the previous screen
@@ -248,7 +319,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Failed to add expense. Please try again."),
+            content: Text("Failed to ${widget.isEditing ? 'update' : 'add'} expense. Please try again."),
             backgroundColor: DertamColors.red,
           ),
         );
@@ -479,7 +550,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Add Expense"),
+        title: Text(widget.isEditing ? "Edit Expense" : "Add Expense"),
         backgroundColor: DertamColors.blueSky,
         actions: [
           _isLoading
@@ -496,7 +567,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 )
               : TextButton(
                   onPressed: _addExpense,
-                  child: Text("Save", style: TextStyle(color: Colors.black)),
+                  child: Text(widget.isEditing ? "Update" : "Save", style: TextStyle(color: Colors.black)),
                 ),
         ],
       ),
