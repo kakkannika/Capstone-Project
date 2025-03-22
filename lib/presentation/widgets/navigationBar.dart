@@ -3,7 +3,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:tourism_app/presentation/screens/home/home_screen.dart';
 import 'package:tourism_app/presentation/screens/profiles/profile_screen.dart';
 import 'package:tourism_app/presentation/screens/trip/screen/trips_screen.dart';
-
+import 'package:tourism_app/presentation/screens/home/favorite.dart';
 
 class Navigationbar extends StatelessWidget {
   const Navigationbar({super.key, this.currentIndex = 0});
@@ -32,8 +32,8 @@ class Navigationbar extends StatelessWidget {
             label: 'Trip Plan',
           ),
           NavigationDestination(
-            icon: Icon(Iconsax.money),
-            label: 'Budget',
+            icon: Icon(Iconsax.heart),
+            label: 'Favorite',
           ),
           NavigationDestination(
             icon: Icon(Iconsax.user),
@@ -56,6 +56,12 @@ class Navigationbar extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const TripsScreen()),
+              );
+              break;
+            case 2:
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const FavoriteScreen()),
               );
               break;
             case 3:

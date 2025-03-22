@@ -11,6 +11,8 @@ import 'package:tourism_app/presentation/widgets/navigationBar.dart';
 import 'package:tourism_app/providers/place_provider.dart';
 // import 'package:tourism_app/providers/place_retrieve_provider.dart';
 import 'package:tourism_app/providers/auth_provider.dart';
+import 'package:tourism_app/providers/favorite_provider.dart';
+import 'package:iconsax/iconsax.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -145,26 +147,49 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     itemCount: popularPlaces.length,
                     itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DetailEachPlace(
-                                placeId: popularPlaces[index].id),
-                          ),
-                        ),
-                        child: Container(
-                          width: 280,
-                          margin: const EdgeInsets.only(right: 16),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            image: DecorationImage(
-                              image:
-                                  NetworkImage(popularPlaces[index].imageURL),
-                              fit: BoxFit.cover,
+                      return Stack(
+                        children: [
+                          GestureDetector(
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailEachPlace(
+                                    placeId: popularPlaces[index].id),
+                              ),
+                            ),
+                            child: Container(
+                              width: 280,
+                              margin: const EdgeInsets.only(right: 16),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                image: DecorationImage(
+                                  image:
+                                      NetworkImage(popularPlaces[index].imageURL),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                          // Favorite button
+                          Consumer<FavoriteProvider>(
+                            builder: (context, favoriteProvider, _) {
+                              // Get initial state but don't listen to further changes
+                              return Positioned(
+                                top: 8,
+                                right: 24,
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white,
+                                  ),
+                                  child: _FavoriteButton(
+                                    placeId: popularPlaces[index].id,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       );
                     },
                   ),
@@ -230,6 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       image: filteredPlaces[index].imageURL,
                       title: filteredPlaces[index].name,
                       rating: filteredPlaces[index].averageRating,
+                      placeId: filteredPlaces[index].id,
                       onTap: () {
                         Navigator.push(
                           context,
@@ -282,5 +308,52 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
     });
+  }
+}
+
+class _FavoriteButton extends StatefulWidget {
+  final String placeId;
+
+  const _FavoriteButton({required this.placeId});
+
+  @override
+  _FavoriteButtonState createState() => _FavoriteButtonState();
+}
+
+class _FavoriteButtonState extends State<_FavoriteButton> {
+  late bool _isFavorite;
+  bool _initialized = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final favoriteProvider = Provider.of<FavoriteProvider>(context, listen: false);
+
+    // Initialize only once
+    if (!_initialized) {
+      _isFavorite = favoriteProvider.isFavorite(widget.placeId);
+      _initialized = true;
+    }
+
+    return IconButton(
+      icon: Icon(
+        _isFavorite ? Iconsax.heart5 : Iconsax.heart,
+        size: 20,
+        color: _isFavorite ? Colors.red : null,
+      ),
+      onPressed: () {
+        // Update local state first for instant feedback
+        setState(() {
+          _isFavorite = !_isFavorite;
+        });
+        
+        // Update provider without waiting
+        favoriteProvider.toggleFavorite(widget.placeId);
+      },
+      constraints: const BoxConstraints(
+        minHeight: 32,
+        minWidth: 32,
+      ),
+      padding: EdgeInsets.zero,
+    );
   }
 }
