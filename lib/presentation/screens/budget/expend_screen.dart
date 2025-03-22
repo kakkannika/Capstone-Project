@@ -93,19 +93,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     return "${DateFormat('EEE').format(date)} ${DateFormat('dd/MM').format(date)}";
   }
 
-  Widget _buildEmptyState() {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text("It's pretty empty here...", style: TextStyle(color: Colors.grey, fontSize: 16)),
-          SizedBox(height: 8),
-          Text("Enter your\n1st expense", textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey, fontSize: 24, fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
+ 
 
   // Handle expense removal
   void _removeExpense(Budget budget, Expense expense) {
@@ -175,9 +163,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
           const SizedBox(width: 8),
           _buildFilterButton('today', 'Today'),
           const SizedBox(width: 8),
-          _buildFilterButton('past', 'Past'),
-          const SizedBox(width: 8),
-          _buildFilterButton('future', 'Future'),
+          _buildFilterButton('upcoming', 'Upcoming'),
         ],
       ),
     );
@@ -214,12 +200,20 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     final todayDate = DateTime(today.year, today.month, today.day);
     final expenseDate = DateTime(expense.date.year, expense.date.month, expense.date.day);
     
+    // Debug information
+    final isToday = expenseDate.isAtSameMomentAs(todayDate);
+    final isPast = expenseDate.isBefore(todayDate);
+    final isUpcoming = expenseDate.isAfter(todayDate);
+    
+    print("Expense date: ${expense.date}, Today: $today");
+    print("Is today: $isToday, Is past: $isPast, Is upcoming: $isUpcoming");
+    
     if (_selectedFilter == 'today') {
-      return expenseDate.isAtSameMomentAs(todayDate);
+      return isToday;
     } else if (_selectedFilter == 'past') {
-      return expenseDate.isBefore(todayDate);
-    } else if (_selectedFilter == 'future') {
-      return expenseDate.isAfter(todayDate);
+      return isPast;
+    } else if (_selectedFilter == 'upcoming') {
+      return isUpcoming;
     }
     
     return false;
@@ -231,6 +225,392 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
     final todayDate = DateTime(today.year, today.month, today.day);
     final expenseDate = DateTime(expense.date.year, expense.date.month, expense.date.day);
     return expenseDate.isAtSameMomentAs(todayDate);
+  }
+
+  // Check if an expense is upcoming (in the future)
+  bool _isExpenseUpcoming(Expense expense) {
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day);
+    final expenseDate = DateTime(expense.date.year, expense.date.month, expense.date.day);
+    return expenseDate.isAfter(todayDate);
+  }
+
+  // Show past expenses in a bottom sheet
+  void _showPastExpenses(List<Expense> expenses, String currency) {
+    // Filter to get only past expenses
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day);
+    
+    final pastExpenses = expenses.where((expense) {
+      final expenseDate = DateTime(expense.date.year, expense.date.month, expense.date.day);
+      return expenseDate.isBefore(todayDate);
+    }).toList();
+    
+    // Sort by date (newest first within past)
+    pastExpenses.sort((a, b) => b.date.compareTo(a.date));
+    
+    // Group by day
+    final Map<String, List<Expense>> groupedExpenses = {};
+    for (var expense in pastExpenses) {
+      final dateKey = DateFormat('yyyy-MM-dd').format(expense.date);
+      if (!groupedExpenses.containsKey(dateKey)) {
+        groupedExpenses[dateKey] = [];
+      }
+      groupedExpenses[dateKey]!.add(expense);
+    }
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // Make it expandable
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.7, // 70% of screen height
+          minChildSize: 0.5, // Min 50% of screen height
+          maxChildSize: 0.95, // Max 95% of screen height
+          expand: false,
+          builder: (_, scrollController) {
+            return Container(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Past Expenses",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: DertamColors.primary,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: DertamColors.greyLight,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Icon(
+                              Icons.close,
+                              color: DertamColors.grey,
+                              size: 18,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Divider
+                  Divider(thickness: 1, color: DertamColors.greyLight),
+                  
+                  // Empty state
+                  if (pastExpenses.isEmpty)
+                    Expanded(
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.history_toggle_off, size: 64, color: DertamColors.grey),
+                            const SizedBox(height: 16),
+                            Text(
+                              "No past expenses found",
+                              style: TextStyle(color: DertamColors.grey, fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else
+                    // Expenses list
+                    Expanded(
+                      child: ListView.builder(
+                        controller: scrollController,
+                        itemCount: groupedExpenses.length,
+                        itemBuilder: (context, index) {
+                          final dateKey = groupedExpenses.keys.elementAt(index);
+                          final dayExpenses = groupedExpenses[dateKey]!;
+                          final date = DateTime.parse(dateKey);
+                          
+                          // Calculate total for this day
+                          final dayTotal = dayExpenses.fold(
+                            0.0, (sum, expense) => sum + expense.amount);
+                          
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Date header with total
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                      decoration: BoxDecoration(
+                                        color: DertamColors.primary.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      child: Text(
+                                        _formatDate(date),
+                                        style: TextStyle(
+                                          color: DertamColors.primary,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      "$currency ${dayTotal.toStringAsFixed(2)}",
+                                      style: TextStyle(
+                                        color: DertamColors.black,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              
+                              // Day's expenses
+                              ...dayExpenses.map((expense) => ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: DertamColors.grey.withOpacity(0.2),
+                                  child: Icon(expense.category.icon, color: DertamColors.grey),
+                                ),
+                                title: Text(
+                                  "${expense.amount} $currency", 
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                subtitle: Text(
+                                  expense.description,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                trailing: IconButton(
+                                  icon: Icon(Icons.edit, color: DertamColors.primary),
+                                  onPressed: () {
+                                    Navigator.pop(context); // Close the modal
+                                    // Get budget from provider
+                                    final budget = Provider.of<BudgetProvider>(context, listen: false).selectedBudget;
+                                    if (budget != null) {
+                                      _navigateToEditExpense(budget, expense);
+                                    }
+                                  },
+                                ),
+                              )),
+                              
+                              Divider(thickness: 1, color: DertamColors.greyLight),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // Show upcoming expenses in a bottom sheet
+  void _showUpcomingExpenses(List<Expense> expenses, String currency) {
+    // Filter to get only upcoming expenses
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day);
+    
+    final upcomingExpenses = expenses.where((expense) {
+      final expenseDate = DateTime(expense.date.year, expense.date.month, expense.date.day);
+      return expenseDate.isAfter(todayDate);
+    }).toList();
+    
+    // Sort by date (soonest first within upcoming)
+    upcomingExpenses.sort((a, b) => a.date.compareTo(b.date));
+    
+    // Group by day
+    final Map<String, List<Expense>> groupedExpenses = {};
+    for (var expense in upcomingExpenses) {
+      final dateKey = DateFormat('yyyy-MM-dd').format(expense.date);
+      if (!groupedExpenses.containsKey(dateKey)) {
+        groupedExpenses[dateKey] = [];
+      }
+      groupedExpenses[dateKey]!.add(expense);
+    }
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // Make it expandable
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.7, // 70% of screen height
+          minChildSize: 0.5, // Min 50% of screen height
+          maxChildSize: 0.95, // Max 95% of screen height
+          expand: false,
+          builder: (_, scrollController) {
+            return Container(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Upcoming Expenses",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: DertamColors.primary,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: DertamColors.greyLight,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Icon(
+                              Icons.close,
+                              color: DertamColors.grey,
+                              size: 18,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Divider
+                  Divider(thickness: 1, color: DertamColors.greyLight),
+                  
+                  // Empty state
+                  if (upcomingExpenses.isEmpty)
+                    Expanded(
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.event_busy, size: 64, color: DertamColors.grey),
+                            const SizedBox(height: 16),
+                            Text(
+                              "No upcoming expenses found",
+                              style: TextStyle(color: DertamColors.grey, fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else
+                    // Expenses list
+                    Expanded(
+                      child: ListView.builder(
+                        controller: scrollController,
+                        itemCount: groupedExpenses.length,
+                        itemBuilder: (context, index) {
+                          final dateKey = groupedExpenses.keys.elementAt(index);
+                          final dayExpenses = groupedExpenses[dateKey]!;
+                          final date = DateTime.parse(dateKey);
+                          
+                          // Calculate total for this day
+                          final dayTotal = dayExpenses.fold(
+                            0.0, (sum, expense) => sum + expense.amount);
+                          
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Date header with total
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                      decoration: BoxDecoration(
+                                        color: DertamColors.primary.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      child: Text(
+                                        _formatDate(date),
+                                        style: TextStyle(
+                                          color: DertamColors.primary,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      "$currency ${dayTotal.toStringAsFixed(2)}",
+                                      style: TextStyle(
+                                        color: DertamColors.black,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              
+                              // Day's expenses
+                              ...dayExpenses.map((expense) => ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: DertamColors.primary.withOpacity(0.2),
+                                  child: Icon(expense.category.icon, color: DertamColors.primary),
+                                ),
+                                title: Text(
+                                  "${expense.amount} $currency", 
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                subtitle: Text(
+                                  expense.description,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                trailing: IconButton(
+                                  icon: Icon(Icons.edit, color: DertamColors.primary),
+                                  onPressed: () {
+                                    Navigator.pop(context); // Close the modal
+                                    // Get budget from provider
+                                    final budget = Provider.of<BudgetProvider>(context, listen: false).selectedBudget;
+                                    if (budget != null) {
+                                      _navigateToEditExpense(budget, expense);
+                                    }
+                                  },
+                                ),
+                              )),
+                              
+                              Divider(thickness: 1, color: DertamColors.greyLight),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -248,6 +628,28 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
           "Budget & Expenses",
           style: TextStyle(color: DertamColors.black),
         ),
+        actions: [
+          // History button
+          IconButton(
+            icon: Icon(Icons.history, color: DertamColors.black),
+            tooltip: 'Past Expenses',
+            onPressed: () {
+              final budgetProvider = Provider.of<BudgetProvider>(context, listen: false);
+              final budget = budgetProvider.selectedBudget;
+              
+              if (budget != null && budget.expenses.isNotEmpty) {
+                _showPastExpenses(budget.expenses, budget.currency);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('No expenses found'),
+                    backgroundColor: DertamColors.red,
+                  ),
+                );
+              }
+            },
+          ),
+        ],
       ),
       body: StreamBuilder<Budget?>(
         stream: Provider.of<BudgetProvider>(context).getBudgetByTripIdStream(widget.tripId),
@@ -385,6 +787,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                         itemBuilder: (context, index) {
                           final expense = filteredExpenses[index];
                           final isToday = _isExpenseFromToday(expense);
+                          final isUpcoming = _isExpenseUpcoming(expense);
                           
                           return Dismissible(
                             key: Key(expense.id),
@@ -403,16 +806,14 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                             },
                             child: Card(
                               margin: const EdgeInsets.only(bottom: 8),
-                              color: isToday ? Colors.white : Colors.white.withOpacity(0.7),
+                              color: isToday ? Colors.white : isUpcoming ? Colors.white.withOpacity(0.7) : Colors.white.withOpacity(0.3),
                               child: ListTile(
                                 onTap: () => _navigateToEditExpense(budget, expense),
                                 leading: CircleAvatar(
-                                  backgroundColor: isToday 
-                                      ? DertamColors.primary.withOpacity(0.2)
-                                      : DertamColors.grey.withOpacity(0.2),
+                                  backgroundColor: isToday ? DertamColors.primary.withOpacity(0.2) : isUpcoming ? DertamColors.primary.withOpacity(0.2) : DertamColors.grey.withOpacity(0.2),
                                   child: Icon(
                                     expense.category.icon,
-                                    color: isToday ? DertamColors.primary : DertamColors.grey,
+                                    color: isToday ? DertamColors.primary : isUpcoming ? DertamColors.primary : DertamColors.grey,
                                   ),
                                 ),
                                 title: Row(
@@ -422,22 +823,20 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                         '${expense.amount} ${budget.currency}', 
                                         style: DertamTextStyles.body.copyWith(
                                           fontWeight: FontWeight.bold,
-                                          color: isToday ? DertamColors.black : DertamColors.grey,
+                                          color: isToday ? DertamColors.black : isUpcoming ? DertamColors.black : DertamColors.grey,
                                         ),
                                       ),
                                     ),
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                       decoration: BoxDecoration(
-                                        color: isToday 
-                                            ? DertamColors.primary.withOpacity(0.1)
-                                            : DertamColors.grey.withOpacity(0.1),
+                                        color: isToday ? DertamColors.primary.withOpacity(0.1) : isUpcoming ? DertamColors.primary.withOpacity(0.1) : DertamColors.grey.withOpacity(0.1),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(
                                         _formatDate(expense.date),
                                         style: TextStyle(
-                                          color: isToday ? DertamColors.primary : DertamColors.grey,
+                                          color: isToday ? DertamColors.primary : isUpcoming ? DertamColors.primary : DertamColors.grey,
                                           fontSize: 12,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -448,7 +847,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                 subtitle: Text(
                                   expense.description,
                                   style: DertamTextStyles.label.copyWith(
-                                    color: isToday ? null : DertamColors.grey.withOpacity(0.7),
+                                    color: isToday ? null : isUpcoming ? null : DertamColors.grey.withOpacity(0.7),
                                   ),
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,

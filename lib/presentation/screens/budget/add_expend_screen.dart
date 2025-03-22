@@ -499,15 +499,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      if (dateStatus == "Future")
-                        Text(
-                          "(Future)",
-                          style: TextStyle(
-                            color: DertamColors.grey,
-                            fontSize: 12,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
+                      
                     ],
                   ),
                 );
