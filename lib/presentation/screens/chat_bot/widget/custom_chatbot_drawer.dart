@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/providers/auth_provider.dart';
+import 'package:tourism_app/theme/theme.dart';
 import 'package:tourism_app/utils/date_time_util.dart'; // Import the utility class
 
 class CustomDrawer extends StatelessWidget {
@@ -23,21 +24,27 @@ class CustomDrawer extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: <Widget>[
           UserAccountsDrawerHeader(
-            decoration: const BoxDecoration(
-              color: Colors.blue,
+             decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  DertamColors.primary,
+                  DertamColors.lightBlue,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
             accountName: Text(
               displayName,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
+              style: DertamTextStyles.title.copyWith(
+                color: DertamColors.white,
+                fontWeight: FontWeight.bold,
               ),
             ),
             accountEmail: Text(
               userEmail,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
+              style: DertamTextStyles.body.copyWith(
+                color: DertamColors.white,
               ),
             ),
             currentAccountPicture: CircleAvatar(
@@ -47,32 +54,52 @@ class CustomDrawer extends StatelessWidget {
                       as ImageProvider,
             ),
           ),
-          const Divider(),
+          Divider(color: DertamColors.greyLight),
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text('History (${messages.length})',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            padding: EdgeInsets.all(DertamSpacings.m),
+            child: Text(
+              'History (${messages.length})',
+              style: DertamTextStyles.title.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
-          const Divider(),
+          Divider(color:  DertamColors.greyLight,),
           ...messages.map((message) {
             final date = DateTime.parse(message['date']!);
             return Column(
               children: [
                 ListTile(
-                  title: Text(message['text']!),
+                  title: Text(
+                    message['text']!,
+                    style: DertamTextStyles.body,
+                    ),
                   subtitle: Text(
-                      '${message['type'] == 'question' ? 'User' : 'AI'} - ${DateTimeUtils.formatDateTime(date)}'),
+                      '${message['type'] == 'question' ? 'User' : 'AI'} - ${DateTimeUtils.formatDateTime(date)}',
+                      style: DertamTextStyles.label.copyWith(
+                      color: DertamColors.neutralLight,
+                    ),
+                    ),
                   onTap: () {
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
                         title: Text(message['type'] == 'question'
                             ? "User's Question"
-                            : "AI's Response"),
-                        content: Text(message['text']!),
+                            : "AI's Response",
+                            style: DertamTextStyles.title,
+                            ),
+                        content: Text(
+                          message['text']!, 
+                          style: DertamTextStyles.body,),
                         actions: [
                           TextButton(
-                            child: const Text("Close"),
+                            child: Text(
+                              "Close",
+                            style: DertamTextStyles.button.copyWith(
+                                color: DertamColors.primary,
+                              ),
+                              ),
                             onPressed: () => Navigator.of(context).pop(),
                           ),
                         ],
@@ -80,7 +107,7 @@ class CustomDrawer extends StatelessWidget {
                     );
                   },
                 ),
-                const Divider(),
+                Divider(color: DertamColors.greyLight),
               ],
             );
           }),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/providers/auth_provider.dart';
+import 'package:tourism_app/theme/theme.dart';
 
 class MessageList extends StatelessWidget {
   final List<Map<String, String>> messages;
@@ -20,7 +21,7 @@ class MessageList extends StatelessWidget {
         final message = messages[index];
         final isQuestion = message["type"] == "question";
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
+          padding: EdgeInsets.symmetric(vertical: DertamSpacings.s / 3),
           child: Row(
             mainAxisAlignment:
                 isQuestion ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -29,27 +30,39 @@ class MessageList extends StatelessWidget {
                 const CircleAvatar(
                   backgroundImage: AssetImage('lib/assets/images/chatbot.jpg'),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: DertamSpacings.s),
               ],
               Flexible(
                 child: Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: EdgeInsets.all(DertamSpacings.s),
                   decoration: BoxDecoration(
-                    color: isQuestion ? Colors.blue[100] : Colors.grey[300],
-                    borderRadius: BorderRadius.circular(10),
+                    color: isQuestion 
+                    ? DertamColors.blueSky 
+                    : DertamColors.backgroundAccent,
+                    borderRadius: BorderRadius.circular(DertamSpacings.radius),
+                    boxShadow: [
+                      BoxShadow(
+                        color: DertamColors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Text(
                     message["text"]!,
-                    style: TextStyle(
-                      color: isQuestion ? Colors.blue : Colors.black,
-                      fontWeight:
-                          isQuestion ? FontWeight.bold : FontWeight.normal,
+                    style: DertamTextStyles.body.copyWith(
+                      color: isQuestion 
+                          ? DertamColors.primary 
+                          : DertamColors.neutralDark,
+                      fontWeight: isQuestion 
+                          ? FontWeight.bold 
+                          : FontWeight.normal,
                     ),
                   ),
                 ),
               ),
               if (isQuestion) ...[
-                const SizedBox(width: 8),
+                const SizedBox(width:  DertamSpacings.s),
                 CircleAvatar(
                   backgroundImage: currentUser?.photoUrl != null
                       ? NetworkImage(currentUser!.photoUrl!)

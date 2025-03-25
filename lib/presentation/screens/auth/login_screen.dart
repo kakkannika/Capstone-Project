@@ -2,140 +2,190 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/presentation/screens/auth/gmail_signup_screen.dart';
-import 'package:tourism_app/presentation/widgets/custome_input_field.dart';
 import 'package:tourism_app/presentation/widgets/dertam_button.dart';
+import 'package:tourism_app/presentation/widgets/dertam_textfield.dart';
 import 'package:tourism_app/providers/auth_provider.dart';
+import 'package:tourism_app/theme/theme.dart';
 import 'reset_password_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-
+  final ValueNotifier<bool> _obscureTextNotifier = ValueNotifier<bool>(true);
 
   @override
   Widget build(BuildContext context) {
     return Consumer<AuthServiceProvider>(
       builder: (context, authService, child) {
         return Scaffold(
-          resizeToAvoidBottomInset: true, // Prevent keyboard overflow
-          body: SafeArea(
-            child: SingleChildScrollView(
-              // Enables scrolling when the keyboard appears
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(height: 60),
-                    // Logo
-                    Center(
-                      child: Image.asset(
-                        'lib/assets/images/logo.png',
-                        height: 80,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    const Center(
-                      child: Text(
-                        'Login',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                    // Email field
-                    CustomInputField(
-                      controller: _emailController,
-                      hintText: 'Enter your email address',
-                    ),
-                    const SizedBox(height: 20),
-                    CustomInputField(
-                      controller: _passwordController,
-                      hintText: 'Enter your password',
-                      obscureText: true,
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Forgot password
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const ForgotPasswordScreen()),
-                          );
-                        },
-                        child: const Text(
-                          'Forgot your password?',
-                          style: TextStyle(
-                            color: Color(0xFF2F80ED),
+            resizeToAvoidBottomInset: true, // Prevent keyboard overflow
+            body: SafeArea(
+              child: SingleChildScrollView(
+                // Enables scrolling when the keyboard appears
+                child: Form(
+                  // Add Form widget here
+                  key: _formKey,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 40),
+                        // Logo
+                        Center(
+                          child: Image.asset(
+                            'lib/assets/images/logo.png',
+                            height: 150,
                           ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    // Sign in button
-                    DertamButton(
-                      onPressed: () => authService.signInWithEmail(
-                          email: _emailController.text,
-                          password: _passwordController.text,
-                          context: context),
-                      text: "Sign in",
-                      buttonType: ButtonType.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ), // Example of a custom shape
-                    ),
-                    const SizedBox(height: 24),
-
-                    // OR continue with
-                    const Center(
-                      child: Text(
-                        'Or continue with',
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 14,
+                        SizedBox(height: DertamSpacings.m),
+                        Center(
+                          child: Text(
+                            'Login',
+                            style: DertamTextStyles.heading.copyWith(
+                              color: DertamColors.primary,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                        SizedBox(height: DertamSpacings.m),
+                        // Email field with validation
+                        DertamTextfield(
+                          controller: _emailController,
+                          label: 'Email',
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your email';
+                            }
+                            if (!value.contains('@')) {
+                              return 'Please enter a valid email';
+                            }
+                            return null;
+                          },
+                          borderColor: DertamColors.greyLight,
+                          focusedBorderColor: DertamColors.primary,
+                          textColor: DertamColors.neutralDark,
+                        ),
 
-                    // Social login buttons
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SocialLoginButton(
-                            onTap: () => authService.signInWithGoogle(context),
-                            imagePath: 'lib/assets/images/google.png'),
-                        const SizedBox(width: 16),
-                        // SocialLoginButton(
-                        //     onTap: () => authService.signInWithFacebook(context),
-                        //     imagePath: 'lib/assets/images/facebook.png'),
-                        const SizedBox(width: 16),
-                        // SocialLoginButton(
-                        //     onTap: () => handlePhoneLogin(context),
-                        //     imagePath: 'lib/assets/images/phone.png')
+                        // password field and forgot password section with:
+                        ValueListenableBuilder<bool>(
+                          valueListenable: _obscureTextNotifier,
+                          builder: (context, obscureText, _) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              mainAxisSize: MainAxisSize.min, // Add this
+                              children: [
+                                DertamTextfield(
+                                  controller: _passwordController,
+                                  label: 'Password',
+                                  isPassword: true,
+                                  obscureText: obscureText,
+                                  onVisibilityToggle: () {
+                                    _obscureTextNotifier.value = !obscureText;
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your password';
+                                    }
+                                    if (value.length < 6) {
+                                      return 'Password must be at least 6 characters';
+                                    }
+                                    return null;
+                                  },
+                                  borderColor: DertamColors.greyLight,
+                                  focusedBorderColor: DertamColors.primary,
+                                  textColor: DertamColors.neutralDark,
+                                ),
+                                Transform.translate(
+                                  // Add this wrapper
+                                  offset: const Offset(
+                                      0, -8), // Move up by 8 pixels
+                                  child: TextButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const ForgotPasswordScreen(),
+                                        ),
+                                      );
+                                    },
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                      minimumSize: Size.zero,
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      alignment: Alignment.centerRight,
+                                    ),
+                                    child: Text(
+                                      'Forgot your password?',
+                                      style: DertamTextStyles.body.copyWith(
+                                        color: DertamColors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        SizedBox(height: DertamSpacings.m),
+                        // Sign in button
+                        DertamButton(
+                          onPressed: () {
+                            if (_formKey.currentState!.validate()) {
+                              authService.signInWithEmail(
+                                email: _emailController.text,
+                                password: _passwordController.text,
+                                context: context,
+                              );
+                            }
+                          },
+                          text: "Sign in",
+                          buttonType: ButtonType.primary,
+                        ),
+                        SizedBox(height: DertamSpacings.s),
+
+                        // OR continue with
+                        Center(
+                          child: Text(
+                            'Or continue with',
+                            style: DertamTextStyles.body.copyWith(
+                              color: DertamColors.neutralLight,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: DertamSpacings.s),
+
+                        // Social login buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SocialLoginButton(
+                                onTap: () =>
+                                    authService.signInWithGoogle(context),
+                                imagePath: 'lib/assets/images/google.png'),
+                            //SizedBox(height: DertamSpacings.m),
+                            // SocialLoginButton(
+                            //     onTap: () => authService.signInWithFacebook(context),
+                            //     imagePath: 'lib/assets/images/facebook.png'),
+                            // SizedBox(height: DertamSpacings.m),
+                            // SocialLoginButton(
+                            //     onTap: () => handlePhoneLogin(context),
+                            //     imagePath: 'lib/assets/images/phone.png')
+                          ],
+                        ),
+
+                        // Register link
+                        _signup(context),
                       ],
                     ),
-                    const SizedBox(height: 16),
-
-                    // Register link
-                    _signup(context),
-                    const SizedBox(height: 16),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
-        );
+            ));
       },
     );
   }
@@ -152,13 +202,17 @@ class LoginScreen extends StatelessWidget {
           );
         },
         child: RichText(
-          text: const TextSpan(
+          text: TextSpan(
             text: "Don't have an account? ",
-            style: TextStyle(color: Colors.black54),
+            style: DertamTextStyles.body.copyWith(
+              color: DertamColors.neutralLight,
+            ),
             children: [
               TextSpan(
                 text: 'Register',
-                style: TextStyle(color: Color(0xFF2F80ED)),
+                style: DertamTextStyles.body.copyWith(
+                  color: DertamColors.primary,
+                ),
               ),
             ],
           ),
@@ -184,16 +238,30 @@ class SocialLoginButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 200,
-        height: 64,
+        width: 48,
+        height: 48,
         decoration: BoxDecoration(
-          color: const Color(0xFFF5F7FB), 
-          borderRadius: BorderRadius.circular(8),
+          color: DertamColors.white,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: DertamColors.greyLight,
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: DertamColors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        child: Center(
+        child: Padding(
+          padding: EdgeInsets.all(DertamSpacings.s - 4),
           child: Image.asset(
             imagePath,
-            height: 24,
+            height: DertamSize.icon - 8,
+            width: DertamSize.icon - 8,
+            fit: BoxFit.contain,
           ),
         ),
       ),

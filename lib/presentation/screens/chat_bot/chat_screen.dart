@@ -5,6 +5,7 @@ import 'package:tourism_app/presentation/screens/chat_bot/message_list.dart';
 import 'package:tourism_app/presentation/screens/chat_bot/widget/custom_chatbot_bar.dart';
 import 'package:tourism_app/presentation/screens/chat_bot/widget/custom_chatbot_drawer.dart';
 import 'package:tourism_app/providers/chatbot_provider.dart';
+import 'package:tourism_app/theme/theme.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -105,7 +106,7 @@ class _ChatScreenState extends State<ChatScreen> {
       drawer:
           CustomDrawer(messages: _messages, onSelectMessage: _selectMessage),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(DertamSpacings.m),
         child: Column(
           children: [
             // Modern greeting section, styled with background
@@ -115,18 +116,23 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.blueAccent,
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(DertamSpacings.radius),
                     boxShadow: [
-                      BoxShadow(color: Colors.black26, blurRadius: 6)
+                      BoxShadow(
+                        color: DertamColors.black.withOpacity(0.2),
+                        blurRadius: 6,
+                      ),
                     ],
                   ),
                   padding:
-                      const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                      const EdgeInsets.symmetric(
+                        vertical: DertamSpacings.m,
+                        horizontal: DertamSpacings.l,
+                        ),
                   child: Text(
                     "Start Chatting with our AI Assistant!",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
+                    style: DertamTextStyles.title.copyWith(
+                      color: DertamColors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'package:tourism_app/theme/theme.dart';
 
 class ChatInputField extends StatefulWidget {
   final TextEditingController controller;
@@ -45,14 +46,16 @@ class _ChatInputFieldState extends State<ChatInputField> {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(30),
+                  color: DertamColors.backgroundAccent,
+                  borderRadius: BorderRadius.circular(DertamSpacings.radiusLarge),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: TextField(
                     controller: widget.controller,
-                    style: TextStyle(color: Colors.black),
+                    style: DertamTextStyles.body.copyWith(
+                      color: DertamColors.neutralDark,
+                    ),
                     decoration: InputDecoration(
                       hintText: 'Type a message...',
                       border: InputBorder.none,
@@ -65,7 +68,11 @@ class _ChatInputFieldState extends State<ChatInputField> {
               onPressed: () {
                 _sendMessage();
               },
-              icon: Icon(Icons.send, color: Colors.blue),
+              icon: Icon(
+                Icons.send,
+                color: DertamColors.primary,
+                size: DertamSize.icon,
+              ),
             ),
           ],
         ),

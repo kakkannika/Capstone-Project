@@ -11,6 +11,7 @@ import 'package:tourism_app/presentation/widgets/navigationBar.dart';
 import 'package:tourism_app/providers/place_provider.dart';
 // import 'package:tourism_app/providers/place_retrieve_provider.dart';
 import 'package:tourism_app/providers/auth_provider.dart';
+import 'package:tourism_app/theme/theme.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -64,31 +65,35 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 // Header Section
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: EdgeInsets.all(DertamSpacings.s-2),
                   child: Row(
                     children: [
                       CircleAvatar(
-                        radius: 20,
+                        radius: DertamSize.icon - 8,
                         backgroundImage: currentUser?.photoUrl != null
                             ? NetworkImage(currentUser!.photoUrl!)
                             : const AssetImage('lib/assets/images/avatar.jpg')
                                 as ImageProvider,
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: DertamSpacings.s-4),
                       Text(
                         'Hello, $displayName',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
+                        style: DertamTextStyles.body.copyWith(
+                          color: DertamColors.neutralDark,
                         ),
                       ),
                       const Spacer(),
                       IconButton(
-                        icon: const Icon(Icons.notifications_outlined),
+                        icon: Icon(Icons.notifications_outlined,
+                        color: DertamColors.neutral,
+                        size: DertamSize.icon-4,),
+                        padding: EdgeInsets.all(DertamSpacings.s-4),
                         onPressed: () {},
                       ),
                       IconButton(
-                        icon: const Icon(Icons.language),
+                        icon: const Icon(Icons.language,
+                        size: DertamSize.icon - 4,),
+                        padding: EdgeInsets.all(DertamSpacings.s-4),
                         onPressed: () {},
                       ),
                     ],
@@ -101,13 +106,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     Image.asset(
                       'lib/assets/place_images/Angkor_wat.jpg',
                       width: double.infinity,
-                      height: 300,
+                      height: 200,
                       fit: BoxFit.cover,
                     ),
                     Positioned(
-                      left: 16,
-                      right: 16,
-                      bottom: 16,
+                      left: DertamSpacings.m,
+                      right: DertamSpacings.m,
+                      bottom: DertamSpacings.m,
                       child: TamSearchbar(
                         onBackPressed: onBackPressed,
                         onSearchChanged: (text) => placeProvider.searchPlace(text),
@@ -274,7 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
             shape: const CircleBorder(),
             elevation: 0, // Set to 0 to use the custom shadow
             child: Image.asset(
-              'lib/assets/images/chatbot.jpg', // Replace with the actual asset path
+              'lib/assets/images/chatBot.png', // Replace with the actual asset path
               width: 40, // Adjust size as needed
               height: 40,
             ),

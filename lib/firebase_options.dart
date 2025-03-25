@@ -60,12 +60,11 @@ class DefaultFirebaseOptions {
     messagingSenderId: '864597870395',
     projectId: 'dertam-a445f',
     storageBucket: 'dertam-a445f.firebasestorage.app',
-    androidClientId:
-        '864597870395-5bjm9ve7cueh3mhjqdnlj4afbrm4s7sv.apps.googleusercontent.com',
-    iosClientId:
-        '864597870395-fij26l13vqjvo1geqtaecuvv6alp04pp.apps.googleusercontent.com',
+    androidClientId: '864597870395-5bjm9ve7cueh3mhjqdnlj4afbrm4s7sv.apps.googleusercontent.com',
+    iosClientId: '864597870395-fij26l13vqjvo1geqtaecuvv6alp04pp.apps.googleusercontent.com',
     iosBundleId: 'com.example.tourismApp',
   );
+
   static const FirebaseOptions web = FirebaseOptions(
     apiKey: 'AIzaSyCh9rOYhPB2olsYsPxh5M1fFJxGu0n0dAE',
     appId: '1:864597870395:android:9ab7fd924a078fd961191e',

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tourism_app/theme/theme.dart';
 class CustomInputField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
@@ -14,16 +15,24 @@ class CustomInputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: DertamSpacings.m, vertical: DertamSpacings.s-8),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F7FB),
-        borderRadius: BorderRadius.circular(8),
-      ),
+      color: DertamColors.white,
+      borderRadius: BorderRadius.circular(DertamSpacings.radius),
+      
+      boxShadow: [
+        BoxShadow(
+          color: DertamColors.black.withOpacity(0.05),
+          blurRadius: 4,
+          offset: const Offset(0, 2),
+        ),
+      ],
+    ),
       child: TextField(
         controller: controller,
         obscureText: obscureText,
         decoration: InputDecoration(
-          hintText: hintText,
+          hintText: hintText,hintStyle: TextStyle(color: DertamColors.grey),
           border: InputBorder.none,
         ),
       ),

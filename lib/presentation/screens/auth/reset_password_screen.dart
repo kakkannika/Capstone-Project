@@ -2,9 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tourism_app/presentation/widgets/custome_input_field.dart';
 import 'package:tourism_app/presentation/widgets/dertam_button.dart';
+import 'package:tourism_app/presentation/widgets/dertam_textfield.dart';
 import 'package:tourism_app/providers/auth_provider.dart';
+import 'package:tourism_app/theme/theme.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -15,70 +16,115 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
-
-
+  final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Consumer<AuthServiceProvider>(
-        builder: (context, authService, child) {
-      return Scaffold(
-        body: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFF085794),
-                Color(0xFF17649F),
-                Color(0xFF206CA6),
-                Color(0xFF74B5E3),
-                Color(0xFFFFFFFF),
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Image.asset('lib/assets/images/logo.png', height: 100),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Forgot Password?',
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+      builder: (context, authService, child) {
+        return Scaffold(
+            body: SafeArea(
+          child: SingleChildScrollView(
+            child: Form(
+              // Wrap with Form
+              key: _formKey,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 40),
+                    // Logo
+                    Center(
+                      child: Image.asset(
+                        'lib/assets/images/logo.png',
+                        height: 150,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Select your preferred method to reset your password.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: Colors.white70),
-                  ),
-                  const SizedBox(height: 30),
-                  CustomInputField(
+                    SizedBox(height: DertamSpacings.m),
+                    Text(
+                      'Forgot Password?',
+                      style: DertamTextStyles.heading.copyWith(
+                        color: DertamColors.black,
+                      ),
+                    ),
+                    SizedBox(height: DertamSpacings.s),
+                    Text(
+                      'Select your preferred method to reset your password.',
+                      textAlign: TextAlign.center,
+                      style: DertamTextStyles.body.copyWith(
+                        color: DertamColors.black.withOpacity(0.7),
+                      ),
+                    ),
+                    SizedBox(height: DertamSpacings.l),
+                    //Email field
+                    DertamTextfield(
                       controller: _emailController,
-                      hintText: 'Please enter your email'),
-                  const SizedBox(height: 30),
-                  DertamButton(
-                    onPressed: () => authService.resetPassword(
-                        _emailController.text, context),
-                    text: 'Send',
-                    buttonType: ButtonType.secondary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      label: 'Email',
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your email';
+                        }
+                        if (!value.contains('@')) {
+                          return 'Please enter a valid email';
+                        }
+                        return null;
+                      },
+                      borderColor: DertamColors.greyLight,
+                      focusedBorderColor: DertamColors.primary,
+                      textColor: DertamColors.neutralDark,
                     ),
-                  ),
-                ],
+                    SizedBox(height: DertamSpacings.l),
+                    DertamButton(
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          try {
+                            await authService.resetPassword(
+                              _emailController.text,
+                              context,
+                            );
+                            // Show success message
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Password reset link sent to your email',
+                                  style: DertamTextStyles.body.copyWith(
+                                    color: DertamColors.white,
+                                  ),
+                                ),
+                                backgroundColor: DertamColors.green,
+                                behavior: SnackBarBehavior.floating,
+                                margin: EdgeInsets.all(DertamSpacings.m),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          } catch (e) {
+                            // Show error message
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Failed to send reset link: ${e.toString()}',
+                                  style: DertamTextStyles.body.copyWith(
+                                    color: DertamColors.white,
+                                  ),
+                                ),
+                                backgroundColor: DertamColors.red,
+                                behavior: SnackBarBehavior.floating,
+                                margin: EdgeInsets.all(DertamSpacings.m),
+                              ),
+                            );
+                          }
+                        }
+                      },
+                      text: 'Send',
+                      buttonType: ButtonType.primary,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      );
-    });
+        ));
+      },
+    );
   }
 }

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tourism_app/presentation/widgets/custome_input_field.dart';
 import 'package:tourism_app/presentation/widgets/dertam_button.dart';
+import 'package:tourism_app/presentation/widgets/dertam_textfield.dart';
 import 'package:tourism_app/providers/auth_provider.dart';
+import 'package:tourism_app/theme/theme.dart';
 import 'login_screen.dart';
 
 class EmailRegisterScreen extends StatefulWidget {
   const EmailRegisterScreen({super.key});
+  
 
   @override
   State<EmailRegisterScreen> createState() => _RegisterScreenState();
@@ -18,6 +20,9 @@ class _RegisterScreenState extends State<EmailRegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  final ValueNotifier<bool> _passwordVisibilityNotifier = ValueNotifier<bool>(true);
+  final ValueNotifier<bool> _confirmPasswordVisibilityNotifier = ValueNotifier<bool>(true);
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -28,67 +33,137 @@ class _RegisterScreenState extends State<EmailRegisterScreen> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: SingleChildScrollView(
+                child: Form( 
+                  key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const SizedBox(height: 20),
                     // Logo
                     Center(
-                      child: SizedBox(
-                        height: 80,
-                        child: Image.asset(
-                          'lib/assets/images/logo.png',
-                          fit: BoxFit.contain,
-                        ),
+                      child: Image.asset(
+                        'lib/assets/images/logo.png',
+                        height: 150,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: DertamSpacings.m),
                     // Register Text
-                    const Center(
+                    Center(
                       child: Text(
                         'Register',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.blue,
+                        style: DertamTextStyles.heading.copyWith(
+                          color: DertamColors.primary,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    SizedBox(height: DertamSpacings.xl),
                     // Username TextField
-                    CustomInputField(
+                     DertamTextfield(
                         controller: _usernameController,
-                        hintText: "enter your name"),
-                    const SizedBox(height: 16),
+                        label: "Full Name",
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your name';
+                          }
+                          return null;
+                        },
+                        borderColor: DertamColors.greyLight,
+                        focusedBorderColor: DertamColors.primary,
+                        textColor: DertamColors.neutralDark,
+                      ),
+                      
                     // Email TextField
-                    CustomInputField(
+                    DertamTextfield(
                         controller: _emailController,
-                        hintText: "enter your email"),
-                    const SizedBox(height: 16),
+                        label: "Email",
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your email';
+                          }
+                          if (!value.contains('@')) {
+                            return 'Please enter a valid email';
+                          }
+                          return null;
+                        },
+                        borderColor: DertamColors.greyLight,
+                        focusedBorderColor: DertamColors.primary,
+                        textColor: DertamColors.neutralDark,
+                      ),
+                 
                     // Password TextField
-                    CustomInputField(
-                        controller: _passwordController,
-                        hintText: "Enter your password",
-                        obscureText: true),
-                    const SizedBox(height: 16),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: _passwordVisibilityNotifier,
+                      builder: (context, obscureText, _) {
+                        return DertamTextfield(
+                          controller: _passwordController,
+                          label: "Password",
+                          isPassword: true,
+                          obscureText: obscureText,
+                          onVisibilityToggle: () {
+                            _passwordVisibilityNotifier.value = !obscureText;
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your password';
+                            }
+                            if (value.length < 6) {
+                              return 'Password must be at least 6 characters';
+                            }
+                            return null;
+                          },
+                          borderColor: DertamColors.greyLight,
+                          focusedBorderColor: DertamColors.primary,
+                          textColor: DertamColors.neutralDark,
+                        );
+                      },
+                    ),
+                
                     // Confirm Password TextField
-                    CustomInputField(
-                        controller: _confirmPasswordController,
-                        hintText: "Please enter Confirm Password"),
-                    const SizedBox(height: 32),
+                     ValueListenableBuilder<bool>(
+                      valueListenable: _confirmPasswordVisibilityNotifier,
+                      builder: (context, obscureText, _) {
+                        return DertamTextfield(
+                          controller: _confirmPasswordController,
+                          label: "Confirm Password",
+                          isPassword: true,
+                          obscureText: obscureText,
+                          onVisibilityToggle: () {
+                            _confirmPasswordVisibilityNotifier.value = !obscureText;
+                          },
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please confirm your password';
+                            }
+                            if (value != _passwordController.text) {
+                              return 'Passwords do not match';
+                            }
+                            return null;
+                          },
+                          borderColor: DertamColors.greyLight,
+                          focusedBorderColor: DertamColors.primary,
+                          textColor: DertamColors.neutralDark,
+                        );
+                      },
+                    ),
+                    SizedBox(height: DertamSpacings.xl),
                     // Sign Up Button
                     DertamButton(
                         onPressed: () async {
-                          await authService.signUpWithEmail(
+                          if (_formKey.currentState!.validate()) {
+                            await authService.signUpWithEmail(
                               email: _emailController.text,
                               password: _passwordController.text,
                               username: _usernameController.text,
                               confirmPassword: _confirmPasswordController.text,
-                              context: context);
+                              context: context,
+                            );
+                          }
                         },
-                        text: 'Signup',
-                        buttonType: ButtonType.primary),
-                    const SizedBox(height: 16),
+                        text: 'Sign up',
+                        buttonType: ButtonType.primary,
+                      ),
+                    SizedBox(height: DertamSpacings.s),
                     // Already have an account text
                     Center(
                       child: TextButton(
@@ -99,11 +174,10 @@ class _RegisterScreenState extends State<EmailRegisterScreen> {
                                 builder: (context) => LoginScreen()),
                           );
                         },
-                        child: const Text(
+                        child: Text(
                           'Already have an account',
-                          style: TextStyle(
-                            color: Colors.black54,
-                            fontSize: 14,
+                          style: DertamTextStyles.body.copyWith(
+                          color: DertamColors.primary,
                           ),
                         ),
                       ),
@@ -112,6 +186,7 @@ class _RegisterScreenState extends State<EmailRegisterScreen> {
                 ),
               ),
             ),
+          )
           ),
         );
       },

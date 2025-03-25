@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+import 'package:tourism_app/theme/theme.dart';
+
 class GreetingSection extends StatefulWidget {
   final Function(String) onSuggestionSelected;
 
@@ -56,22 +58,20 @@ class _GreetingSectionState extends State<GreetingSection> {
         children: [
           Text(
             _displayedText,
-            style: const TextStyle(
-              fontSize: 28,
+             style: DertamTextStyles.heading.copyWith(
+              color: DertamColors.neutralDark,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
             ),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: DertamSpacings.s),
           if (_showSuggestions) ...[
             Text(
               "Don't know what to ask? Try these examples:",
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.grey[600],
+              style: DertamTextStyles.title.copyWith(
+                color: DertamColors.neutralLight,
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: DertamSpacings.m),
             Column(
               children: [
                 _buildSuggestionCard("Show me some nearby restaurants with good reviews."),
@@ -89,11 +89,13 @@ class _GreetingSectionState extends State<GreetingSection> {
     return GestureDetector(
       onTap: () => widget.onSuggestionSelected(suggestion),
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        margin: const EdgeInsets.symmetric(vertical: DertamSpacings.s / 3),
+        padding: const EdgeInsets.symmetric(
+          horizontal: DertamSpacings.m,
+          vertical: DertamSpacings.s,),
         decoration: BoxDecoration(
-          color: Colors.grey[300],
-          borderRadius: BorderRadius.circular(12),
+          color: DertamColors.backgroundAccent,
+          borderRadius: BorderRadius.circular(DertamSpacings.radius),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.2),
@@ -109,7 +111,9 @@ class _GreetingSectionState extends State<GreetingSection> {
             Expanded(
               child: Text(
                 suggestion,
-                style: const TextStyle(color: Colors.black87, fontSize: 16),
+                style: DertamTextStyles.body.copyWith(
+                  color: DertamColors.neutralDark,
+                ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
