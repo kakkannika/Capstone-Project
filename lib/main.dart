@@ -10,7 +10,6 @@ import 'package:tourism_app/ui/providers/auth_provider.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
 import 'package:tourism_app/ui/screens/get_start_screen.dart';
 
-import 'ui/screens/home/home_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,7 +40,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Tourism App',
         theme: ThemeData(primarySwatch: Colors.blue),
-        home: const HomeScreen(),
+        home:  GetStartedScreen(),
       ),
     );
   }

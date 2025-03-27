@@ -5,26 +5,26 @@ import 'package:provider/provider.dart';
 
 import 'package:iconsax/iconsax.dart';
 import 'package:tourism_app/models/place/place.dart';
-import 'package:tourism_app/ui/providers/auth_provider.dart';
 import 'package:tourism_app/ui/providers/favorite_provider.dart';
 import 'package:tourism_app/ui/providers/place_provider.dart';
 import 'package:tourism_app/ui/screens/chat_bot/chat_screen.dart';
 import 'package:tourism_app/ui/screens/home/detail_each_place.dart';
+import 'package:tourism_app/ui/screens/home/home_page.dart';
 import 'package:tourism_app/ui/screens/home/widget/filter_chip.dart';
 import 'package:tourism_app/ui/widgets/dertam_place_picker.dart';
 import 'package:tourism_app/ui/widgets/dertam_searchBar.dart';
 import 'package:tourism_app/ui/widgets/destination_card.dart';
-import 'package:tourism_app/ui/widgets/navigationBar.dart';
 import 'package:tourism_app/utils/animation_utils.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class DetailHomePages extends StatefulWidget {
+  final String province;
+  const DetailHomePages({super.key, required this.province});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<DetailHomePages> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<DetailHomePages> {
   String selectedCategory = 'all'; // Stores selected category
 
   void onBackPressed() {
@@ -41,11 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthServiceProvider>(context);
-    final currentUser = authProvider.currentUser;
-    final displayName = currentUser?.displayName ??
-        (currentUser?.email.split('@')[0] ?? 'User');
-
     return Consumer<PlaceProvider>(builder: (context, placeProvider, child) {
       // Filter places based on selected category
       final filteredPlaces = selectedCategory == 'all'
@@ -70,33 +65,26 @@ class _HomeScreenState extends State<HomeScreen> {
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      CircleAvatar(
-                        radius: 20,
-                        backgroundImage: currentUser?.photoUrl != null
-                            ? NetworkImage(currentUser!.photoUrl!)
-                            : const AssetImage('assets/images/avatar.jpg')
-                                as ImageProvider,
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      HomeScreen())); // Navigate back to the previous screen
+                        },
+                        child: const Icon(Icons.home, size: 24),
                       ),
-                      const SizedBox(width: 12),
                       Text(
-                        'Hello, $displayName',
+                        widget.province, // Display the province name
                         style: const TextStyle(
                           fontSize: 18,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const Spacer(),
-                      IconButton(
-                        icon: const Icon(Icons.notifications_outlined),
-                        onPressed: () {},
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.search),
-                        onPressed: () {
-                          onBackPressed();
-                        },
-                      ),
+                      const SizedBox(width: 24), // Placeholder for alignment
                     ],
                   ),
                 ),
@@ -275,7 +263,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-        bottomNavigationBar: const Navigationbar(),
         // Floating Action Button
         floatingActionButton: Container(
           margin: const EdgeInsets.only(bottom: 20, right: 16),

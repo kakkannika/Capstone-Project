@@ -109,5 +109,11 @@ class PlaceFirebaseRepository extends PlaceRepository {
       return [];
     }
   }
+  
+  @override
+  List<Place> filterByProvince(List<Place> places, String provinceName) {
+    // TODO: implement filterByProvince
+    throw UnimplementedError();
+  }
 
 }

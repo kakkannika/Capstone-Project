@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:tourism_app/ui/providers/place_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:tourism_app/ui/providers/auth_provider.dart';
+import 'package:tourism_app/ui/screens/home/detail_home_pages.dart';
+import 'package:tourism_app/ui/screens/profiles/profile_screen.dart';
 import 'package:tourism_app/ui/widgets/navigationBar.dart';
 
 enum Province {
@@ -42,8 +44,13 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthServiceProvider>(context);
+    final currentUser = authProvider.currentUser;
+    final displayName = currentUser?.displayName ??
+        (currentUser?.email.split('@')[0] ?? 'User');
     // Get all provinces as a list
     final List<Province> provinces = Province.values;
+    
 
     return Scaffold(
       body: SafeArea(
@@ -56,13 +63,27 @@ class HomeScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
                   children: [
-                    CircleAvatar(
-                      radius: 20,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ProfileScreen(),
+                          ),
+                        );
+                      },
+                      child: CircleAvatar(
+                        radius: 20,
+                        backgroundImage: currentUser?.photoUrl != null
+                            ? NetworkImage(currentUser!.photoUrl!)
+                            : const AssetImage('assets/images/avatar.jpg')
+                                as ImageProvider,
+                      ),
                     ),
                     const SizedBox(width: 12),
-                    const Text(
-                      'Hello, Kannika',
-                      style: TextStyle(
+                    Text(
+                      'Hello, $displayName',
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w500,
                       ),
@@ -99,7 +120,6 @@ class HomeScreen extends StatelessWidget {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(25),
                       ),
-                     
                     ),
                   ),
                 ],
@@ -112,7 +132,7 @@ class HomeScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Popular destination',
+                      'Popular Provinces',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -142,8 +162,9 @@ class HomeScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  ProvincePlacesScreen(province: province),
+                              builder: (context) => DetailHomePages(
+                                province: province.displayName,
+                              ),
                             ),
                           );
                         },
@@ -217,8 +238,9 @@ class HomeScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              ProvincePlacesScreen(province: province),
+                          builder: (context) => DetailHomePages(
+                            province: province.displayName,
+                          ),
                         ),
                       );
                     },
@@ -261,8 +283,9 @@ class HomeScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              ProvincePlacesScreen(province: province),
+                          builder: (context) => DetailHomePages(
+                            province: province.displayName,
+                          ),
                         ),
                       );
                     },
@@ -335,45 +358,6 @@ class ProvincesCard extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class ProvincePlacesScreen extends StatelessWidget {
-  final Province province;
-
-  const ProvincePlacesScreen({super.key, required this.province});
-
-  @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) =>
-          PlaceProvider()..fetchPlacesByProvince(province.displayName),
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(province.displayName),
-        ),
-        body: Consumer<PlaceProvider>(
-          builder: (context, placeProvider, child) {
-            if (placeProvider.isLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            return ListView.builder(
-              itemCount: placeProvider.places.length,
-              itemBuilder: (context, index) {
-                final place = placeProvider.places[index];
-                return ListTile(
-                  leading: Image.network(place.imageURL,
-                      width: 50, height: 50, fit: BoxFit.cover),
-                  title: Text(place.name),
-                  subtitle: Text(place.description),
-                );
-              },
-            );
-          },
-        ),
-      ),
     );
   }
 }

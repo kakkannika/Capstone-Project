@@ -50,4 +50,9 @@ class PlaceMockRepository implements PlaceRepository {
           .toList();
     });
   }
+
+  @override
+  List<Place> filterByProvince(List<Place> places, String provinceName) {
+    return places.where((place) => place.province == provinceName).toList();
+  }
 }

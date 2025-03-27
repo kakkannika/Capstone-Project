@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/ui/screens/home/detail_home_pages.dart';
 import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/screens/home/home_page.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppBar({super.key});

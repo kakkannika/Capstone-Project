@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/data/repository/firebase/place_firebase_repository.dart';
 import 'package:tourism_app/data/repository/mock/place_mock_repository.dart';
 import 'package:tourism_app/data/repository/place_repository.dart';
 import 'package:tourism_app/models/place/place.dart';
 
 class PlaceProvider extends ChangeNotifier {
-  final PlaceRepository _placeRepository = PlaceFirebaseRepository();
-    // final PlaceRepository _placeRepository = PlaceMockRepository();
-
+  // final PlaceRepository _placeRepository = PlaceFirebaseRepository();
+  final PlaceRepository _placeRepository = PlaceMockRepository();
 
   List<Place> _places = [];
   bool _isLoading = false;
@@ -34,6 +32,17 @@ class PlaceProvider extends ChangeNotifier {
     try {
       _places = await _placeRepository.fetchPlacesByProvince(province);
     } catch (e) {
+      _setLoading(false);
+      notifyListeners();
+    }
+  }
+
+  Future<void> filterByProvince(List<Place> places, String provinceName) async {
+    _setLoading(true);
+    notifyListeners();
+    try{
+      _places = await _placeRepository.filterByProvince(places, provinceName);
+    }catch (e){
       _setLoading(false);
       notifyListeners();
     }
