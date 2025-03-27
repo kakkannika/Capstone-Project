@@ -11,7 +11,7 @@ import 'package:tourism_app/models/user/user_preference.dart';
 import 'package:tourism_app/data/repository/authentication_repository.dart';
 import 'package:tourism_app/data/repository/firebase/auth_firebase_repository.dart';
 import 'package:tourism_app/ui/screens/auth/login_screen.dart';
-import 'package:tourism_app/ui/screens/home/detail_home_pages.dart';
+import 'package:tourism_app/ui/screens/home/home_page.dart';
 
 class AuthServiceProvider extends ChangeNotifier {
   final AuthenticationRepository _authRepository = AuthFirebaseRepository();

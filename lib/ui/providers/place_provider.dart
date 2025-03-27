@@ -5,7 +5,7 @@ import 'package:tourism_app/data/repository/place_repository.dart';
 import 'package:tourism_app/models/place/place.dart';
 
 class PlaceProvider extends ChangeNotifier {
-  final PlaceRepository _placeRepository = PlaceFirebaseRepository();
+  final PlaceRepository _placeRepository = PlaceMockRepository();
     // final PlaceRepository _placeRepository = PlaceMockRepository();
 
 

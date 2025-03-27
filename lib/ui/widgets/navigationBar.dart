@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:tourism_app/ui/screens/favorite/favorite_screen.dart';
-import 'package:tourism_app/ui/screens/home/detail_home_pages.dart';
+import 'package:tourism_app/ui/screens/home/home_page.dart';
 import 'package:tourism_app/ui/screens/profiles/profile_screen.dart';
 import 'package:tourism_app/ui/screens/trip/screen/trips_screen.dart';
 
@@ -70,13 +70,7 @@ class Navigationbar extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => const ProfileScreen()),
               );
               break;
-            // Add case for Budget tab when you implement it
-            // case 2:
-            //   Navigator.pushReplacement(
-            //     context,
-            //     MaterialPageRoute(builder: (context) => const BudgetScreen()),
-            //   );
-            //   break;
+         
           }
         },
       ),

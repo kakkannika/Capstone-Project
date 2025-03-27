@@ -8,8 +8,6 @@ import 'package:tourism_app/ui/providers/favorite_provider.dart';
 import 'package:tourism_app/ui/providers/place_provider.dart';
 import 'package:tourism_app/ui/providers/auth_provider.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
-import 'package:tourism_app/ui/screens/get_start_screen.dart';
-
 import 'ui/screens/home/home_page.dart';
 
 Future<void> main() async {
