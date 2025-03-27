@@ -45,6 +45,8 @@ class DataTables extends StatelessWidget {
                 DataColumn(label: Text('Name', style: DertamTextStyles.body)),
                 DataColumn(label: Text('Rating', style: DertamTextStyles.body)),
                 DataColumn(
+                    label: Text('Province', style: DertamTextStyles.body)),
+                DataColumn(
                     label: Text('Category', style: DertamTextStyles.body)),
                 DataColumn(label: Text('Fee', style: DertamTextStyles.body)),
                 DataColumn(label: Text('Hours', style: DertamTextStyles.body)),
@@ -66,6 +68,7 @@ class DataTables extends StatelessWidget {
                         DataCell(Text(place.name)),
                         DataCell(
                             Text(place.averageRating?.toString() ?? 'N/A')),
+                        DataCell(Text(place.province)),
                         DataCell(Text(place.category)),
                         DataCell(Text(
                             '\$${place.entranceFees?.toStringAsFixed(2) ?? 'N/A'}')),

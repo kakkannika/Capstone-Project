@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tourism_app/presentation/screens/dashboard/Screens/destination_screen.dart';
-import 'package:tourism_app/presentation/screens/dashboard/widgets/data_table.dart';
+import 'package:tourism_app/presentation/screens/dashboard/widgets/places_data_table.dart';
 import 'package:tourism_app/theme/theme.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -65,39 +65,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   SizedBox(width: DertamSpacings.m),
-                  // Notifications
-                  // IconButton(
-                  //   icon: Stack(
-                  //     children: [
-                  //       Icon(Icons.notifications_outlined),
-                  //       Positioned(
-                  //         right: 0,
-                  //         top: 0,
-                  //         child: Container(
-                  //           padding: EdgeInsets.all(2),
-                  //           decoration: BoxDecoration(
-                  //             color: Colors.red,
-                  //             borderRadius: BorderRadius.circular(6),
-                  //           ),
-                  //           constraints: BoxConstraints(
-                  //             minWidth: 12,
-                  //             minHeight: 12,
-                  //           ),
-                  //           child: Text(
-                  //             '5',
-                  //             style: TextStyle(
-                  //               color: Colors.white,
-                  //               fontSize: 8,
-                  //             ),
-                  //             textAlign: TextAlign.center,
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     ],
-                  //   ),
-                  //   onPressed: () {},
-                  // ),
-                  SizedBox(width: DertamSpacings.s),
                 ],
               ),
             ),
@@ -107,51 +74,50 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Statistics Cards
-                    Row(
-                      children: [
-                        Expanded(
-                          child: InfoCard(
-                            title: 'Site Traffic',
-                            value: '12',
-                            trend: '+2.5%',
-                            color: Colors.red[400]!,
-                            icon: Icons.trending_up,
-                          ),
-                        ),
-                        SizedBox(width: DertamSpacings.m),
-                        Expanded(
-                          child: InfoCard(
-                            title: 'Site Traffic',
-                            value: '278',
-                            trend: '+3.1%',
-                            color: Colors.blue[400]!,
-                            icon: Icons.bar_chart,
-                          ),
-                        ),
-                        SizedBox(width: DertamSpacings.m),
-                        Expanded(
-                          child: InfoCard(
-                            title: 'Site Traffic',
-                            value: '36%',
-                            trend: '+4.9%',
-                            color: Colors.green[400]!,
-                            icon: Icons.show_chart,
-                          ),
-                        ),
-                        SizedBox(width: DertamSpacings.m),
-                        Expanded(
-                          child: InfoCard(
-                            title: 'Site Traffic',
-                            value: '849',
-                            trend: '+1.2%',
-                            color: Colors.orange[400]!,
-                            icon: Icons.trending_up,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: DertamSpacings.l),
+                    // // Statistics Cards
+                    // Row(
+                    //   children: [
+                    //     Expanded(
+                    //       child: InfoCard(
+                    //         title: 'Site Traffic',
+                    //         value: '12',
+                    //         trend: '+2.5%',
+                    //         color: Colors.red[400]!,
+                    //         icon: Icons.trending_up,
+                    //       ),
+                    //     ),
+                    //     SizedBox(width: DertamSpacings.m),
+                    //     Expanded(
+                    //       child: InfoCard(
+                    //         title: 'Site Traffic',
+                    //         value: '278',
+                    //         trend: '+3.1%',
+                    //         color: Colors.blue[400]!,
+                    //         icon: Icons.bar_chart,
+                    //       ),
+                    //     ),
+                    //     SizedBox(width: DertamSpacings.m),
+                    //     Expanded(
+                    //       child: InfoCard(
+                    //         title: 'Site Traffic',
+                    //         value: '36%',
+                    //         trend: '+4.9%',
+                    //         color: Colors.green[400]!,
+                    //         icon: Icons.show_chart,
+                    //       ),
+                    //     ),
+                    //     SizedBox(width: DertamSpacings.m),
+                    //     Expanded(
+                    //       child: InfoCard(
+                    //         title: 'Site Traffic',
+                    //         value: '849',
+                    //         trend: '+1.2%',
+                    //         color: Colors.orange[400]!,
+                    //         icon: Icons.trending_up,
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
                     // Places Table
                     Container(
                       padding: EdgeInsets.all(DertamSpacings.m),

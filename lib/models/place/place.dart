@@ -5,6 +5,7 @@ class Place {
   final String id;
   final String name;
   final String description;
+  final String province;
   final GeoPoint location;
   final String imageURL;
   final String category;
@@ -16,6 +17,7 @@ class Place {
     required this.id,
     required this.name,
     required this.description,
+    required this.province,
     required this.location,
     required this.imageURL,
     required this.category,
@@ -42,6 +44,7 @@ class Place {
     return Place(
       id: doc.id,
       name: data['name'] ?? '',
+      province: data['province'] ?? '',
       description: data['description'] ?? '',
       location: locationPoint,
       imageURL: data['imageURL'] ?? '',
@@ -56,6 +59,7 @@ class Place {
     return {
       'name': name,
       'description': description,
+      'province': province,
       'location': location,
       'imageURL': imageURL,
       'category': category,

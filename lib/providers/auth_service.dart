@@ -76,16 +76,17 @@ class AuthService extends ChangeNotifier {
   }
 
   // Signin with Email & Password
-  Future<void> signinEmail({
+  Future<UserCredential> signinEmail({
     required String email,
     required String password,
     required BuildContext context,
   }) async {
     try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
-      await Future.delayed(const Duration(seconds: 1));
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+      final userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      return userCredential;
     } on FirebaseAuthException catch (e) {
       String message = '';
       if (e.code == 'invalid-email') {
@@ -94,6 +95,7 @@ class AuthService extends ChangeNotifier {
         message = 'Wrong password provided for that user';
       }
       _showToast(message);
+      throw e;
     }
   }
 

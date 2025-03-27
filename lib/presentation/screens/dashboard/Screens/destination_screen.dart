@@ -26,13 +26,13 @@ class _DestinationScreenState extends State<DestinationScreen> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _imageURLController = TextEditingController();
-  final _categoryController = TextEditingController();
   final _ratingController = TextEditingController();
   final _feesController = TextEditingController();
   final _hoursController = TextEditingController();
   final _latitudeController = TextEditingController();
   final _longitudeController = TextEditingController();
   PlaceCategory? selectedCategory;
+  Province? selectedProvince;
 
   bool _isLoading = false;
   String? _createdPlaceId;
@@ -45,9 +45,16 @@ class _DestinationScreenState extends State<DestinationScreen> {
     if (_isEditing) {
       // Populate form fields with existing place data
       _nameController.text = widget.place!.name;
+      selectedProvince = Province.values.firstWhere(
+        (p) => p.displayName == widget.place!.province,
+        orElse: () => Province.values.first,
+      );
+      selectedCategory = PlaceCategory.values.firstWhere(
+        (c) => c.displayName == widget.place!.category,
+        orElse: () => PlaceCategory.values.first,
+      );
       _descriptionController.text = widget.place!.description;
       _imageURLController.text = widget.place!.imageURL;
-      _categoryController.text = widget.place!.category;
       _ratingController.text = widget.place!.averageRating?.toString() ?? '';
       _feesController.text = widget.place!.entranceFees?.toString() ?? '';
       _hoursController.text = widget.place!.openingHours ?? '';
@@ -61,7 +68,6 @@ class _DestinationScreenState extends State<DestinationScreen> {
     _nameController.dispose();
     _descriptionController.dispose();
     _imageURLController.dispose();
-    _categoryController.dispose();
     _ratingController.dispose();
     _feesController.dispose();
     _hoursController.dispose();
@@ -70,69 +76,79 @@ class _DestinationScreenState extends State<DestinationScreen> {
     super.dispose();
   }
 
-  Future<void> _savePlace() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-
-      try {
-        final place = Place(
-          id: _isEditing ? widget.place!.id : '',
-          name: _nameController.text,
-          description: _descriptionController.text,
-          location: GeoPoint(
-            double.parse(_latitudeController.text),
-            double.parse(_longitudeController.text),
+  Widget _buildDropdown<T>({
+    required String label,
+    required T? value,
+    required List<T> items,
+    required String Function(T) getLabel,
+    required void Function(T?) onChanged,
+    String? Function(T?)? validator,
+  }) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      child: Container(
+        decoration: BoxDecoration(
+          color: DertamColors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: DropdownButtonFormField<T>(
+          value: value,
+          isExpanded: true,
+          dropdownColor: DertamColors.white,
+          decoration: InputDecoration(
+            labelText: label,
+            labelStyle: DertamTextStyles.body.copyWith(
+              color: DertamColors.textNormal,
+            ),
+            filled: true,
+            fillColor: DertamColors.white,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: Colors.grey.withOpacity(0.2),
+                width: 1,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: Colors.grey.withOpacity(0.2),
+                width: 1,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: DertamColors.primary,
+                width: 2,
+              ),
+            ),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           ),
-          imageURL: _imageURLController.text,
-          category: _categoryController.text,
-          entranceFees: double.tryParse(_feesController.text),
-          openingHours: _hoursController.text,
-          averageRating: double.tryParse(_ratingController.text),
-        );
-
-        if (_isEditing) {
-          await _placeCrudService.updatePlace(place);
-        } else {
-          await _placeCrudService.addPlace(place);
-        }
-
-        // Reset form after successful save
-        if (!_isEditing) {
-          _resetForm();
-        }
-
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(_isEditing
-                ? 'Place updated successfully!'
-                : 'Place added successfully!'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 2),
-          ),
-        );
-
-        setState(() {
-          _isLoading = false;
-        });
-      } catch (e) {
-        // Show error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                'Error ${_isEditing ? 'updating' : 'adding'} place: ${e.toString()}'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 2),
-          ),
-        );
-
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
+          items: items.map((T item) {
+            return DropdownMenuItem<T>(
+              value: item,
+              child: Text(
+                getLabel(item),
+                style: DertamTextStyles.body.copyWith(fontSize: 14),
+              ),
+            );
+          }).toList(),
+          onChanged: onChanged,
+          validator: validator,
+          menuMaxHeight: 300,
+          icon: Icon(Icons.arrow_drop_down, color: DertamColors.textNormal),
+        ),
+      ),
+    );
   }
 
   @override
@@ -170,6 +186,23 @@ class _DestinationScreenState extends State<DestinationScreen> {
                     SizedBox(height: DertamSpacings.m),
                     InputTextField(
                         label: 'Place Name', controller: _nameController),
+                    _buildDropdown<Province>(
+                      label: 'Province',
+                      value: selectedProvince,
+                      items: Province.values,
+                      getLabel: (province) => province.displayName,
+                      onChanged: (newValue) {
+                        setState(() {
+                          selectedProvince = newValue;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Please select a province';
+                        }
+                        return null;
+                      },
+                    ),
                     InputTextField(
                         label: 'Description',
                         controller: _descriptionController,
@@ -198,9 +231,24 @@ class _DestinationScreenState extends State<DestinationScreen> {
                     Row(
                       children: [
                         Expanded(
-                            child: InputTextField(
-                                label: 'Category',
-                                controller: _categoryController)),
+                          child: _buildDropdown<PlaceCategory>(
+                            label: 'Category',
+                            value: selectedCategory,
+                            items: PlaceCategory.values,
+                            getLabel: (category) => category.displayName,
+                            onChanged: (newValue) {
+                              setState(() {
+                                selectedCategory = newValue;
+                              });
+                            },
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please select a category';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
                         SizedBox(width: DertamSpacings.m),
                         Expanded(
                           child: InputTextField(
@@ -251,13 +299,86 @@ class _DestinationScreenState extends State<DestinationScreen> {
     );
   }
 
+  Future<void> _savePlace() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        final place = Place(
+          id: _isEditing ? widget.place!.id : '',
+          name: _nameController.text,
+          province: selectedProvince?.displayName ?? '',
+          description: _descriptionController.text,
+          location: GeoPoint(
+            double.parse(_latitudeController.text),
+            double.parse(_longitudeController.text),
+          ),
+          imageURL: _imageURLController.text,
+          category: selectedCategory?.displayName ?? '',
+          entranceFees: double.tryParse(_feesController.text),
+          openingHours: _hoursController.text,
+          averageRating: double.tryParse(_ratingController.text),
+        );
+
+        if (_isEditing) {
+          await _placeCrudService.updatePlace(place);
+        } else {
+          await _placeCrudService.addPlace(place);
+        }
+
+        // Reset form after successful save
+        if (!_isEditing) {
+          _resetForm();
+        }
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(_isEditing
+                ? 'Place updated successfully!'
+                : 'Place added successfully!'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        setState(() {
+          _isLoading = false;
+        });
+      } catch (e) {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Error ${_isEditing ? 'updating' : 'adding'} place: ${e.toString()}'),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
+          ),
+        );
+
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   void _resetForm() {
     if (_isEditing && widget.place != null) {
       // Reset to original values if editing
       _nameController.text = widget.place!.name;
+      selectedProvince = Province.values.firstWhere(
+        (p) => p.displayName == widget.place!.province,
+        orElse: () => Province.values.first,
+      );
+      selectedCategory = PlaceCategory.values.firstWhere(
+        (c) => c.displayName == widget.place!.category,
+        orElse: () => PlaceCategory.values.first,
+      );
       _descriptionController.text = widget.place!.description;
       _imageURLController.text = widget.place!.imageURL;
-      _categoryController.text = widget.place!.category;
       _ratingController.text = widget.place!.averageRating?.toString() ?? '';
       _feesController.text = widget.place!.entranceFees?.toString() ?? '';
       _hoursController.text = widget.place!.openingHours ?? '';
@@ -270,14 +391,14 @@ class _DestinationScreenState extends State<DestinationScreen> {
       _feesController.clear();
       _hoursController.clear();
       _imageURLController.clear();
-      _categoryController.clear();
       _ratingController.clear();
       _latitudeController.clear();
       _longitudeController.clear();
+      setState(() {
+        selectedCategory = null;
+        selectedProvince = null;
+      });
     }
-    setState(() {
-      selectedCategory = null;
-    });
   }
 }
 

@@ -47,7 +47,8 @@ class PlaceProvider with ChangeNotifier {
     try {
       QuerySnapshot querySnapshot =
           await _firestore.collection(_collection).get();
-      _places = querySnapshot.docs.map((doc) => Place.fromFirestore(doc)).toList();
+      _places =
+          querySnapshot.docs.map((doc) => Place.fromFirestore(doc)).toList();
       _filteredPlaces = List.from(_places);
       notifyListeners();
     } catch (e) {
@@ -163,6 +164,7 @@ class PlaceProvider with ChangeNotifier {
       Place newPlace = Place(
         id: newId,
         name: place.name,
+        province: place.province,
         description: place.description,
         location: place.location,
         imageURL: place.imageURL,
@@ -183,6 +185,7 @@ class PlaceProvider with ChangeNotifier {
       _setLoading(false);
     }
   }
+
   // Update an existing place
   Future<bool> updatePlace(Place place) async {
     _setLoading(true);
@@ -216,6 +219,7 @@ class PlaceProvider with ChangeNotifier {
       _setLoading(false);
     }
   }
+
   // Delete a place
   Future<bool> deletePlace(String id) async {
     _setLoading(true);
@@ -235,6 +239,7 @@ class PlaceProvider with ChangeNotifier {
       _setLoading(false);
     }
   }
+
   // Listen to real-time updates for all places
   void setupPlacesListener() {
     _firestore.collection(_collection).snapshots().listen((snapshot) {
@@ -246,6 +251,7 @@ class PlaceProvider with ChangeNotifier {
       print(_error);
     });
   }
+
   // Find places near location
   void findPlacesNearLocation(GeoPoint location, double radiusInKm) {
     // Basic implementation - ideally use a specialized geo library
@@ -260,6 +266,7 @@ class PlaceProvider with ChangeNotifier {
 
     notifyListeners();
   }
+
   // Helper function to calculate distance using Haversine formula
   double _calculateDistance(
       double lat1, double lon1, double lat2, double lon2) {
@@ -269,6 +276,7 @@ class PlaceProvider with ChangeNotifier {
         cos(lat1 * p) * cos(lat2 * p) * (1 - cos((lon2 - lon1) * p)) / 2;
     return 12742 * asin(sqrt(a)); // 2 * Earth radius (6371 km)
   }
+
   // Clear filters and show all places
   void clearFilters() {
     _filteredPlaces = List.from(_places);

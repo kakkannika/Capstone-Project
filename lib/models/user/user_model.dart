@@ -9,6 +9,7 @@ class AppUser {
   final String? photoUrl;
   final DateTime createdAt;
   final UserPreferences preferences;
+  final UserRole role;
 
   AppUser({
     required this.uid,
@@ -17,17 +18,21 @@ class AppUser {
     this.photoUrl,
     required this.createdAt,
     required this.preferences,
+    required this.role,
   });
 
   factory AppUser.fromFirestore(DocumentSnapshot doc) {
-    Map data = doc.data() as Map;
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     return AppUser(
       uid: doc.id,
-      email: data['email'],
+      email: data['email'] ?? '',
       displayName: data['displayName'],
       photoUrl: data['photoUrl'],
-      createdAt: data['createdAt'].toDate(),
-      preferences: UserPreferences.fromMap(data['preferences']),
+      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      preferences: UserPreferences.fromMap(data['preferences'] ?? {}),
+      role: data['role'] != null
+          ? UserRole.values[data['role'] as int]
+          : UserRole.user,
     );
   }
 
@@ -38,6 +43,32 @@ class AppUser {
       'photoUrl': photoUrl,
       'createdAt': createdAt,
       'preferences': preferences.toMap(),
+      'role': role.index,
     };
   }
+
+  AppUser copyWith({
+    String? uid,
+    String? email,
+    String? displayName,
+    String? photoUrl,
+    DateTime? createdAt,
+    UserPreferences? preferences,
+    UserRole? role,
+  }) {
+    return AppUser(
+      uid: uid ?? this.uid,
+      email: email ?? this.email,
+      displayName: displayName ?? this.displayName,
+      photoUrl: photoUrl ?? this.photoUrl,
+      createdAt: createdAt ?? this.createdAt,
+      preferences: preferences ?? this.preferences,
+      role: role ?? this.role,
+    );
+  }
+}
+
+enum UserRole {
+  admin,
+  user,
 }

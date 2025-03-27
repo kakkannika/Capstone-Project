@@ -18,6 +18,7 @@ class PlaceCrudService extends ChangeNotifier {
       DocumentReference docRef = await places.add({
         'name': place.name,
         'description': place.description,
+        'province': place.province,
         'location': GeoPoint(place.location.latitude, place.location.longitude),
         'imageURL': place.imageURL,
         'category': place.category,
@@ -39,6 +40,7 @@ class PlaceCrudService extends ChangeNotifier {
       await _firestore.collection(collectionName).doc(place.id).update({
         'name': place.name,
         'description': place.description,
+        'province': place.province,
         'location': place.location,
         'imageURL': place.imageURL,
         'category': place.category,
@@ -85,6 +87,7 @@ class PlaceCrudService extends ChangeNotifier {
           id: doc.id,
           name: data['name'] ?? '',
           description: data['description'] ?? '',
+          province: data['province'] ?? '',
           location: data['location'] as GeoPoint,
           imageURL: data['imageURL'] ?? '',
           category: data['category'] ?? '',
