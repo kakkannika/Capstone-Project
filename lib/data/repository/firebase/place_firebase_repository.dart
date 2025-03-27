@@ -92,7 +92,7 @@ class PlaceFirebaseRepository extends PlaceRepository {
       throw Exception('Error searching places: $e');
     }
   }
-  
+
   @override
   Future<List<Place>> fetchPlacesByProvince(String province) async {
     try {
@@ -101,19 +101,10 @@ class PlaceFirebaseRepository extends PlaceRepository {
           .where('province', isEqualTo: province)
           .get();
 
-      return querySnapshot.docs
-          .map((doc) => Place.fromFirestore(doc))
-          .toList();
+      return querySnapshot.docs.map((doc) => Place.fromFirestore(doc)).toList();
     } catch (e) {
       print('Error fetching places: $e');
       return [];
     }
   }
-  
-  @override
-  List<Place> filterByProvince(List<Place> places, String provinceName) {
-    // TODO: implement filterByProvince
-    throw UnimplementedError();
-  }
-
 }

@@ -37,6 +37,13 @@ enum Province {
   const Province(this.displayName);
 
   String get imagePath => 'assets/provinces/$name.jpg';
+  // In your Province enum
+  static Province fromDisplayName(String displayName) {
+    return Province.values.firstWhere(
+      (province) => province.displayName == displayName,
+      orElse: () => Province.phnomPenh, // default fallback
+    );
+  }
 }
 
 class HomeScreen extends StatelessWidget {
@@ -50,7 +57,6 @@ class HomeScreen extends StatelessWidget {
         (currentUser?.email.split('@')[0] ?? 'User');
     // Get all provinces as a list
     final List<Province> provinces = Province.values;
-    
 
     return Scaffold(
       body: SafeArea(

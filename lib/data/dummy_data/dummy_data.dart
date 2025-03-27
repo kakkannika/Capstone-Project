@@ -127,4 +127,19 @@ List<Place> dummyPlaces = [
     entranceFees: 37, // USD for a one-day pass
     openingHours: "5:00-17:30", province: 'Phnom Penh',
   ),
+
+   Place(
+    id: "H1",
+    name: "Royal Palace",
+    description:
+        "The Royal Palace in Phnom Penh is a stunning complex of buildings that serves as the official residence of the King of Cambodia. It's a must-see attraction for visitors to the city, offering a glimpse into the rich history and culture of Cambodia.",
+    location: GeoPoint(11.563915192723806, 104.93124361897165),
+    imageURL:
+        "https://media-cdn.tripadvisor.com/media/photo-c/2560x500/10/e4/ce/b1/20171006-093816-01-largejpg.jpg",
+    category: 'historical_place',
+    averageRating: 4.0,
+    entranceFees: 0.25,
+    openingHours: "8:00-17:00",
+    province: 'Takeo',
+  ),
 ];

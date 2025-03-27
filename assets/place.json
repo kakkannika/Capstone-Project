@@ -1,200 +1,152 @@
 [
     {
-        "id": "H1",
-        "name": "Royal Palace",
-        "description": "The Royal Palace in Phnom Penh is a stunning complex of buildings that serves as the official residence of the King of Cambodia. It's a must-see attraction for visitors to the city, offering a glimpse into the rich history and culture of Cambodia.",
-        "location": "11.563915192723806, 104.93124361897165",
-        "imageURL": "https://media-cdn.tripadvisor.com/media/photo-c/2560x500/10/e4/ce/b1/20171006-093816-01-largejpg.jpg",
-        "category": "historical_place",
-        "averageRating": 4.0,
-        "entranceFees": 0.25,
-        "openingHours": "8:00-17:00"
+      "id": "H1",
+      "name": "Royal Palace",
+      "description": "The Royal Palace in Phnom Penh is a stunning complex of buildings that serves as the official residence of the King of Cambodia. It's a must-see attraction for visitors to the city, offering a glimpse into the rich history and culture of Cambodia.",
+      "location": {
+        "latitude": 11.563915192723806,
+        "longitude": 104.93124361897165
+      },
+      "imageURL": "https://media-cdn.tripadvisor.com/media/photo-c/2560x500/10/e4/ce/b1/20171006-093816-01-largejpg.jpg",
+      "category": "historical_place",
+      "averageRating": 4.0,
+      "entranceFees": 0.25,
+      "openingHours": "8:00-17:00",
+      "province": "Phnom Penh"
     },
     {
-        "id": "H2",
-        "name": "Wat Phnom",
-        "description": "Wat Phnom is a Buddhist temple in Doun Penh, Phnom Penh. It is a pagoda, that symbolizes the name of Phnom Penh, and a historical site that is part of the Khmer national identity. Wat Phnom has a total height of 46 meters.",
-        "location": "11.57559165235394, 104.92279173774908",
-        "imageURL": "https://media-cdn.tripadvisor.com/media/photo-o/09/c7/fc/16/pagoda-wat-phnom.jpg",
-        "category": "historical_place",
-        "averageRating": 4.0,
-        "entranceFees": 0,
-        "openingHours": "6:00-18:00"
+      "id": "H2",
+      "name": "Wat Phnom",
+      "description": "Wat Phnom is a Buddhist temple in Doun Penh, Phnom Penh. It is a pagoda, that symbolizes the name of Phnom Penh, and a historical site that is part of the Khmer national identity. Wat Phnom has a total height of 46 meters.",
+      "location": {
+        "latitude": 11.57559165235394,
+        "longitude": 104.92279173774908
+      },
+      "imageURL": "https://media-cdn.tripadvisor.com/media/photo-o/09/c7/fc/16/pagoda-wat-phnom.jpg",
+      "category": "historical_place",
+      "averageRating": 4.0,
+      "entranceFees": 0,
+      "openingHours": "6:00-18:00",
+      "province": "Phnom Penh"
     },
     {
-        "id": "H3",
-        "name": "Independence Monument",
-        "description": "The Independence Monument in Phnom Penh, capital of Cambodia, was built in 1958 to memorialize Cambodia's independence from France in 1953. It stands on a roundabout in the intersection of Norodom Boulevard and Sihanouk Boulevard in the center of the city.",
-        "location": "11.556666160296219, 104.928456882754",
-        "imageURL": "https://media-cdn.tripadvisor.com/media/photo-o/0b/d7/46/a0/the-independence-monument.jpg",
-        "category": "historical_place",
-        "averageRating": 3.5,
-        "entranceFees": 0,
-        "openingHours": "24h"
+      "id": "H3",
+      "name": "Independence Monument",
+      "description": "The Independence Monument in Phnom Penh, capital of Cambodia, was built in 1958 to memorialize Cambodia's independence from France in 1953. It stands on a roundabout in the intersection of Norodom Boulevard and Sihanouk Boulevard in the center of the city.",
+      "location": {
+        "latitude": 11.556666160296219,
+        "longitude": 104.928456882754
+      },
+      "imageURL": "https://media-cdn.tripadvisor.com/media/photo-o/0b/d7/46/a0/the-independence-monument.jpg",
+      "category": "historical_place",
+      "averageRating": 3.5,
+      "entranceFees": 0,
+      "openingHours": "24h",
+      "province": "Phnom Penh"
     },
     {
-        "id": "MU1",
-        "name": "National Museum",
-        "description": "The National Museum of Cambodia is Cambodia's largest museum of cultural history and is the country's leading historical and archaeological museum. It is located in Chey Chumneas, Phnom Penh.",
-        "location": "11.565927865526413, 104.92916785309234",
-        "imageURL": "https://media-cdn.tripadvisor.com/media/photo-o/0c/aa/6a/cb/caption.jpg",
-        "category": "museum",
-        "averageRating": 4.0,
-        "entranceFees": 0.25,
-        "openingHours": "8:00-17:00"
+      "id": "MU1",
+      "name": "National Museum",
+      "description": "The National Museum of Cambodia is Cambodia's largest museum of cultural history and is the country's leading historical and archaeological museum. It is located in Chey Chumneas, Phnom Penh.",
+      "location": {
+        "latitude": 11.565927865526413,
+        "longitude": 104.92916785309234
+      },
+      "imageURL": "https://media-cdn.tripadvisor.com/media/photo-o/0c/aa/6a/cb/caption.jpg",
+      "category": "museum",
+      "averageRating": 4.0,
+      "entranceFees": 0.25,
+      "openingHours": "8:00-17:00",
+      "province": "Phnom Penh"
     },
     {
-        "id": "MU2",
-        "name": "Choeung Ek Genocidal Museum",
-        "description": "Choeung Ek is a former orchard in Dangkao, Phnom Penh, Cambodia, that was used as a Killing Field between 1975 and 1979 by the Khmer Rouge in perpetrating the Cambodian genocide. Situated about 17 kilometres south of the city centre, it was attached to the Tuol Sleng detention centre.",
-        "location": "11.484261216788582, 104.9012759954193",
-        "imageURL": "https://media-cdn.tripadvisor.com/media/photo-m/1280/19/f9/74/83/killing-field.jpg",
-        "category": "museum",
-        "averageRating": 4.5,
-        "entranceFees": 0,
-        "openingHours": "8:00-17:00"
+      "id": "MU2",
+      "name": "Choeung Ek Genocidal Museum",
+      "description": "Choeung Ek is a former orchard in Dangkao, Phnom Penh, Cambodia, that was used as a Killing Field between 1975 and 1979 by the Khmer Rouge in perpetrating the Cambodian genocide. Situated about 17 kilometers south of the city centre, it was attached to the Tuol Sleng detention centre.",
+      "location": {
+        "latitude": 11.484261216788582,
+        "longitude": 104.9012759954193
+      },
+      "imageURL": "https://media-cdn.tripadvisor.com/media/photo-m/1280/19/f9/74/83/killing-field.jpg",
+      "category": "museum",
+      "averageRating": 4.5,
+      "entranceFees": 0,
+      "openingHours": "8:00-17:00",
+      "province": "Phnom Penh"
     },
     {
-        "id": "MU3",
-        "name": "Sosoro Museum",
-        "description": "Sosoro Museum, officially known as the National Bank of Cambodia’s Sosoro Museum, showcases Cambodia’s economic and monetary history. It provides visitors with interactive exhibits and educational displays about Cambodia’s financial evolution.",
-        "location": "11.574398031290212, 104.9254118665849",
-        "imageURL": "https://media-cdn.tripadvisor.com/media/photo-o/1b/2c/3d/4e/sosoro-museum.jpg",
-        "category": "museum",
-        "averageRating": 4.3,
-        "entranceFees": 0,
-        "openingHours": "9:00-17:00"
+      "id": "MA1",
+      "name": "Phnom Penh's Night Market",
+      "description": "The Phnom Penh Night Market was a fun way to spend an evening. It's lively, filled with food stalls, clothing vendors, and a vibrant local crowd.",
+      "location": {
+        "latitude": 11.574160706064237,
+        "longitude": 104.92720442425656
+      },
+      "imageURL": "https://media-cdn.tripadvisor.com/media/photo-o/02/4e/18/79/filename-120126-nightmarket.jpg",
+      "category": "market",
+      "averageRating": 3.5,
+      "entranceFees": 0,
+      "openingHours": "17:00-24:00",
+      "province": ""
     },
     {
-        "id": "MA1",
-        "name": "Phnom Penh's Night Market",
-        "description": "The Phnom Penh Night Market was a fun way to spend an evening. It's lively, filled with food stalls, clothing vendors, and a vibrant local crowd.",
-        "location": "11.574160706064237, 104.92720442425656",
-        "imageURL": "https://media-cdn.tripadvisor.com/media/photo-o/02/4e/18/79/filename-120126-nightmarket.jpg",
-        "category": "market",
-        "averageRating": 3.5,
-        "entranceFees": 0,
-        "openingHours": "17:00-24:00"
+      "id": "MA2",
+      "name": "Central Market",
+      "description": "The Central Market, known as Phsar Thmey in Khmer, stands as a beacon of Phnom Penh’s rich culture and history. Opened in 1937, this market is not just a shopping destination but a landmark of architectural splendor. Its distinctive yellow dome, one of the largest in Asia, crowns a hub of bustling activity and cultural exchange.",
+      "location": {
+        "latitude": 11.569520456088785,
+        "longitude": 104.92090799542073
+      },
+      "imageURL": "https://media-cdn.tripadvisor.com/media/photo-o/09/0b/c3/fd/central-market.jpg",
+      "category": "market",
+      "averageRating": 4.0,
+      "entranceFees": 0,
+      "openingHours": "17:00-24:00",
+      "province": ""
     },
     {
-        "id": "MA2",
-        "name": "Central Market",
-        "description": "The Central Market, known as Phsar Thmey in Khmer, stands as a beacon of Phnom Penh’s rich culture and history. Opened in 1937, this market is not just a shopping destination but a landmark of architectural splendor. Its distinctive yellow dome, one of the largest in Asia, crowns a hub of bustling activity and cultural exchange.",
-        "location": "11.569520456088785, 104.92090799542073",
-        "imageURL": "https://media-cdn.tripadvisor.com/media/photo-o/09/0b/c3/fd/central-market.jpg",
-        "category": "market",
-        "averageRating": 4.0,
-        "entranceFees": 0,
-        "openingHours": "17:00-24:00"
+      "id": "MA3",
+      "name": "Boeung Keng Kang 1 (BKK1) Market",
+      "description": "Boeung Keng Kang 1 (BKK1) Market is a trendy shopping area in Phnom Penh, known for its boutique shops, organic markets, and a variety of local and international food stalls. It’s a favorite spot for expats and young professionals.",
+      "location": {
+        "latitude": 11.547041964083396,
+        "longitude": 104.92568726933473
+      },
+      "imageURL": "https://media-cdn.tripadvisor.com/media/photo-o/1a/2b/3c/4d/bkk1-market.jpg",
+      "category": "market",
+      "averageRating": 4.1,
+      "entranceFees": 0,
+      "openingHours": "7:00-20:00",
+      "province": "Phnom Penh"
     },
     {
-        "id": "MA3",
-        "name": "Boeung Keng Kang 1 (BKK1) Market",
-        "description": "Boeung Keng Kang 1 (BKK1) Market is a trendy shopping area in Phnom Penh, known for its boutique shops, organic markets, and a variety of local and international food stalls. It’s a favorite spot for expats and young professionals.",
-        "location": "11.547041964083396, 104.92568726933473",
-        "imageURL": "https://media-cdn.tripadvisor.com/media/photo-o/1a/2b/3c/4d/bkk1-market.jpg",
-        "category": "market",
-        "averageRating": 4.1,
-        "entranceFees": 0,
-        "openingHours": "7:00-20:00"
+      "id": "ANG1",
+      "name": "Angkor Wat",
+      "description": "Angkor Wat is the largest religious monument in the world, located in Siem Reap, Cambodia. This iconic temple, built in the 12th century, is a symbol of Khmer heritage and attracts millions of visitors each year.",
+      "location": {
+        "latitude": 13.4125,
+        "longitude": 103.8667
+      },
+      "imageURL": "https://upload.wikimedia.org/wikipedia/commons/a/a8/Angkor_Wat_at_Sunrise.jpg",
+      "category": "historical_place",
+      "averageRating": 4.8,
+      "entranceFees": 37,
+      "openingHours": "5:00-17:30",
+      "province": "Phnom Penh"
     },
     {
-        "id": "E1",
-        "name": "Floatation",
-        "description": "Mekong Floating Bungalows from 2006 to 2018, Floatation off the Areksat banks from 2018 to 2020, and now Floatation anchored in Koh Pich (Diamond Island): the one-and-only floating entertainment venue in Cambodia's capital city is more buoyant than ever.",
-        "location": "11.54950158145788, 104.94511538007694",
-        "imageURL": "https://media-cdn.tripadvisor.com/media/photo-o/2d/49/78/cd/floatation-in-the-evening.jpg",
-        "category": "entertain_attraction",
-        "averageRating": 4.5,
-        "entranceFees": 0,
-        "openingHours": "8:00-17:00"
-    },
-    {
-        "id": "E2",
-        "name": "Bassac Lane",
-        "description": "Bassac Lane is the famous bar street in Phnom Penh. This is where you’ll find some of the city’s best bars, but Bassac Lane also has a very good selection of restaurants with food from all corners of the world.",
-        "location": "11.553087014785012, 104.92971136658457",
-        "imageURL": "https://media-cdn.tripadvisor.com/media/photo-o/0e/10/57/e1/bassac-lane.jpg",
-        "category": "entertain_attraction",
-        "averageRating": 4.5,
-        "entranceFees": 0,
-        "openingHours": "8:00-20:00"
-    },
-    {
-        "id": "E3",
-        "name": "Sisowath Quay",
-        "description": "Sisowath Quay is a 3-kilometre riverfront strip along the Tonlé Sap River in Phnom Penh, Cambodia. Riverfront.",
-        "location": "11.574238331314342, 104.92779739542078",
-        "imageURL": "https://media-cdn.tripadvisor.com/media/photo-o/01/d7/03/eb/sisowath-quay.jpg",
-        "category": "entertain_attraction",
-        "averageRating": 4.0,
-        "entranceFees": 0,
-        "openingHours": "24h"
-    },
-    {
-        "id": "H1",
-        "name": "Sokha Phnom Penh-World Hotel",
-        "description":"Sokha Phnom Penh is strategically located on Chroy Changvar peninsula, opposite to the Royal Palace and approximately 13 km from Phnom Penh International Airport. Offering breathtaking view of the majestic Royal Palace, Chaktomuk River and a wide sweeping view of the untouched greenery rural beauty opposite of Phnom Penh capital, Sokha Phnom Penh provides the peaceful, less busy side of the congested capital.",
-        "location": "11.568713206281814, 104.93756782610738",
-        "imageURL": "https://media-cdn.tripadvisor.com/media/photo-m/1280/19/55/4b/d4/swimming-pool.jpg",
-        "category": "hotel",
-        "averageRating": 4.0,
-        "entranceFees": 0,
-        "openingHours": "24h"
-    },
-    {
-        "id": "H2",
-        "name": "The Peninsula Phnom Penh",
-        "description":"Situated in Phnom Penh, 3.1 km from Wat Phnom, The Peninsula Phnom Penh features accommodation with an outdoor swimming pool, free private parking, a fitness centre and a garden. With a shared lounge, the property also has a terrace, as well as a bar. The accommodation provides a 24-hour front desk, airport transfers, a shared kitchen and free WiFi throughout the property.\n\nAt the hotel rooms have air conditioning, a seating area, a flat-screen TV with satellite channels, a kitchen, a dining area, a safety deposit box and a private bathroom with a shower, free toiletries and a hairdryer. The Peninsula Phnom Penh offers some rooms with river views, and rooms come with a balcony. The rooms will provide guests with a fridge.\n\nBreakfast is available each morning, and includes continental, Full English/Irish and American options.\n\nSpa and wellness facilities including a sauna and a hot tub are at guests' disposal during their stay at the accommodation. You can play billiards at The Peninsula Phnom Penh, and bike hire and car hire are available.\n\nVattanac Capital is 3.2 km from the hotel, while Riverside Park is 3.9 km from the property. Phnom Penh International Airport is 12 km away.",
-        "location": "11.589497839104636, 104.928647195421",
-        "imageURL": "https://media-cdn.tripadvisor.com/media/photo-m/1280/26/79/81/c0/the-peninsula-hotel-and.jpg",
-        "category": "hotel",
-        "averageRating": 5.0,
-        "entranceFees": 0,
-        "openingHours": "24h"
-    },
-    {
-        "id": "H3",
-        "name": "Rosewood Phnom Penh",
-        "description":"Rosewood Phnom Penh occupies the top 14 floors of Vattanac Capital Tower, soaring 188 meters above the heart of the city. The hotel offers unobstructed panoramic views of Phnom Penh, including the fabled Mekong River. It features 175 rooms and suites, six dining venues, Sense, A Rosewood Spa, an indoor lap swimming pool, and The Pavilion, the brand's signature residential-style event space.",
-        "location": "11.573621174193876, 104.91926928007743",
-        "imageURL": "https://media-cdn.tripadvisor.com/media/photo-m/1280/2c/1b/43/d2/entrance-driveway.jpg",
-        "category": "hotel",
-        "averageRating": 5.0,
-        "entranceFees": 0,
-        "openingHours": "24h"
-    },
-    {
-        "id": "R1",
-        "name": "La. Chronique cafe & bistro",
-        "description": "La. Chronique Cafe & Bistro offers a cozy ambiance with a variety of French and Western dishes, including light meals, pastries, and coffee. It's a great spot for breakfast or casual dining with options that cater to different tastes.",
-        "location": "11.540701536378224, 104.9169225242561",
-        "imageURL": "https://media-cdn.tripadvisor.com/media/photo-o/0e/18/0a/68/something-from-us.jpg",
-        "category": "restaurant",
-        "averageRating": 4.0,
-        "entranceFees": 0,
-        "openingHours": "7:00-21:00"
-    },
-    {
-        "id": "R2",
-        "name": "Kabbas Restaurant",
-        "description":"Kabbas offers both Cambodian and Western cuisine, with an emphasis on fresh ingredients. Known for its traditional Cambodian dishes, it provides a casual dining experience with friendly service.",
-        "location": "11.566941076207206, 104.92762653774892",
-        "imageURL": "https://media-cdn.tripadvisor.com/media/photo-o/19/3a/8f/ad/small-place-but-very.jpg",
-        "category": "restaurant",
-        "averageRating": 4.5,
-        "entranceFees": 0,
-        "openingHours": "10:00-22:00"
-    },
-    {
-        "id": "R3",
-        "name": "Topaz",
-        "description":"Topaz is a fine dining restaurant known for its French and European cuisine, offering an elegant setting and exceptional service.",
-        "location": "11.548665986429883, 104.92853431076368",
-        "imageURL": "https://media-cdn.tripadvisor.com/media/photo-m/1280/14/e2/ec/a7/for-special-occasions.jpg",
-        "category": "restaurant",
-        "averageRating": 4.5,
-        "entranceFees": 0,
-        "openingHours": "11:00-22:00"
+      "id": "H1",
+      "name": "Royal Palace",
+      "description": "The Royal Palace in Phnom Penh is a stunning complex of buildings that serves as the official residence of the King of Cambodia. It's a must-see attraction for visitors to the city, offering a glimpse into the rich history and culture of Cambodia.",
+      "location": {
+        "latitude": 11.563915192723806,
+        "longitude": 104.93124361897165
+      },
+      "imageURL": "https://media-cdn.tripadvisor.com/media/photo-c/2560x500/10/e4/ce/b1/20171006-093816-01-largejpg.jpg",
+      "category": "historical_place",
+      "averageRating": 4.0,
+      "entranceFees": 0.25,
+      "openingHours": "8:00-17:00",
+      "province": "Takeo"
     }
-]
+  ]

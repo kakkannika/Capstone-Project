@@ -12,13 +12,12 @@ abstract class TripRepository {
   Future<Trip?> getTripById(String tripId);
 
   Future<List<Trip>> getTripsForCurrentUser();
-
+  
   Future<void> addPlaceToDay({
     required String tripId,
     required String dayId, // Should be in format 'day1', 'day2', etc.
     required String placeId,
   });
-
   Future<void> removePlaceFromDay({
     required String tripId,
     required String dayId,

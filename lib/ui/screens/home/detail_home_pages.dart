@@ -42,17 +42,21 @@ class _HomeScreenState extends State<DetailHomePages> {
   @override
   Widget build(BuildContext context) {
     return Consumer<PlaceProvider>(builder: (context, placeProvider, child) {
-      // Filter places based on selected category
-      final filteredPlaces = selectedCategory == 'all'
-          ? placeProvider.places
-          : placeProvider.places
-              .where((place) => place.category == selectedCategory)
-              .toList();
+      final province = Province.fromDisplayName(widget.province);
 
-      // Fileter popular places
+      // Filter popular places based on the province
       final popularPlaces = placeProvider.places
-          .where((place) => place.averageRating >= 4)
+          .where((place) =>
+              place.averageRating >= 4 && place.province == widget.province)
           .take(6)
+          .toList();
+
+      final filteredPlaces = placeProvider.places
+          .where((place) =>
+              place.province == widget.province) // Filter by province
+          .where((place) =>
+              selectedCategory == 'all' ||
+              place.category == selectedCategory) // Filter by category
           .toList();
 
       return Scaffold(
@@ -93,7 +97,7 @@ class _HomeScreenState extends State<DetailHomePages> {
                 Stack(
                   children: [
                     Image.asset(
-                      'assets/place_images/Angkor_wat.jpg',
+                      province.imagePath,
                       width: double.infinity,
                       height: 300,
                       fit: BoxFit.cover,
@@ -112,6 +116,7 @@ class _HomeScreenState extends State<DetailHomePages> {
                 ),
 
                 // Popular Destination Section
+                // Popular Destination Section
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
@@ -128,61 +133,69 @@ class _HomeScreenState extends State<DetailHomePages> {
                   ),
                 ),
 
-                // Popular Destination Cards
-                SizedBox(
-                  height: 150,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: popularPlaces.length,
-                    itemBuilder: (context, index) {
-                      return Stack(
-                        children: [
-                          GestureDetector(
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DetailEachPlace(
-                                    placeId: popularPlaces[index].id),
-                              ),
-                            ),
-                            child: Container(
-                              width: 280,
-                              margin: const EdgeInsets.only(right: 16),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                image: DecorationImage(
-                                  image: NetworkImage(
-                                      popularPlaces[index].imageURL),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          ),
-                          // Favorite button
-                          Consumer<FavoriteProvider>(
-                            builder: (context, favoriteProvider, _) {
-                              // Get initial state but don't listen to further changes
-                              return Positioned(
-                                top: 8,
-                                right: 24,
-                                child: Container(
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.white,
+// If there are popular places, show the list; otherwise, show a message
+                popularPlaces.isNotEmpty
+                    ? SizedBox(
+                        height: 150,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          itemCount: popularPlaces.length,
+                          itemBuilder: (context, index) {
+                            return Stack(
+                              children: [
+                                GestureDetector(
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => DetailEachPlace(
+                                          placeId: popularPlaces[index].id),
+                                    ),
                                   ),
-                                  child: _FavoriteButton(
-                                    placeId: popularPlaces[index].id,
+                                  child: Container(
+                                    width: 280,
+                                    margin: const EdgeInsets.only(right: 16),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      image: DecorationImage(
+                                        image: NetworkImage(
+                                            popularPlaces[index].imageURL),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              );
-                            },
+                                Consumer<FavoriteProvider>(
+                                  builder: (context, favoriteProvider, _) {
+                                    return Positioned(
+                                      top: 8,
+                                      right: 24,
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.white,
+                                        ),
+                                        child: _FavoriteButton(
+                                          placeId: popularPlaces[index].id,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Center(
+                          child: Text(
+                            'No popular destinations available in ${widget.province}.',
+                            style: TextStyle(fontSize: 16, color: Colors.grey),
                           ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
+                        ),
+                      ),
 
                 // Explore Destination Section
                 const Padding(
@@ -203,12 +216,12 @@ class _HomeScreenState extends State<DetailHomePages> {
                   child: Row(
                     children: [
                       'all',
-                      'museum',
-                      'market',
-                      'entertain_attraction',
-                      'historical_place',
-                      'restaurant',
-                      'hotel',
+                      'Museum',
+                      'Market',
+                      'Entertain Attraction',
+                      'Historical Place',
+                      'Restaurant',
+                      'Hotel',
                     ]
                         .map((category) => Padding(
                               padding:
