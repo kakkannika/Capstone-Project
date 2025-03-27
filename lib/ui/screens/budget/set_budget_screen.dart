@@ -231,94 +231,97 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(DertamSpacings.m),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Center(
-                      child: Text(
-                        "Set Your Budget",
-                        style: DertamTextStyles.heading.copyWith(
-                          color: DertamColors.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: DertamSpacings.xl),
-                    Text(
-                      "Define your total budget in ${widget.selectedCurrency}.",
-                      style: DertamTextStyles.body.copyWith(
-                        color: DertamColors.black.withOpacity(0.7),
-                      ),
-                    ),
-                    const SizedBox(height: DertamSpacings.m),
-                    DertamTextfield(
-                      label: "Total Budget (${widget.selectedCurrency})",
-                      controller: _totalBudgetController,
-                      keyboardType: TextInputType.number,
-                      borderColor: DertamColors.greyLight,
-                    ),
-
-                    // Display daily budget calculation
-                    if (_trip != null && _trip!.days.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: DertamSpacings.m),
+                    Expanded(
+                      child: SingleChildScrollView(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              "Trip Duration: $_numberOfDays days",
-                              style: DertamTextStyles.body.copyWith(
-                                color: DertamColors.grey,
-                                fontWeight: FontWeight.w500,
+                            Center(
+                              child: Text(
+                                "Set Your Budget",
+                                style: DertamTextStyles.heading.copyWith(
+                                  color: DertamColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: DertamSpacings.xl),
+                            Text(
+                              "Define your total budget in ${widget.selectedCurrency}.",
+                              style: DertamTextStyles.body.copyWith(
+                                color: DertamColors.black.withOpacity(0.7),
+                              ),
+                            ),
+                            const SizedBox(height: DertamSpacings.m),
                             DertamTextfield(
                               label:
-                                  "Daily Budget (${widget.selectedCurrency})",
-                              controller: _dailyBudgetController,
+                                  "Total Budget (${widget.selectedCurrency})",
+                              controller: _totalBudgetController,
                               keyboardType: TextInputType.number,
                               borderColor: DertamColors.greyLight,
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                TextButton.icon(
-                                  icon: Icon(
-                                    Icons.refresh,
-                                    color: DertamColors.primary,
-                                    size: 18,
-                                  ),
-                                  label: Text(
-                                    "Reset to auto-calculated",
-                                    style: TextStyle(
-                                      color: DertamColors.primary,
-                                      fontSize: 12,
+                            if (_trip != null && _trip!.days.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: DertamSpacings.m),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Trip Duration: $_numberOfDays days",
+                                      style: DertamTextStyles.body.copyWith(
+                                        color: DertamColors.grey,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
-                                  ),
-                                  onPressed: () {
-                                    // Reset to auto-calculated value
-                                    setState(() {
-                                      _dailyBudgetManuallyEdited = false;
-                                      _updateDailyBudget();
-                                    });
-                                  },
+                                    const SizedBox(height: 16),
+                                    DertamTextfield(
+                                      label:
+                                          "Daily Budget (${widget.selectedCurrency})",
+                                      controller: _dailyBudgetController,
+                                      keyboardType: TextInputType.number,
+                                      borderColor: DertamColors.greyLight,
+                                    ),
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: TextButton.icon(
+                                        icon: Icon(
+                                          Icons.refresh,
+                                          color: DertamColors.primary,
+                                          size: 18,
+                                        ),
+                                        label: Text(
+                                          "Reset to auto-calculated",
+                                          style: TextStyle(
+                                            color: DertamColors.primary,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            _dailyBudgetManuallyEdited = false;
+                                            _updateDailyBudget();
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      "Note: Daily budget is automatically calculated but you can adjust it manually if needed.",
+                                      style: DertamTextStyles.body.copyWith(
+                                        color: DertamColors.grey,
+                                        fontSize: 12,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              "Note: Daily budget is automatically calculated but you can adjust it manually if needed.",
-                              style: DertamTextStyles.body.copyWith(
-                                color: DertamColors.grey,
-                                fontSize: 12,
-                                fontStyle: FontStyle.italic,
                               ),
-                            ),
                           ],
                         ),
                       ),
-
-                    const Spacer(),
+                    ),
                     Center(
                       child: _isLoading
                           ? const CircularProgressIndicator()

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:tourism_app/data/repository/budget_repository.dart';
 import 'package:tourism_app/data/repository/firebase/budget_firebase_repository.dart';
 import 'package:tourism_app/models/budget/budget.dart';
 import 'package:tourism_app/models/budget/expend.dart';
@@ -7,14 +8,14 @@ import 'package:tourism_app/models/trips/trips.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
 
 class BudgetProvider with ChangeNotifier {
-  final BudgetFirebaseRepository _budgetService = BudgetFirebaseRepository();
+  final BudgetRepository _budgetService = BudgetFirebaseRepository();
   final TripProvider _tripProvider = TripProvider();
 
   Budget? _selectedBudget;
   bool _isLoading = false;
   String? _error;
   StreamSubscription<Budget?>? _budgetSubscription;
-  
+
   // Use static to ensure it persists across instances and rebuilds
   static bool _hasShownOverBudgetWarning = false;
 
@@ -22,7 +23,7 @@ class BudgetProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
   bool get hasShownOverBudgetWarning => _hasShownOverBudgetWarning;
-  
+
   // Method to set the flag when warning has been shown
   void setOverBudgetWarningShown(bool value) {
     _hasShownOverBudgetWarning = value;
@@ -42,33 +43,30 @@ class BudgetProvider with ChangeNotifier {
   // Calculate daily budget based on total budget and number of days
   double calculateDailyBudget(double totalBudget, int numberOfDays) {
     if (numberOfDays <= 0) numberOfDays = 1; // Avoid division by zero
-    
+
     // Debug information - remove in production
-    print("Calculating daily budget:");
-    print("Total budget: $totalBudget");
-    print("Number of days: $numberOfDays");
-    print("Result: ${totalBudget / numberOfDays}");
-    
+
     return totalBudget / numberOfDays;
   }
 
   // Get the available budget for today
   double getAvailableBudgetForToday(Trip trip, Budget budget) {
     if (trip.days.isEmpty) return 0.0;
-    
+
     // Find which day of the trip today is
     final today = DateTime.now();
     final todayDate = DateTime(today.year, today.month, today.day);
-    final tripStartDate = DateTime(trip.startDate.year, trip.startDate.month, trip.startDate.day);
-    
+    final tripStartDate =
+        DateTime(trip.startDate.year, trip.startDate.month, trip.startDate.day);
+
     // Calculate days since trip started
     final difference = todayDate.difference(tripStartDate).inDays;
-    
+
     // If today is before trip starts or after trip ends, no budget available
     if (difference < 0 || difference >= trip.days.length) {
       return 0.0;
     }
-    
+
     // Return daily budget for today
     return budget.dailyBudget;
   }
@@ -79,7 +77,7 @@ class BudgetProvider with ChangeNotifier {
     if (trip.days.isEmpty || dayIndex < 0 || dayIndex >= trip.days.length) {
       return 0.0;
     }
-    
+
     // For all days, return the daily budget
     return budget.dailyBudget;
   }
@@ -90,7 +88,7 @@ class BudgetProvider with ChangeNotifier {
     if (trip.days.isEmpty || dayIndex < 0 || dayIndex >= trip.days.length) {
       return false;
     }
-    
+
     // All days are now available
     return true;
   }
@@ -124,7 +122,7 @@ class BudgetProvider with ChangeNotifier {
   // Add a method to reset the warning flag (useful for testing)
   void resetOverBudgetWarning() {
     _hasShownOverBudgetWarning = false;
-    print("Over budget warning flag has been reset");
+    _setError("Over budget warning flag has been reset");
   }
 
   // Start listening to a budget stream for a specific trip
@@ -134,54 +132,47 @@ class BudgetProvider with ChangeNotifier {
 
     // Cancel any existing subscription
     _budgetSubscription?.cancel();
-    
+
     // Don't reset the warning flag - we want it to persist across all trips in a session
     // _hasShownOverBudgetWarning = false; - removing this line
-    
+
     // Start a new subscription
     _budgetSubscription = _budgetService.getBudgetByTripIdStream(tripId).listen(
       (budget) {
         _selectedBudget = budget;
-        
+
         // Debug information - remove in production
         if (budget != null) {
-          print("Budget updated from Firestore:");
-          print("Total: ${budget.total}");
-          print("Daily budget: ${budget.dailyBudget}");
-          print("Remaining: ${budget.remaining}");
-          
           // Check if daily budget needs to be recalculated
           if (budget.dailyBudget <= 0 && budget.total > 0) {
-            print("Daily budget is 0, attempting to fix...");
             _fixDailyBudget(tripId, budget);
           }
         } else {
-          print("No budget found for trip ID: $tripId");
+          _setError("Error fixing daily budget: $tripId");
         }
-        
+
         _setLoading(false);
         notifyListeners();
       },
       onError: (error) {
-        print("Error in budget subscription: $error");
         _setLoading(false);
         _setError('Error listening to budget: $error');
       },
     );
   }
-  
+
   // Fix a budget with zero daily budget
   Future<void> _fixDailyBudget(String tripId, Budget budget) async {
     try {
       // Get the trip to calculate days
       await _tripProvider.selectTrip(tripId);
       final trip = _tripProvider.selectedTrip;
-      
+
       if (trip != null && trip.days.isNotEmpty) {
         // Calculate correct daily budget
-        final correctDailyBudget = calculateDailyBudget(budget.total, trip.days.length);
-        print("Fixing daily budget to: $correctDailyBudget");
-        
+        final correctDailyBudget =
+            calculateDailyBudget(budget.total, trip.days.length);
+        _setError("Fixing daily budget to: $correctDailyBudget");
         // Update the budget with the correct daily budget
         await updateBudget(
           budgetId: budget.id,
@@ -189,7 +180,7 @@ class BudgetProvider with ChangeNotifier {
         );
       }
     } catch (e) {
-      print("Error fixing daily budget: $e");
+      _setError("Error fixing daily budget: $e");
     }
   }
 
@@ -203,29 +194,24 @@ class BudgetProvider with ChangeNotifier {
     try {
       _setLoading(true);
       _error = null;
-      
+
       // Ensure daily budget is never zero
       double finalDailyBudget = dailyBudget;
       if (finalDailyBudget <= 0 && total > 0) {
         // Get the trip to calculate days
         await _tripProvider.selectTrip(tripId);
         final trip = _tripProvider.selectedTrip;
-        
+
         if (trip != null && trip.days.isNotEmpty) {
           finalDailyBudget = calculateDailyBudget(total, trip.days.length);
         } else {
           finalDailyBudget = total; // Default to total if can't calculate
         }
       }
-      
+
       // Debug information - remove in production
-      print("Creating budget with:");
-      print("Trip ID: $tripId");
-      print("Total budget: $total");
-      print("Currency: $currency");
-      print("Daily budget (original): $dailyBudget");
-      print("Daily budget (final): $finalDailyBudget");
-      
+  
+
       final budgetId = await _budgetService.createBudget(
         tripId: tripId,
         total: total,
@@ -236,7 +222,6 @@ class BudgetProvider with ChangeNotifier {
       _setLoading(false);
       return budgetId;
     } catch (e) {
-      print("Error creating budget: $e");
       _setLoading(false);
       _setError('Failed to create budget: $e');
       return null;

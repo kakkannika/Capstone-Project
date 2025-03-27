@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:math'; // Import this to use Random
 import 'package:flutter/material.dart';
 import 'auth/login_screen.dart';
@@ -18,7 +20,6 @@ class GetStartedScreen extends StatelessWidget {
           ),
           Container(
             decoration: BoxDecoration(
-              // ignore: deprecated_member_use
               color: Colors.black.withOpacity(0.5),
             ),
           ),

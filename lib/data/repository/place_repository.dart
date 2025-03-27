@@ -5,11 +5,9 @@ abstract class PlaceRepository {
 
   Future<Place?> getPlaceById(String placeId);
 
-  Future<List<Place>> fetchPlacesByCategory(String category);
 
-  Future<List<Place>> fetchHightlyRatedPlaces(double minRating);
 
   Future<List<Place>> searchPlaces(String query);
-  Future<List<Place>> fetchPlacesByProvince(String province);
+  
   
 }

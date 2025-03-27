@@ -50,6 +50,7 @@ class _HomeScreenState extends State<DetailHomePages> {
               place.averageRating >= 4 && place.province == widget.province)
           .take(6)
           .toList();
+    
 
       final filteredPlaces = placeProvider.places
           .where((place) =>

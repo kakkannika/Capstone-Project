@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:tourism_app/data/repository/trip_repository.dart';
 import 'package:tourism_app/models/place/place.dart';
 import 'package:tourism_app/models/trips/trips.dart';
 import 'package:tourism_app/data/repository/firebase/trip_firebase_repository.dart';
 
 class TripProvider with ChangeNotifier {
-  final TripFirebaseRepository _tripService = TripFirebaseRepository();
+  final TripRepository _tripService = TripFirebaseRepository();
   List<Trip> _trips = [];
   Trip? _selectedTrip;
   bool _isLoading = false;
