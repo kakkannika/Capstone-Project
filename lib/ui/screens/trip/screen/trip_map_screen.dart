@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:tourism_app/models/place/place.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
 import 'package:tourism_app/utils/routing_util.dart';
+import 'dart:ui' as ui;
 
 class TripMapScreen extends StatefulWidget {
   final String tripId;
@@ -65,8 +66,8 @@ class _TripMapScreenState extends State<TripMapScreen> {
         return;
       }
       
-      // Just show the places without optimizing
-      _updateMapWithPlaces(_places);
+      // Just show the places without optimizing using numbered markers
+      await _updateMapWithNumberedMarkers(_places);
       setState(() {
         _isLoading = false;
       });
@@ -131,8 +132,9 @@ class _TripMapScreenState extends State<TripMapScreen> {
         _isRouteOptimized = false;
         _routingResult = null;
         _polylines = {};
-        _updateMapWithPlaces(_places);
       });
+      // Use regular markers for normal view
+      await _updateMapWithNumberedMarkers(_places, optimized: false);
     } else {
       // Optimize the route
       await _fetchPlacesAndCalculateRoute();
@@ -188,7 +190,16 @@ class _TripMapScreenState extends State<TripMapScreen> {
       // Update state with routing result
       setState(() {
         _routingResult = result;
-        _updateMapData(result);
+        _polylines = {}; // Clear existing polylines
+      });
+      
+      // Add polyline for the route
+      _updateRoutePolyline(result);
+      
+      // Update markers with numbers based on optimized order
+      await _updateMapWithNumberedMarkers(result.optimizedRoute, optimized: true);
+      
+      setState(() {
         _isLoading = false;
       });
       
@@ -202,6 +213,41 @@ class _TripMapScreenState extends State<TripMapScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
+    }
+  }
+
+  void _updateRoutePolyline(SmartRoutingResult result) {
+    // Set polyline color based on transport mode
+    Color polylineColor;
+    switch (_selectedTransportMode) {
+      case 'driving':
+        polylineColor = Colors.blue.shade700;
+      case 'walking':
+        polylineColor = Colors.green.shade700;
+      case 'bicycling':
+        polylineColor = Colors.orange.shade700;
+      default:
+        polylineColor = Colors.blue.shade700;
+    }
+    
+    // Add polyline connecting all places in order
+    if (result.polylinePoints.isNotEmpty) {
+      final polyline = Polyline(
+        polylineId: const PolylineId('route'),
+        points: result.polylinePoints,
+        color: polylineColor,
+        width: 4,
+        patterns: [
+          PatternItem.dash(10),
+          PatternItem.gap(5),
+        ],
+        endCap: Cap.roundCap,
+        startCap: Cap.roundCap,
+      );
+      
+      setState(() {
+        _polylines.add(polyline);
+      });
     }
   }
 
@@ -397,6 +443,153 @@ class _TripMapScreenState extends State<TripMapScreen> {
       case PlaceType.foodAndBeverage:
         return Colors.red;
     }
+  }
+
+  // Adding a method to create custom numbered markers with standard pin shape
+  Future<BitmapDescriptor> _createNumberedMarker(int number, Color color) async {
+    // Create a picture recorder
+    final pictureRecorder = ui.PictureRecorder();
+    final canvas = ui.Canvas(pictureRecorder);
+    const size = 200.0; // Larger size for better quality
+    
+    // Calculate center for drawing
+    const center = size / 2;
+    
+    // Draw the standard pin marker (teardrop shape)
+    final path = Path()
+      ..moveTo(center, size * 0.20) // Top of the pin 
+      ..quadraticBezierTo(size * 0.70, size * 0.15, size * 0.70, size * 0.40) // Top right curve
+      ..quadraticBezierTo(size * 0.70, size * 0.70, center, size * 0.90) // Bottom right curve
+      ..quadraticBezierTo(size * 0.30, size * 0.70, size * 0.30, size * 0.40) // Bottom left curve
+      ..quadraticBezierTo(size * 0.30, size * 0.15, center, size * 0.20); // Top left curve
+    
+    // Fill the path with color
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+    canvas.drawPath(path, paint);
+    
+    // Add letter/number in white
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: number.toString(),
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 80, // Larger font
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      textDirection: ui.TextDirection.ltr,
+    );
+    
+    textPainter.layout();
+    textPainter.paint(
+      canvas, 
+      Offset(
+        center - textPainter.width / 2, 
+        size * 0.40 - textPainter.height / 2  // Position centered in the pin
+      )
+    );
+    
+    // Convert to image
+    final picture = pictureRecorder.endRecording();
+    final image = await picture.toImage(size.toInt(), size.toInt());
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    
+    if (byteData == null) {
+      // Fall back to default markers if custom creation fails
+      return BitmapDescriptor.defaultMarkerWithHue(
+        color == Colors.blue 
+          ? BitmapDescriptor.hueBlue
+          : color == Colors.red
+              ? BitmapDescriptor.hueRed
+              : BitmapDescriptor.hueViolet
+      );
+    }
+    
+    final bytes = byteData.buffer.asUint8List();
+    return BitmapDescriptor.fromBytes(bytes);
+  }
+  
+  // Adding a method to use custom icons (for both optimized and unoptimized views)
+  Future<void> _updateMapWithNumberedMarkers(List<Place> places, {bool optimized = false}) async {
+    // Clear existing markers
+    _markers = {};
+    
+    // Add markers for each place
+    for (var i = 0; i < places.length; i++) {
+      final place = places[i];
+      final placeType = SmartRoutingUtil.getPlaceType(place);
+      
+      if (optimized) {
+        // For optimized view, use custom numbered markers
+        // Choose marker color based on place type
+        Color markerColor;
+        switch (placeType) {
+          case PlaceType.hotel:
+            markerColor = Colors.purple;
+          case PlaceType.attraction:
+            markerColor = Colors.blue;
+          case PlaceType.foodAndBeverage:
+            markerColor = Colors.red;
+        }
+        
+        // Create numbered marker icon
+        final markerIcon = await _createNumberedMarker(i + 1, markerColor);
+        
+        final marker = Marker(
+          markerId: MarkerId(place.id),
+          position: LatLng(place.location.latitude, place.location.longitude),
+          infoWindow: InfoWindow(
+            title: '${i + 1}. ${place.name}',
+            snippet: place.description.length > 50 
+                ? '${place.description.substring(0, 50)}...' 
+                : place.description,
+          ),
+          icon: markerIcon,
+          onTap: () {
+            setState(() {
+              _focusedPlaceId = place.id;
+            });
+          },
+        );
+        
+        _markers.add(marker);
+      } else {
+        // For regular view, use standard Google Maps markers
+        BitmapDescriptor markerIcon;
+        switch (placeType) {
+          case PlaceType.hotel:
+            markerIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet);
+          case PlaceType.attraction:
+            markerIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
+          case PlaceType.foodAndBeverage:
+            markerIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
+        }
+        
+        final marker = Marker(
+          markerId: MarkerId(place.id),
+          position: LatLng(place.location.latitude, place.location.longitude),
+          infoWindow: InfoWindow(
+            title: place.name,
+            snippet: place.description.length > 50 
+                ? '${place.description.substring(0, 50)}...' 
+                : place.description,
+          ),
+          icon: markerIcon,
+          onTap: () {
+            setState(() {
+              _focusedPlaceId = place.id;
+            });
+          },
+        );
+        
+        _markers.add(marker);
+      }
+    }
+    
+    // Fit markers on map
+    _zoomToFitMarkers();
   }
 
   @override
