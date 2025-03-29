@@ -51,12 +51,13 @@ class PlaceProvider extends ChangeNotifier {
     _setLoading(true);
     try {
       final place = await _placeRepository.getPlaceById(placeId);
+      _setLoading(false);
       return place;
     } catch (e) {
       _setError('Error fetching place: $e');
+      _setLoading(false);
+      return null;
     }
-    _setLoading(false);
-    return null;
   }
 
   // Future<void> fetchPlacesByCategory(String category) async {
@@ -86,8 +87,11 @@ class PlaceProvider extends ChangeNotifier {
     _setLoading(true);
     try {
       _places = await _placeRepository.searchPlaces(query);
+      _setError(null);
+      _setLoading(false);
     } catch (e) {
-      throw Exception('Faile to search places');
+      _setError('Failed to search places');
+      _setLoading(false);
     }
   }
 }

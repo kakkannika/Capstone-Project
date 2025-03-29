@@ -13,6 +13,7 @@ import 'package:tourism_app/ui/screens/trip/screen/search_place_screen.dart';
 import 'package:tourism_app/ui/providers/budget_provider.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:tourism_app/ui/screens/trip/screen/trip_map_screen.dart';
 
 class ItineraryPage extends StatefulWidget {
   final String? tripId;
@@ -186,6 +187,19 @@ class _ItineraryPageState extends State<ItineraryPage> {
                     onPressed: () {
                       if (trip.days.isNotEmpty &&
                           _selectedDayIndex < trip.days.length) {
+                        // Navigate to map screen
+                        _navigateToMapScreen(trip.days[_selectedDayIndex]);
+                      }
+                    },
+                    backgroundColor: const Color(0xFF0D3E4C),
+                    heroTag: 'map',
+                    child: const Icon(Icons.map, color: Colors.white),
+                  ),
+                  const SizedBox(height: 16),
+                  FloatingActionButton(
+                    onPressed: () {
+                      if (trip.days.isNotEmpty &&
+                          _selectedDayIndex < trip.days.length) {
                         _navigateToSearchPlace(trip.days[_selectedDayIndex]);
                       }
                     },
@@ -219,6 +233,21 @@ class _ItineraryPageState extends State<ItineraryPage> {
 
     // If we got a result back, the place was added successfully
     // The UI will update automatically through the StreamBuilder
+  }
+
+  void _navigateToMapScreen(Day day) async {
+    final tripProvider = context.read<TripProvider>();
+    if (tripProvider.selectedTrip == null) return;
+    
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TripMapScreen(
+          tripId: tripProvider.selectedTrip!.id,
+          dayId: day.id,
+        ),
+      ),
+    );
   }
 
   Widget _buildTabButton(String title, int index) {

@@ -1,9 +1,9 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/models/place/place.dart';
 import 'package:tourism_app/ui/providers/place_provider.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
+import 'dart:async';
 
 class SearchPlaceScreen extends StatefulWidget {
   final String tripId;
@@ -23,30 +23,30 @@ class SearchPlaceScreen extends StatefulWidget {
 
 class _SearchPlaceScreenState extends State<SearchPlaceScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final bool _isLoading = false;
-  String? _error;
+  Timer? _debounce;
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _searchController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<PlaceProvider>(
-      builder: (context, placeProvider, child) {
-        return Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            title: const Text(
-              'Add a Place',
-              style: TextStyle(color: Colors.black),
-            ),
-            iconTheme: const IconThemeData(color: Colors.black),
-          ),
-          body: Stack(
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          'Add a Place',
+          style: TextStyle(color: Colors.black),
+        ),
+        iconTheme: const IconThemeData(color: Colors.black),
+      ),
+      body: Consumer<PlaceProvider>(
+        builder: (context, placeProvider, child) {
+          return Stack(
             children: [
               Column(
                 children: [
@@ -79,7 +79,13 @@ class _SearchPlaceScreenState extends State<SearchPlaceScreen> {
                             vertical: 12, horizontal: 16),
                       ),
                       onChanged: (value) {
-                        placeProvider.searchPlace(value);
+                        if (_debounce?.isActive ?? false) _debounce!.cancel();
+                        _debounce = Timer(const Duration(milliseconds: 500), () {
+                          // Use a safe way to access the provider outside of build
+                          if (!mounted) return;
+                          final provider = Provider.of<PlaceProvider>(context, listen: false);
+                          provider.searchPlace(value);
+                        });
                       },
                     ),
                   ),
@@ -92,11 +98,11 @@ class _SearchPlaceScreenState extends State<SearchPlaceScreen> {
 
                   // Search Results
                   Expanded(
-                    child: _isLoading && placeProvider.places.isEmpty
+                    child: placeProvider.isLoading
                         ? const Center(child: CircularProgressIndicator())
-                        : _error != null
+                        : placeProvider.error != null
                             ? Center(
-                                child: Text(_error!,
+                                child: Text(placeProvider.error!,
                                     style: const TextStyle(color: Colors.red)))
                             : placeProvider.places.isEmpty
                                 ? Center(
@@ -118,7 +124,7 @@ class _SearchPlaceScreenState extends State<SearchPlaceScreen> {
               ),
 
               // Loading Overlay when adding a place
-              if (_isLoading && placeProvider.places.isNotEmpty)
+              if (placeProvider.isLoading && placeProvider.places.isNotEmpty)
                 Container(
                   color: Colors.black.withOpacity(0.3),
                   child: const Center(
@@ -128,9 +134,9 @@ class _SearchPlaceScreenState extends State<SearchPlaceScreen> {
                   ),
                 ),
             ],
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 

@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use, avoid_print
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 
 import 'package:iconsax/iconsax.dart';
@@ -35,8 +36,12 @@ class _HomeScreenState extends State<DetailHomePages> {
   @override
   void initState() {
     super.initState();
-    // Fetch data when the screen is initialized
-    Provider.of<PlaceProvider>(context, listen: false).fetchAllPlaces();
+    // Fetch data when the screen is initialized, but after the first frame renders
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        Provider.of<PlaceProvider>(context, listen: false).fetchAllPlaces();
+      }
+    });
   }
 
   @override

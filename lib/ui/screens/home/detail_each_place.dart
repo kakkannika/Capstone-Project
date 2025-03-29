@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/ui/screens/googlemap/map_screen.dart';
 import 'package:tourism_app/data/repository/firebase/place_firebase_repository.dart';
@@ -35,13 +36,22 @@ class _DetailEachPlaceState extends State<DetailEachPlace> {
   @override
   void initState() {
     super.initState();
-    _loadPlaceData();
+    // Load data safely after the first frame is built
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _loadPlaceData();
+      }
+    });
   }
 
   Future<void> _loadPlaceData() async {
+    if (!mounted) return;
+    
     final placeProvider = Provider.of<PlaceProvider>(context, listen: false);
     try {
       final fetchedPlace = await placeProvider.getPlaceById(widget.placeId);
+      if (!mounted) return;
+      
       setState(() {
         place = fetchedPlace;
         isLoading = false;
@@ -52,6 +62,8 @@ class _DetailEachPlaceState extends State<DetailEachPlace> {
         _loadNearbyPlaces();
       }
     } catch (error) {
+      if (!mounted) return;
+      
       setState(() {
         isLoading = false;
       });
@@ -62,7 +74,7 @@ class _DetailEachPlaceState extends State<DetailEachPlace> {
   }
 
   Future<void> _loadNearbyPlaces() async {
-    if (place == null) return;
+    if (place == null || !mounted) return;
 
     setState(() {
       loadingNearby = true;
@@ -75,6 +87,8 @@ class _DetailEachPlaceState extends State<DetailEachPlace> {
       final allNearbyPlaces = await placeProvider.findPlacesNearLocation(
           place!.location, 5.0 // 5 km radius
           );
+      
+      if (!mounted) return;
 
       // Filter by category
       final attractions = allNearbyPlaces
@@ -95,6 +109,8 @@ class _DetailEachPlaceState extends State<DetailEachPlace> {
               p.category.toLowerCase() == 'cafe')
           .toList();
 
+      if (!mounted) return;
+      
       setState(() {
         nearbyPlaces = attractions.take(10).toList(); // Limit to 10 items
         nearbyHotels = hotels.take(10).toList();
@@ -102,6 +118,8 @@ class _DetailEachPlaceState extends State<DetailEachPlace> {
         loadingNearby = false;
       });
     } catch (error) {
+      if (!mounted) return;
+      
       setState(() {
         loadingNearby = false;
       });
