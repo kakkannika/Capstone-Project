@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:tourism_app/config/env_config.dart';
 
 // Define an enum for place types with priority order
 enum PlaceType {
@@ -72,10 +73,9 @@ class SmartRoutingResult {
 }
 
 class SmartRoutingUtil {
-  // Google Maps API key - get from your configuration
+  // Google Maps API key from secure configuration
   static String get _apiKey {
-    // Use actual API key provided by user
-    return 'AIzaSyBAeKngtUoBtDDR6wSAV2SDn27YJIyeZ9o';
+    return EnvConfig.googleMapsApiKey;
   }
   static final Dio _dio = Dio();
 

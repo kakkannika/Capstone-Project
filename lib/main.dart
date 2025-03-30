@@ -9,10 +9,15 @@ import 'package:tourism_app/ui/providers/place_provider.dart';
 import 'package:tourism_app/ui/providers/auth_provider.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
 import 'package:tourism_app/ui/screens/get_start_screen.dart';
+import 'package:tourism_app/config/env_config.dart';
 
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize environment configuration
+  await EnvConfig.init();
+  
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
