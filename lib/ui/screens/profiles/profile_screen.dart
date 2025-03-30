@@ -14,6 +14,8 @@ import 'package:tourism_app/ui/widgets/dertam_dialog.dart';
 import 'widget/option_tile.dart';
 import 'edit_profile_screen.dart';
 import 'setting_screen.dart';
+import 'package:tourism_app/ui/screens/auth/auth_wrapper.dart';
+import 'package:tourism_app/ui/screens/auth/login_screen.dart';
 // Import AuthServiceProvider
 
 class ProfileScreen extends StatefulWidget {
@@ -264,10 +266,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _logout(BuildContext context) {
-    // Get the auth provider and call signOut
-    final authProvider =
-        Provider.of<AuthServiceProvider>(context, listen: false);
-    authProvider.signOut(context);
+  void _logout(BuildContext context) async {
+    // Get the auth provider without listening
+    final authProvider = Provider.of<AuthServiceProvider>(context, listen: false);
+    
+    try {
+      // First sign out
+      await authProvider.signOut();
+      
+      // Then navigate directly to login screen, not through AuthWrapper
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+        (route) => false, // Remove all previous routes
+      );
+    } catch (e) {
+      print('Error during logout: $e');
+    }
   }
 }

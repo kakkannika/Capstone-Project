@@ -152,13 +152,20 @@ class _RegisterScreenState extends State<EmailRegisterScreen> {
                     DertamButton(
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-                            await authService.signUpWithEmail(
+                            bool success = await authService.signUpWithEmail(
                               email: _emailController.text,
                               password: _passwordController.text,
                               username: _usernameController.text,
                               confirmPassword: _confirmPasswordController.text,
-                              context: context,
                             );
+                            
+                            // Navigate to login screen only after successful signup
+                            if (success) {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => LoginScreen()),
+                              );
+                            }
                           }
                         },
                         text: 'Sign up',

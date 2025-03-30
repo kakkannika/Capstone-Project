@@ -28,13 +28,69 @@ class AuthServiceProvider extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
+  // Authentication state
+  bool _isAuthenticated = false;
+  bool get isAuthenticated => _isAuthenticated;
+  bool _isInitialized = false;
+  bool get isInitialized => _isInitialized;
+
+  // Default constructor
+  AuthServiceProvider();
+  
+  // Factory constructor that initializes without notification
+  static Future<AuthServiceProvider> createInitialized() async {
+    final provider = AuthServiceProvider();
+    await provider.initializeAuth(silent: true);
+    return provider;
+  }
+
+  // Initialize authentication state - check if user is already logged in
+  Future<bool> initializeAuth({bool silent = false}) async {
+    // Set loading immediately, but don't notify yet
+    _isLoading = true;
+    
+    try {
+      // Check if there's a current Firebase user
+      User? firebaseUser = FirebaseAuth.instance.currentUser;
+      
+      if (firebaseUser != null && firebaseUser.emailVerified) {
+        // User is logged in and verified, fetch user data
+        DocumentSnapshot userDoc = await _authRepository.getUserData(firebaseUser.uid);
+        
+        if (userDoc.exists) {
+          _currentUser = AppUser.fromFirestore(userDoc);
+          _isAuthenticated = true;
+        } else {
+          // User exists in Firebase Auth but not in Firestore
+          await _authRepository.signOut();
+          _isAuthenticated = false;
+        }
+      } else {
+        _isAuthenticated = false;
+      }
+    } catch (e) {
+      _handleError('Error initializing auth: $e', notify: false);
+      _isAuthenticated = false;
+    }
+    
+    // Update final state
+    _isLoading = false;
+    _isInitialized = true;
+    
+    // Only notify once at the end
+    if (!silent) {
+      notifyListeners();
+    }
+    return _isAuthenticated;
+  }
+
   // Signup method with Firestore integration
-  Future<void> signUpWithEmail({
+  Future<bool> signUpWithEmail({
     required String email,
     required String password,
     required String username,
     required String confirmPassword,
-    required BuildContext context,
+    BuildContext? context,
   }) async {
     _isLoading = true;
     _errorMessage = null;
@@ -42,7 +98,7 @@ class AuthServiceProvider extends ChangeNotifier {
 
     if (password != confirmPassword) {
       _handleError('Passwords do not match');
-      return;
+      return false;
     }
 
     try {
@@ -67,10 +123,12 @@ class AuthServiceProvider extends ChangeNotifier {
         _showToast('Verification email sent. Please verify before logging in.');
 
         await _authRepository.signOut();
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+        return true;
       }
+      return false;
     } on FirebaseAuthException catch (e) {
       _handleAuthError(e);
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -78,10 +136,10 @@ class AuthServiceProvider extends ChangeNotifier {
   }
 
   // Sign In with Email & Fetch User Data
-  Future<void> signInWithEmail({
+  Future<bool> signInWithEmail({
     required String email,
     required String password,
-    required BuildContext context,
+    BuildContext? context,
   }) async {
     _isLoading = true;
     _errorMessage = null;
@@ -97,20 +155,25 @@ class AuthServiceProvider extends ChangeNotifier {
 
         if (userDoc.exists) {
           _currentUser = AppUser.fromFirestore(userDoc);
-          notifyListeners();
-
+          _isAuthenticated = true;
           _showToast('Sign in successful');
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+          return true;
         } else {
           _handleError('User data not found in Firestore');
+          _isAuthenticated = false;
+          return false;
         }
       } else {
         _showToast('Please verify your email before logging in.');
         await firebaseUser?.sendEmailVerification();
         await _authRepository.signOut();
+        _isAuthenticated = false;
+        return false;
       }
     } on FirebaseAuthException catch (e) {
       _handleAuthError(e);
+      _isAuthenticated = false;
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -118,7 +181,7 @@ class AuthServiceProvider extends ChangeNotifier {
   }
 
   // Reset Password
-  Future<void> resetPassword(String email, BuildContext context) async {
+  Future<bool> resetPassword(String email, [BuildContext? context]) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -126,9 +189,10 @@ class AuthServiceProvider extends ChangeNotifier {
     try {
       await _authRepository.resetPassword(email);
       _showToast('Password reset email sent.');
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+      return true;
     } on FirebaseAuthException catch (e) {
       _handleAuthError(e);
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -136,7 +200,7 @@ class AuthServiceProvider extends ChangeNotifier {
   }
 
   // Google Sign In with Firestore Integration
-  Future<void> signInWithGoogle(BuildContext context) async {
+  Future<bool> signInWithGoogle([BuildContext? context]) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -146,7 +210,8 @@ class AuthServiceProvider extends ChangeNotifier {
 
       if (googleUser == null) {
         _handleError('Google sign in cancelled');
-        return;
+        _isAuthenticated = false;
+        return false;
       }
 
       final GoogleSignInAuthentication googleAuth = await _authRepository.getGoogleAuth(googleUser);
@@ -174,11 +239,15 @@ class AuthServiceProvider extends ChangeNotifier {
           _currentUser = AppUser.fromFirestore(userDoc);
         }
 
+        _isAuthenticated = true;
         _showToast('Google sign in successful');
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+        return true;
       }
+      return false;
     } catch (e) {
       _handleError('Google Sign-In Error: $e');
+      _isAuthenticated = false;
+      return false;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -214,25 +283,45 @@ class AuthServiceProvider extends ChangeNotifier {
   }
 
   // Sign Out
-  Future<void> signOut(BuildContext context) async {
-    await _authRepository.signOutGoogle();
-    await _authRepository.signOutFacebook();
-    await _authRepository.signOut();
-
-    _currentUser = null;
-    _showToast('Signed out successfully');
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+  Future<bool> signOut([BuildContext? context]) async {
+    try {
+      _isLoading = true;
+      
+      // Perform all sign out operations
+      await _authRepository.signOutGoogle();
+      await _authRepository.signOutFacebook();
+      await _authRepository.signOut();
+      
+      // Update state only after all async operations
+      _isAuthenticated = false;
+      _currentUser = null;
+      _isLoading = false;
+      
+      // Notify only once at the end
+      notifyListeners();
+      
+      _showToast('Signed out successfully');
+      return true;
+    } catch (e) {
+      _handleError('Error signing out: $e');
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
   }
 
   // Error Handling
-  void _handleAuthError(FirebaseAuthException e) {
-    _handleError('Error: ${e.message}');
+  void _handleAuthError(FirebaseAuthException e, {bool notify = true}) {
+    _handleError('Error: ${e.message}', notify: notify);
   }
 
-  void _handleError(String message) {
+  void _handleError(String message, {bool notify = true}) {
     _errorMessage = message;
     _showToast(message);
-    notifyListeners();
+    // Only notify if we're not in the middle of another state change and notification is requested
+    if (notify && !_isLoading) {
+      notifyListeners();
+    }
   }
 
   void _showToast(String message) {

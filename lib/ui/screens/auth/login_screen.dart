@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:tourism_app/theme/theme.dart';
 import 'package:tourism_app/ui/providers/auth_provider.dart';
 import 'package:tourism_app/ui/screens/auth/gmail_signup_screen.dart';
+import 'package:tourism_app/ui/screens/home/home_page.dart';
 import 'package:tourism_app/ui/widgets/dertam_button.dart';
 import 'package:tourism_app/ui/widgets/dertam_textfield.dart';
 import 'reset_password_screen.dart';
@@ -35,9 +36,33 @@ class LoginScreen extends StatelessWidget {
                         const SizedBox(height: 40),
                         // Logo
                         Center(
-                          child: Image.asset(
-                            'assets/images/logo.png',
-                            height: 150,
+                          child: Column(
+                            children: [
+                              Container(
+                                height: 150,
+                                width: 150,
+                                decoration: BoxDecoration(
+                                  color: DertamColors.primary.withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Image.asset(
+                                  'assets/images/logo.png',
+                                  height: 150,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    print('Error loading logo: $error');
+                                    return Center(
+                                      child: Text(
+                                        'DERTAM',
+                                        style: DertamTextStyles.heading.copyWith(
+                                          color: DertamColors.primary,
+                                          fontSize: 24,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         SizedBox(height: DertamSpacings.m),
@@ -134,13 +159,24 @@ class LoginScreen extends StatelessWidget {
                         SizedBox(height: DertamSpacings.m),
                         // Sign in button
                         DertamButton(
-                          onPressed: () {
+                          onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              authService.signInWithEmail(
+                              bool success = await authService.signInWithEmail(
                                 email: _emailController.text,
                                 password: _passwordController.text,
-                                context: context,
                               );
+                              
+                              // Force navigation on success
+                              if (success) {
+                                // Check isAuthenticated again to be sure
+                                if (authService.isAuthenticated) {
+                                  // Replace the entire navigation stack with the home screen
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                                    (route) => false, // Remove all previous routes
+                                  );
+                                }
+                              }
                             }
                           },
                           text: "Sign in",
@@ -164,9 +200,20 @@ class LoginScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SocialLoginButton(
-                                onTap: () =>
-                                    authService.signInWithGoogle(context),
-                                imagePath: 'assets/images/google.png'),
+                                onTap: () async {
+                                  bool success = await authService.signInWithGoogle();
+                                  if (success) {
+                                    // Force navigation on successful Google sign in
+                                    if (authService.isAuthenticated) {
+                                      Navigator.of(context).pushAndRemoveUntil(
+                                        MaterialPageRoute(builder: (context) => const HomeScreen()),
+                                        (route) => false, // Remove all previous routes
+                                      );
+                                    }
+                                  }
+                                },
+                                imagePath: 'assets/images/google.png',
+                                debugLabel: 'Google icon'),
                             //SizedBox(height: DertamSpacings.m),
                             // SocialLoginButton(
                             //     onTap: () => authService.signInWithFacebook(context),
@@ -226,11 +273,13 @@ class LoginScreen extends StatelessWidget {
 class SocialLoginButton extends StatelessWidget {
   final VoidCallback onTap;
   final String imagePath;
+  final String debugLabel;
 
   const SocialLoginButton({
     super.key,
     required this.onTap,
     required this.imagePath,
+    required this.debugLabel,
   });
 
   @override
@@ -257,11 +306,44 @@ class SocialLoginButton extends StatelessWidget {
         ),
         child: Padding(
           padding: EdgeInsets.all(DertamSpacings.s - 4),
-          child: Image.asset(
-            imagePath,
-            height: DertamSize.icon - 8,
-            width: DertamSize.icon - 8,
-            fit: BoxFit.contain,
+          child: Builder(
+            builder: (context) {
+              // For Google icon specifically, provide a text fallback
+              if (debugLabel == 'Google icon') {
+                return Image.asset(
+                  imagePath,
+                  height: DertamSize.icon - 8,
+                  width: DertamSize.icon - 8,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    print('Error loading $debugLabel image: $error');
+                    // Google icon fallback as text "G"
+                    return Center(
+                      child: Text(
+                        'G',
+                        style: TextStyle(
+                          color: DertamColors.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              }
+              
+              // Default image loading with generic icon fallback
+              return Image.asset(
+                imagePath,
+                height: DertamSize.icon - 8,
+                width: DertamSize.icon - 8,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  print('Error loading $debugLabel image: $error');
+                  return Icon(Icons.link, color: DertamColors.primary);
+                },
+              );
+            }
           ),
         ),
       ),

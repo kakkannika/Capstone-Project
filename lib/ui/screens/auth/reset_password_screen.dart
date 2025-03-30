@@ -79,25 +79,27 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           try {
-                            await authService.resetPassword(
+                            bool success = await authService.resetPassword(
                               _emailController.text,
-                              context,
                             );
+                            
                             // Show success message
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Password reset link sent to your email',
-                                  style: DertamTextStyles.body.copyWith(
-                                    color: DertamColors.white,
+                            if (success) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Password reset link sent to your email',
+                                    style: DertamTextStyles.body.copyWith(
+                                      color: DertamColors.white,
+                                    ),
                                   ),
+                                  backgroundColor: DertamColors.green,
+                                  behavior: SnackBarBehavior.floating,
+                                  margin: EdgeInsets.all(DertamSpacings.m),
                                 ),
-                                backgroundColor: DertamColors.green,
-                                behavior: SnackBarBehavior.floating,
-                                margin: EdgeInsets.all(DertamSpacings.m),
-                              ),
-                            );
-                            Navigator.pop(context);
+                              );
+                              Navigator.pop(context);
+                            }
                           } catch (e) {
                             // Show error message
                             ScaffoldMessenger.of(context).showSnackBar(
