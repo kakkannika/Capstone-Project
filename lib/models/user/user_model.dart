@@ -28,7 +28,9 @@ class AppUser {
       email: data['email'] ?? '',
       displayName: data['displayName'],
       photoUrl: data['photoUrl'],
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      createdAt: data['createdAt'] != null
+          ? (data['createdAt'] as Timestamp).toDate()
+          : DateTime.now(),
       preferences: UserPreferences.fromMap(data['preferences'] ?? {}),
       role: data['role'] != null
           ? UserRole.values[data['role'] as int]
@@ -41,7 +43,7 @@ class AppUser {
       'email': email,
       'displayName': displayName,
       'photoUrl': photoUrl,
-      'createdAt': createdAt,
+      'createdAt': Timestamp.fromDate(createdAt),
       'preferences': preferences.toMap(),
       'role': role.index,
     };

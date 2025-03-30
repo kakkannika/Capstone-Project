@@ -95,7 +95,7 @@ class AuthService extends ChangeNotifier {
         message = 'Wrong password provided for that user';
       }
       _showToast(message);
-      throw e;
+      rethrow;
     }
   }
 

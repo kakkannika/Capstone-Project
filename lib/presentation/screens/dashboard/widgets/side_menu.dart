@@ -127,7 +127,7 @@ class _SideMenuState extends State<SideMenu> {
                             backgroundImage: user?.photoUrl != null
                                 ? NetworkImage(user!.photoUrl!) as ImageProvider
                                 : const AssetImage(
-                                    'lib/assets/images/avatar.jpg'),
+                                    'lib/assets/images/kannika.jpg'),
                           ),
                         ),
                         const SizedBox(height: DertamSpacings.s),
@@ -151,6 +151,7 @@ class _SideMenuState extends State<SideMenu> {
                             final shouldLogout = await showDialog<bool>(
                               context: context,
                               builder: (context) => AlertDialog(
+                                backgroundColor: DertamColors.white,
                                 title: const Text('Logout'),
                                 content: const Text(
                                     'Are you sure you want to logout?'),
@@ -169,8 +170,7 @@ class _SideMenuState extends State<SideMenu> {
                                         Navigator.of(context).pop(true),
                                     child: Text(
                                       'Logout',
-                                      style: TextStyle(
-                                          color: DertamColors.primary),
+                                      style: TextStyle(color: DertamColors.red),
                                     ),
                                   ),
                                 ],

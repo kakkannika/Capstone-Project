@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
             builder: (context) => AlertDialog(
               title: Text('Access Denied', style: TextStyle(color: Colors.red)),
               content: const Text(
-                'This portal is only accessible to administrators. If you believe this is a mistake, please contact your system administrator.',
+                'This portal is only accessible to administrators.',
                 textAlign: TextAlign.center,
               ),
               actions: [

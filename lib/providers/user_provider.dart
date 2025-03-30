@@ -76,12 +76,23 @@ class UserProvider extends ChangeNotifier {
 
   Future<void> createAdminUser({
     required String email,
+    required String password,
     required String displayName,
-    required String uid,
+    required UserRole role,
   }) async {
     try {
-      final newAdmin = AppUser(
-        uid: uid,
+      // First create the user in Firebase Auth
+      final userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Update display name
+      await userCredential.user?.updateDisplayName(displayName);
+
+      // Create user document in Firestore
+      final newUser = AppUser(
+        uid: userCredential.user!.uid,
         email: email,
         displayName: displayName,
         createdAt: DateTime.now(),
@@ -90,22 +101,18 @@ class UserProvider extends ChangeNotifier {
           currency: 'USD',
           dailyActivityLimit: 5,
         ),
-        role: UserRole.admin,
+        role: role,
       );
 
-      final userData = {
-        'email': newAdmin.email,
-        'displayName': newAdmin.displayName,
-        'createdAt': Timestamp.fromDate(newAdmin.createdAt),
-        'preferences': newAdmin.preferences.toMap(),
-        'role': UserRole.values.indexOf(newAdmin.role),
-      };
-
-      await _firestore.collection('users').doc(uid).set(userData);
+      final userData = newUser.toMap();
+      await _firestore
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set(userData);
       notifyListeners();
     } catch (e) {
-      print('Error creating admin user: $e');
-      throw e;
+      print('Error creating user: $e');
+      rethrow;
     }
   }
 
