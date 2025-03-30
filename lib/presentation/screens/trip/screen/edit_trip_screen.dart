@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/models/trips/trips.dart';
+import 'package:tourism_app/presentation/widgets/dertam_textfield.dart';
 import 'package:tourism_app/providers/trip_provider.dart';
+import 'package:tourism_app/theme/theme.dart';
 
-
-
+/// This screen is used to edit a trip. It allows the user to update the trip name, start date, and end date.
 class EditTripScreen extends StatefulWidget {
   final Trip trip;
 
@@ -59,7 +60,7 @@ class _EditTripScreenState extends State<EditTripScreen> {
   }
 
   String _formatDate(DateTime date) {
-    return DateFormat('EEE, MMM d, yyyy').format(date);
+    return DateFormat('d/MMM/yyyy').format(date);
   }
 
   Future<void> _selectDate(BuildContext context, bool isStartDate) async {
@@ -71,11 +72,11 @@ class _EditTripScreenState extends State<EditTripScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFF0D3E4C),
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Colors.black,
+            colorScheme: ColorScheme.light(
+              primary: DertamColors.primary,
+              onPrimary: DertamColors.white,
+              surface: DertamColors.white,
+              onSurface: DertamColors.black,
             ),
           ),
           child: child!,
@@ -122,9 +123,9 @@ class _EditTripScreenState extends State<EditTripScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Trip updated successfully!'),
-            backgroundColor: Colors.green,
+            backgroundColor: DertamColors.green,
           ),
         );
         Navigator.pop(context, true); // Return true to indicate success
@@ -134,7 +135,7 @@ class _EditTripScreenState extends State<EditTripScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error updating trip: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: DertamColors.red,
           ),
         );
       }
@@ -149,210 +150,220 @@ class _EditTripScreenState extends State<EditTripScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final isSmallScreen = screenSize.width < 360;
+
     return Scaffold(
+      backgroundColor: DertamColors.backgroundAccent,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Edit Trip',
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(
+            color: DertamColors.black,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: ListView(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Text(
-                      'Edit Trip Details',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF0D3E4C),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    TextFormField(
-                      controller: _tripNameController,
-                      decoration: InputDecoration(
-                        hintText: 'Enter trip name',
-                        labelText: 'Trip Name',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        prefixIcon: const Icon(Icons.trip_origin, color: Color(0xFF0D3E4C)),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter a trip name';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    // Date Selection Row
-                    Row(
-                      children: [
-                        // Start Date
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Start Date',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF0D3E4C),
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              InkWell(
-                                onTap: () => _selectDate(context, true),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                    horizontal: 12,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey[300]!),
-                                    borderRadius: BorderRadius.circular(8),
-                                    color: Colors.teal.withOpacity(0.1),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        _formatDate(_startDate!),
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      Icon(
-                                        Icons.calendar_today,
-                                        color: Colors.teal[600],
-                                        size: 16,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        // Return Date
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'End Date',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(0xFF0D3E4C),
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              InkWell(
-                                onTap: () => _selectDate(context, false),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                    horizontal: 12,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey[300]!),
-                                    borderRadius: BorderRadius.circular(8),
-                                    color: Colors.teal.withOpacity(0.1),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        _formatDate(_endDate!),
-                                        style: const TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      Icon(
-                                        Icons.calendar_today,
-                                        color: Colors.teal[600],
-                                        size: 16,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+      body: SafeArea(
+        child: Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Center(
+              child: SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: 600,
+                    minHeight: screenSize.height * 0.5,
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: DertamColors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: DertamColors.grey.withOpacity(0.15),
+                          spreadRadius: 2,
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 30),
-                    ElevatedButton(
-                      onPressed: (_isLoading || !_hasChanges) ? null : _updateTrip,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF0D3E4C),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 16),
+                        // Title
+                        Text(
+                          'Edit Trip Details',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: DertamColors.black,
+                          ),
                         ),
-                        elevation: 2,
-                        disabledBackgroundColor: Colors.grey[300],
-                      ),
-                      child: _isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Update your trip information',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: DertamColors.grey,
+                          ),
+                        ),
+                        const SizedBox(height: DertamSpacings.s),
+                        // Trip Name Field
+                        DertamTextfield(
+                          label: 'Trip Name',
+                          controller: _tripNameController,
+                          keyboardType: TextInputType.text,
+                          borderColor: DertamColors.grey,
+                          focusedBorderColor: DertamColors.primary,
+                          textColor: DertamColors.black,
+                          backgroundColor: DertamColors.white,
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter a trip name';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: DertamSpacings.s),
+                        // Date Selection
+                        isSmallScreen
+                            ? _buildDateSelectionColumn()
+                            : _buildDateSelectionRow(),
+                        const SizedBox(height: 32),
+                        // Update button
+                        SizedBox(
+                          height: 56,
+                          child: ElevatedButton(
+                            onPressed: (_isLoading || !_hasChanges) ? null : _updateTrip,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: DertamColors.primary,
+                              foregroundColor: DertamColors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                            )
-                          : Text(
-                              _hasChanges ? 'UPDATE TRIP' : 'NO CHANGES',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.2,
-                              ),
+                              elevation: 2,
+                              disabledBackgroundColor: DertamColors.backgroundAccent,
                             ),
+                            child: _isLoading
+                                ? SizedBox(
+                                    height: 24,
+                                    width: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          DertamColors.white),
+                                    ),
+                                  )
+                                : Text(
+                                    _hasChanges ? 'UPDATE TRIP' : 'NO CHANGES',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 1.2,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
-} 
+
+  Widget _buildDateSelectionRow() {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildDateField('Start Date', true),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: _buildDateField('End Date', false),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateSelectionColumn() {
+    return Column(
+      children: [
+        _buildDateField('Start Date', true),
+        const SizedBox(height: DertamSpacings.s),
+        _buildDateField('End Date', false),
+      ],
+    );
+  }
+
+  Widget _buildDateField(String label, bool isStartDate) {
+    final date = isStartDate ? _startDate : _endDate;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: DertamColors.primary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: () => _selectDate(context, isStartDate),
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              vertical: 16,
+              horizontal: 16,
+            ),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: DertamColors.primary,
+              ),
+              borderRadius: BorderRadius.circular(12),
+              color: DertamColors.blueSky,
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.calendar_today,
+                  color: DertamColors.primary,
+                  size: 18,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    _formatDate(date!),
+                    style: TextStyle(
+                      color: DertamColors.black,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 15,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}

@@ -8,7 +8,9 @@ import 'package:tourism_app/presentation/screens/trip/screen/start_plan_screen.d
 import 'package:tourism_app/presentation/screens/trip/screen/trip_planner_screen.dart';
 import 'package:tourism_app/presentation/widgets/navigationBar.dart';
 import 'package:tourism_app/providers/trip_provider.dart';
+import 'package:tourism_app/theme/theme.dart';
 
+//this screen is used to show the trips of the user. It has two tabs: upcoming and history. The user can add a new trip by clicking on the floating action button.
 class TripsScreen extends StatefulWidget {
   const TripsScreen({super.key});
 
@@ -43,23 +45,23 @@ class _TripsScreenState extends State<TripsScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'My Trips',
           style: TextStyle(
-            color: Colors.black,
+            color: DertamColors.black,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: DertamColors.white,
         elevation: 0,
         bottom: TabBar(
           controller: _tabController,
-          labelColor: const Color(0xFF0D3E4C),
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: const Color(0xFF0D3E4C),
+          labelColor: DertamColors.primary,
+          unselectedLabelColor: DertamColors.grey,
+          indicatorColor: DertamColors.primary,
           tabs: const [
             Tab(text: 'Upcoming'),
-            Tab(text: 'Past'),
+            Tab(text: 'History'),
           ],
         ),
       ),
@@ -90,12 +92,12 @@ class _TripsScreenState extends State<TripsScreen>
               // Upcoming Trips Tab
               upcomingTrips.isEmpty
                   ? _buildEmptyState(
-                      'No upcoming trips', 'Plan a new trip to get started!')
+                      'No upcoming trips', 'Ready to go? Plan your next trip now!',showButton: true)
                   : _buildTripsList(upcomingTrips),
               // Past Trips Tab
               pastTrips.isEmpty
                   ? _buildEmptyState(
-                      'No past trips', 'Your completed trips will appear here.')
+                      'No completed trips yet!', 'Once you finish a trip, you’ll see it here',showButton: false)
                   : _buildTripsList(pastTrips),
             ],
           );
@@ -108,22 +110,25 @@ class _TripsScreenState extends State<TripsScreen>
             MaterialPageRoute(builder: (context) => const PlanNewTripScreen()),
           );
         },
-        backgroundColor: const Color(0xFF0D3E4C),
-        child: const Icon(Icons.add),
+        
+        backgroundColor: DertamColors.white,
+        shape: const CircleBorder(),
+        child: Icon(Icons.add,
+            color: DertamColors.primary, size: 30),
       ),
       bottomNavigationBar: const Navigationbar(currentIndex: 1),
     );
   }
 
-  Widget _buildEmptyState(String title, String subtitle) {
+  Widget _buildEmptyState(String title, String subtitle,{bool showButton = true}) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.luggage,
-            size: 80,
-            color: Colors.grey,
+          Image.asset(
+            'lib/assets/images/empty.png',
+            width: 80,
+            height: 80,
           ),
           const SizedBox(height: 16),
           Text(
@@ -133,27 +138,33 @@ class _TripsScreenState extends State<TripsScreen>
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: DertamSpacings.s-4),
           Text(
             subtitle,
-            style: const TextStyle(
-              color: Colors.grey,
+            style: TextStyle(
+              color: DertamColors.grey,
             ),
           ),
-          const SizedBox(height: 24),
-          ElevatedButton(
+          //SizedBox(height: DertamSpacings.s-4),
+          if (showButton)
+          TextButton(
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const PlanNewTripScreen()),
+                  builder: (context) => const PlanNewTripScreen(),
+                ),
               );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF0D3E4C),
+            style: TextButton.styleFrom(
+              foregroundColor: DertamColors.primary,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              textStyle: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            child: const Text('Plan a Trip'),
+            child: const Text('Start Planning'),
           ),
         ],
       ),
@@ -233,8 +244,8 @@ class _TripsScreenState extends State<TripsScreen>
                   ),
                   child: Text(
                     status,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: DertamColors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -244,7 +255,7 @@ class _TripsScreenState extends State<TripsScreen>
 
             // Trip Details
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -255,32 +266,32 @@ class _TripsScreenState extends State<TripsScreen>
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.calendar_today,
-                          size: 16, color: Colors.grey),
+                      Icon(Icons.calendar_today,
+                          size: 16, color: DertamColors.grey),
                       const SizedBox(width: 4),
                       Text(
                         '${_formatDate(trip.startDate)} - ${_formatDate(trip.endDate)}',
-                        style: const TextStyle(color: Colors.grey),
+                        style: TextStyle(color: DertamColors.grey),
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.place, size: 16, color: Colors.grey),
+                      Icon(Icons.place, size: 16, color: DertamColors.grey),
                       const SizedBox(width: 4),
                       Text(
                         '$numberOfPlaces ${numberOfPlaces == 1 ? 'place' : 'places'} to visit',
-                        style: const TextStyle(color: Colors.grey),
+                        style: TextStyle(color: DertamColors.grey),
                       ),
                       const Spacer(),
                       Text(
                         timeInfo,
                         style: TextStyle(
-                          color: _getStatusColor(status),
+                          color: DertamColors.grey,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -298,13 +309,13 @@ class _TripsScreenState extends State<TripsScreen>
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'planning':
-        return Colors.orange;
+        return DertamColors.orange;
       case 'ongoing':
-        return const Color(0xFF0D3E4C);
+        return DertamColors.primary;
       case 'completed':
-        return Colors.green;
+        return DertamColors.green;
       default:
-        return Colors.grey;
+        return DertamColors.grey;
     }
   }
 
@@ -347,9 +358,9 @@ class _TripsScreenState extends State<TripsScreen>
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.delete, color: Colors.red),
-                title: const Text('Delete Trip',
-                    style: TextStyle(color: Colors.red)),
+                leading: Icon(Icons.delete, color: DertamColors.red),
+                title: Text('Delete Trip',
+                    style: TextStyle(color: DertamColors.red)),
                 onTap: () {
                   Navigator.pop(context); // Close the bottom sheet
                   _showDeleteConfirmation(trip);
@@ -394,7 +405,7 @@ class _TripsScreenState extends State<TripsScreen>
               Navigator.pop(context);
               _deleteTrip(trip);
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: DertamColors.red),
             child: const Text('Delete'),
           ),
         ],
@@ -411,9 +422,9 @@ class _TripsScreenState extends State<TripsScreen>
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Trip deleted successfully'),
-            backgroundColor: Colors.green,
+            backgroundColor: DertamColors.red,
           ),
         );
       }

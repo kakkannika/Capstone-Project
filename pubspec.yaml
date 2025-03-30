@@ -102,7 +102,6 @@ flutter:
     # - images/a_dot_ham.jpeg
     - lib/assets/icons/
     - lib/assets/images/
-    - lib/assets/images/chatBot.png
     - lib/assets/place_images/
     - lib/assets/place.json
   

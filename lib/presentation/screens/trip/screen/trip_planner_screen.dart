@@ -4,7 +4,7 @@ import 'package:tourism_app/models/trips/trips.dart';
 import 'package:tourism_app/presentation/screens/trip/screen/plan_trip_detial.dart';
 import 'package:tourism_app/providers/trip_provider.dart';
 
-
+/// This screen is used to plan a trip. It shows the itinerary page and allows the user to select destinations and dates.
 class TripPlannerScreen extends StatefulWidget {
   final List<String?> selectedDestinations;
   final DateTime startDate;
