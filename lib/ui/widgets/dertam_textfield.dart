@@ -19,7 +19,8 @@ class DertamTextfield extends StatelessWidget {
   final Color iconColor;
   final Color textColor;
   final Color backgroundColor;
-  final Function(String)? onChanged; // <-- ADD THIS
+  final Function(String)? onChanged;
+  final bool enabled;
 
   const DertamTextfield({
     super.key,
@@ -37,7 +38,8 @@ class DertamTextfield extends StatelessWidget {
     this.iconColor = Colors.black,
     this.textColor = Colors.black,
     this.backgroundColor = Colors.white,
-    this.onChanged, // <-- ADD THIS
+    this.onChanged,
+    this.enabled = true,
   });
 
   @override
@@ -50,7 +52,8 @@ class DertamTextfield extends StatelessWidget {
         obscureText: obscureText,
         validator: validator,
         style: TextStyle(color: textColor),
-        onChanged: onChanged, // <-- ADD THIS
+        onChanged: onChanged,
+        enabled: enabled,
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(color: textColor.withOpacity(0.7)),

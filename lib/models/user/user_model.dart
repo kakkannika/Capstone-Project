@@ -33,11 +33,27 @@ class AppUser {
 
   Map<String, dynamic> toMap() {
     return {
+      'uid': uid,
       'email': email,
       'displayName': displayName,
       'photoUrl': photoUrl,
-      'createdAt': createdAt,
+      'createdAt': createdAt.toIso8601String(),
       'preferences': preferences.toMap(),
     };
+  }
+
+  factory AppUser.fromMap(Map<String, dynamic> map) {
+    return AppUser(
+      uid: map['uid'],
+      email: map['email'],
+      displayName: map['displayName'],
+      photoUrl: map['photoUrl'],
+      createdAt: map['createdAt'] is String 
+          ? DateTime.parse(map['createdAt']) 
+          : (map['createdAt'] as Timestamp).toDate(),
+      preferences: map['preferences'] is Map 
+          ? UserPreferences.fromMap(map['preferences'])
+          : UserPreferences(),
+    );
   }
 }

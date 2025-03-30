@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:tourism_app/models/trips/trips.dart';
 import 'package:tourism_app/ui/screens/auth/reset_password_screen.dart';
 import 'package:tourism_app/ui/screens/trip/screen/trip_planner_screen.dart';
@@ -16,6 +17,8 @@ import 'edit_profile_screen.dart';
 import 'setting_screen.dart';
 import 'package:tourism_app/ui/screens/auth/auth_wrapper.dart';
 import 'package:tourism_app/ui/screens/auth/login_screen.dart';
+import 'package:tourism_app/utils/profile_cache.dart';
+import 'dart:io';
 // Import AuthServiceProvider
 
 class ProfileScreen extends StatefulWidget {
@@ -26,6 +29,27 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  File? _cachedProfileImage;
+  
+  @override
+  void initState() {
+    super.initState();
+    _checkLocalProfileImage();
+  }
+  
+  Future<void> _checkLocalProfileImage() async {
+    try {
+      final localImage = await ProfileCache.getProfileImage();
+      if (localImage != null && mounted) {
+        setState(() {
+          _cachedProfileImage = localImage;
+        });
+      }
+    } catch (e) {
+      print('Error loading cached profile image: $e');
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     // Access the auth provider to get current user
@@ -64,11 +88,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundImage: currentUser?.photoUrl != null
-                        ? NetworkImage(currentUser!.photoUrl!) as ImageProvider
-                        : const AssetImage('lib/assets/images/avatar.jpg'),
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: DertamColors.primary.withOpacity(0.5),
+                        width: 2,
+                      ),
+                    ),
+                    child: ClipOval(
+                      child: _cachedProfileImage != null
+                        ? Image.file(
+                            _cachedProfileImage!,
+                            fit: BoxFit.cover,
+                          )
+                        : currentUser?.photoUrl != null
+                            ? CachedNetworkImage(
+                                imageUrl: currentUser!.photoUrl!,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => const Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) {
+                                  print('Error loading profile image: $error');
+                                  return Image.asset(
+                                    'assets/images/avatar.jpg',
+                                    fit: BoxFit.cover,
+                                  );
+                                },
+                                // Simplify caching options
+                                memCacheWidth: 200,
+                                memCacheHeight: 200,
+                              )
+                            : Image.asset(
+                                'assets/images/avatar.jpg',
+                                fit: BoxFit.cover,
+                              ),
+                    ),
                   ),
                   const SizedBox(height: DertamSpacings.m),
                   Text(userName, style: DertamTextStyles.heading),
@@ -220,19 +280,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
           OptionTile(
             icon: Icons.person_outline,
             title: 'Edit Profile',
-            onTap: () async {
+            onTap: () {
+              // First dismiss the dialog to avoid stacked contexts
               Navigator.pop(context);
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const EditProfileScreen()),
-              );
+              
+              // Then navigate with a separate method to handle profile editing
+              _navigateToEditProfile(context);
             },
           ),
           OptionTile(
             icon: Icons.lock_outline,
             title: 'Reset Password',
             onTap: () async {
+              Navigator.pop(context);
               await Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -249,6 +309,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: const [],
       ),
     );
+  }
+  
+  // Separate method to handle navigation to edit profile and refreshing on return
+  Future<void> _navigateToEditProfile(BuildContext context) async {
+    try {
+      // Give time for the dialog to close
+      await Future.delayed(Duration.zero);
+      
+      // Navigate to edit profile screen
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const EditProfileScreen()),
+      );
+      
+      // If profile was updated, refresh the data and UI
+      if (result == true && mounted) {
+        setState(() {
+          _cachedProfileImage = null; // Clear cached image to force refresh
+        });
+        
+        // Check for new local profile image
+        await _checkLocalProfileImage();
+        
+        // Refresh user data from auth provider
+        await Provider.of<AuthServiceProvider>(context, listen: false)
+          .initializeAuth(silent: true);
+          
+        // Update UI once more
+        if (mounted) {
+          setState(() {});
+        }
+      }
+    } catch (e) {
+      print('Error navigating to edit profile: $e');
+    }
   }
 
   void _goToTripDetails(Trip trip) {

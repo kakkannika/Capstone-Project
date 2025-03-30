@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,8 +11,8 @@ import 'package:tourism_app/models/user/user_model.dart';
 import 'package:tourism_app/models/user/user_preference.dart';
 import 'package:tourism_app/data/repository/authentication_repository.dart';
 import 'package:tourism_app/data/repository/firebase/auth_firebase_repository.dart';
-import 'package:tourism_app/ui/screens/auth/login_screen.dart';
-import 'package:tourism_app/ui/screens/home/home_page.dart';
+import 'package:tourism_app/utils/profile_cache.dart';
+
 
 class AuthServiceProvider extends ChangeNotifier {
   final AuthenticationRepository _authRepository = AuthFirebaseRepository();
@@ -59,14 +60,34 @@ class AuthServiceProvider extends ChangeNotifier {
         
         if (userDoc.exists) {
           _currentUser = AppUser.fromFirestore(userDoc);
+          
+          // Save user data to local cache
+          await ProfileCache.saveUserData(_currentUser!.toMap());
+          
           _isAuthenticated = true;
         } else {
-          // User exists in Firebase Auth but not in Firestore
-          await _authRepository.signOut();
-          _isAuthenticated = false;
+          // Check if we have cached user data
+          final cachedUserData = await ProfileCache.getUserData();
+          if (cachedUserData != null) {
+            try {
+              _currentUser = AppUser.fromMap(cachedUserData);
+              _isAuthenticated = true;
+            } catch (e) {
+              await _authRepository.signOut();
+              _isAuthenticated = false;
+              await ProfileCache.clearCache();
+            }
+          } else {
+            // User exists in Firebase Auth but not in Firestore
+            await _authRepository.signOut();
+            _isAuthenticated = false;
+          }
         }
       } else {
         _isAuthenticated = false;
+        
+        // Clear local cache when not authenticated
+        await ProfileCache.clearCache();
       }
     } catch (e) {
       _handleError('Error initializing auth: $e', notify: false);
@@ -155,6 +176,10 @@ class AuthServiceProvider extends ChangeNotifier {
 
         if (userDoc.exists) {
           _currentUser = AppUser.fromFirestore(userDoc);
+          
+          // Save user data to local storage
+          await ProfileCache.saveUserData(_currentUser!.toMap());
+          
           _isAuthenticated = true;
           _showToast('Sign in successful');
           return true;
@@ -259,27 +284,91 @@ class AuthServiceProvider extends ChangeNotifier {
     String? displayName,
     String? photoUrl,
     UserPreferences? preferences,
+    File? profileImage,
   }) async {
-    if (_currentUser == null) return;
+    if (_currentUser == null) {
+      _handleError('Cannot update profile - no user logged in');
+      throw Exception("Cannot update profile - user not authenticated");
+    }
 
-    Map<String, dynamic> updates = {};
-    if (displayName != null) updates['displayName'] = displayName;
-    if (photoUrl != null) updates['photoUrl'] = photoUrl;
-    if (preferences != null) updates['preferences'] = preferences.toMap();
-
-    await _authRepository.updateUserProfile(_currentUser!.uid, updates);
-
-    // Update local user model
-    _currentUser = AppUser(
-      uid: _currentUser!.uid,
-      email: _currentUser!.email,
-      displayName: displayName ?? _currentUser!.displayName,
-      photoUrl: photoUrl ?? _currentUser!.photoUrl,
-      createdAt: _currentUser!.createdAt,
-      preferences: preferences ?? _currentUser!.preferences,
-    );
-
+    _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
+    
+    Map<String, dynamic> updates = {};
+    String? finalPhotoUrl = photoUrl;
+    
+    try {
+      // If profile image is provided, upload it first
+      if (profileImage != null) {
+        try {
+          // Save image locally for quick access
+          await ProfileCache.saveProfileImage(profileImage);
+          
+          // Upload image to Firebase Storage
+          finalPhotoUrl = await _authRepository.uploadProfileImage(
+            profileImage, 
+            _currentUser!.uid
+          );
+          
+          // Set the new photo URL
+          updates['photoUrl'] = finalPhotoUrl;
+        } catch (e) {
+          _handleError('Error uploading profile image: $e');
+          _isLoading = false;
+          notifyListeners();
+          throw e;
+        }
+      } else if (photoUrl != null) {
+        updates['photoUrl'] = photoUrl;
+      }
+      
+      // Add other updates if provided
+      if (displayName != null) {
+        updates['displayName'] = displayName;
+      }
+      
+      if (preferences != null) {
+        updates['preferences'] = preferences.toMap();
+      }
+      
+      // Only update Firestore if we have changes to make
+      if (updates.isNotEmpty) {
+        // Update Firestore
+        await _authRepository.updateUserProfile(_currentUser!.uid, updates);
+        
+        // Update Firebase Auth user profile
+        final User? firebaseUser = FirebaseAuth.instance.currentUser;
+        if (firebaseUser != null) {
+          if (displayName != null) {
+            await firebaseUser.updateDisplayName(displayName);
+          }
+          
+          if (finalPhotoUrl != null) {
+            await firebaseUser.updatePhotoURL(finalPhotoUrl);
+          }
+        }
+        
+        // Update local user model
+        _currentUser = AppUser(
+          uid: _currentUser!.uid,
+          email: _currentUser!.email,
+          displayName: displayName ?? _currentUser!.displayName,
+          photoUrl: finalPhotoUrl ?? _currentUser!.photoUrl,
+          createdAt: _currentUser!.createdAt,
+          preferences: preferences ?? _currentUser!.preferences,
+        );
+        
+        // Save user data to local cache
+        await ProfileCache.saveUserData(_currentUser!.toMap());
+      }
+    } catch (e) {
+      _handleError('Error updating profile: $e');
+      throw e;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   // Sign Out
@@ -291,6 +380,9 @@ class AuthServiceProvider extends ChangeNotifier {
       await _authRepository.signOutGoogle();
       await _authRepository.signOutFacebook();
       await _authRepository.signOut();
+      
+      // Clear local cached data
+      await ProfileCache.clearCache();
       
       // Update state only after all async operations
       _isAuthenticated = false;

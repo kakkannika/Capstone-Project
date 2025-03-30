@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tourism_app/models/user/user_model.dart';
+import 'dart:io';
 
 abstract class AuthenticationRepository {
   Future<UserCredential> signUpWithEmail(String email, String password);
@@ -18,5 +19,6 @@ abstract class AuthenticationRepository {
   Future<void> signOutGoogle();
   Future<void> signOutFacebook();
   Future<void> updateUserProfile(String uid, Map<String, dynamic> updates);
+  Future<String> uploadProfileImage(File imageFile, String userId);
 
 }
