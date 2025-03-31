@@ -218,7 +218,7 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
                           },
                         ),
                         SizedBox(height: DertamSpacings.s),
-                        // Date Selection
+                        // Date Selection    
                         isSmallScreen
                             ? _buildDateSelectionColumn()
                             : _buildDateSelectionRow(),

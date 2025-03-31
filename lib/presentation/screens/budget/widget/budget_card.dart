@@ -8,6 +8,7 @@ class BudgetCard extends StatelessWidget {
   final double spent;
   final double budget;
   final String currency;
+  final String? subtitle;
 
   const BudgetCard({
     super.key,
@@ -15,6 +16,7 @@ class BudgetCard extends StatelessWidget {
     required this.spent,
     required this.budget,
     required this.currency,
+    this.subtitle,
   });
 
   @override
@@ -33,7 +35,21 @@ class BudgetCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min, // Ensures the card takes minimal height
             children: [
-              Text(title, style: DertamTextStyles.body),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(title, style: DertamTextStyles.body),
+                  if (subtitle != null)
+                    Text(
+                      subtitle!,
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: DertamColors.grey,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                ],
+              ),
               const SizedBox(height: 8), // Standard spacing for consistency
               Text(
                 '$currency ${spent.toStringAsFixed(0)}',
@@ -53,6 +69,7 @@ class BudgetCard extends StatelessWidget {
                 valueColor: AlwaysStoppedAnimation<Color>(
                   spent > budget ? DertamColors.red : DertamColors.primary,
                 ),
+                minHeight: spent > budget ? 2 : null, // Make the line slightly thicker when over budget
               ),
             ],
           ),
