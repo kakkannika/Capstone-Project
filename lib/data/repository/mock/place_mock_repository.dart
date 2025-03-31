@@ -11,28 +11,28 @@ class PlaceMockRepository implements PlaceRepository {
     });
   }
 
-  // @override
-  // Future<List<Place>> fetchHightlyRatedPlaces(double minRating, String province) async {
-  //   return Future.delayed(Duration(seconds: 1), () {
-  //     return _places
-  //         .where((place) => place.averageRating >= minRating)
-  //         .toList();
-  //   });
-  // }
+  @override
+  Future<List<Place>> fetchHightlyRatedPlaces(double minRating, String) async {
+    return Future.delayed(Duration(seconds: 1), () {
+      return _places
+          .where((place) => place.averageRating >= minRating)
+          .toList();
+    });
+  }
 
-  // @override
-  // Future<List<Place>> fetchPlacesByCategory(String category) async {
-  //   return Future.delayed(Duration(seconds: 1), () {
-  //     return _places.where((place) => place.category == category).toList();
-  //   });
-  // }
+  @override
+  Future<List<Place>> fetchPlacesByCategory(String category) async {
+    return Future.delayed(Duration(seconds: 1), () {
+      return _places.where((place) => place.category == category).toList();
+    });
+  }
 
-  // @override
-  // Future<List<Place>> fetchPlacesByProvince(String province) async {
-  //   return Future.delayed(Duration(seconds: 1), () {
-  //     return _places.where((place) => place.province == province).toList();
-  //   });
-  // }
+  @override
+  Future<List<Place>> fetchPlacesByProvince(String province) async {
+    return Future.delayed(Duration(seconds: 1), () {
+      return _places.where((place) => place.province == province).toList();
+    });
+  }
 
   @override
   Future<Place?> getPlaceById(String placeId) async {

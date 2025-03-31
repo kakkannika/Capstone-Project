@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'package:iconsax/iconsax.dart';
 import 'package:tourism_app/models/place/place.dart';
+import 'package:tourism_app/theme/theme.dart';
 import 'package:tourism_app/ui/providers/favorite_provider.dart';
 import 'package:tourism_app/ui/providers/place_provider.dart';
 import 'package:tourism_app/ui/screens/chat_bot/chat_screen.dart';
@@ -29,7 +30,9 @@ class _HomeScreenState extends State<DetailHomePages> {
 
   void onBackPressed() {
     Navigator.of(context)
-        .push<Place>(AnimationUtils.createBottomToTopRoute(PlacePicker()));
+        .push<Place>(AnimationUtils.createBottomToTopRoute(PlacePicker(
+      province: widget.province,
+    )));
   }
 
   @override
@@ -50,7 +53,6 @@ class _HomeScreenState extends State<DetailHomePages> {
               place.averageRating >= 4 && place.province == widget.province)
           .take(6)
           .toList();
-    
 
       final filteredPlaces = placeProvider.places
           .where((place) =>
@@ -61,46 +63,57 @@ class _HomeScreenState extends State<DetailHomePages> {
           .toList();
 
       return Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          title: Row(
+            children: [
+              // Header Section
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    HomeScreen())); // Navigate back to the previous screen
+                      },
+                      child:  Icon(Icons.home, size: 24,),
+                    ),
+                    SizedBox(
+                      width: 50,
+                    ),
+                    Text(
+                      widget.province, // Display the province name
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: DertamColors.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 24), // Placeholder for alignment
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
         body: SafeArea(
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header Section
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      HomeScreen())); // Navigate back to the previous screen
-                        },
-                        child: const Icon(Icons.home, size: 24),
-                      ),
-                      Text(
-                        widget.province, // Display the province name
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(width: 24), // Placeholder for alignment
-                    ],
-                  ),
-                ),
-
                 // Hero Image & Search Bar
                 Stack(
                   children: [
                     Image.asset(
                       province.imagePath,
                       width: double.infinity,
-                      height: 300,
+                      height: 250,
                       fit: BoxFit.cover,
                     ),
                     Positioned(
@@ -226,7 +239,7 @@ class _HomeScreenState extends State<DetailHomePages> {
                     ]
                         .map((category) => Padding(
                               padding:
-                                  const EdgeInsets.symmetric(horizontal: 4.0),
+                                  const EdgeInsets.symmetric(horizontal: 3.0),
                               child: FiltersChip(
                                 label: category,
                                 isSelected: selectedCategory == category,

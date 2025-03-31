@@ -1,11 +1,13 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:async';
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_storage/firebase_storage.dart'; // Add this import
 import 'package:tourism_app/models/user/user_model.dart';
 import 'package:tourism_app/models/user/user_preference.dart';
 import 'package:tourism_app/data/repository/authentication_repository.dart';
@@ -46,7 +48,8 @@ class AuthServiceProvider extends ChangeNotifier {
     }
 
     try {
-      UserCredential userCredential = await _authRepository.signUpWithEmail(email, password);
+      UserCredential userCredential =
+          await _authRepository.signUpWithEmail(email, password);
       User? firebaseUser = userCredential.user;
 
       if (firebaseUser != null) {
@@ -67,7 +70,8 @@ class AuthServiceProvider extends ChangeNotifier {
         _showToast('Verification email sent. Please verify before logging in.');
 
         await _authRepository.signOut();
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => LoginScreen()));
       }
     } on FirebaseAuthException catch (e) {
       _handleAuthError(e);
@@ -88,19 +92,22 @@ class AuthServiceProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      UserCredential userCredential = await _authRepository.signInWithEmail(email, password);
+      UserCredential userCredential =
+          await _authRepository.signInWithEmail(email, password);
       User? firebaseUser = userCredential.user;
 
       if (firebaseUser != null && firebaseUser.emailVerified) {
         // Fetch user data from Firestore
-        DocumentSnapshot userDoc = await _authRepository.getUserData(firebaseUser.uid);
+        DocumentSnapshot userDoc =
+            await _authRepository.getUserData(firebaseUser.uid);
 
         if (userDoc.exists) {
           _currentUser = AppUser.fromFirestore(userDoc);
           notifyListeners();
 
           _showToast('Sign in successful');
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const HomeScreen()));
         } else {
           _handleError('User data not found in Firestore');
         }
@@ -126,7 +133,8 @@ class AuthServiceProvider extends ChangeNotifier {
     try {
       await _authRepository.resetPassword(email);
       _showToast('Password reset email sent.');
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => LoginScreen()));
     } on FirebaseAuthException catch (e) {
       _handleAuthError(e);
     } finally {
@@ -142,21 +150,26 @@ class AuthServiceProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final GoogleSignInAccount? googleUser = await _authRepository.signInWithGoogle();
+      final GoogleSignInAccount? googleUser =
+          await _authRepository.signInWithGoogle();
 
       if (googleUser == null) {
         _handleError('Google sign in cancelled');
         return;
       }
 
-      final GoogleSignInAuthentication googleAuth = await _authRepository.getGoogleAuth(googleUser);
-      final AuthCredential credential = _authRepository.getGoogleCredential(googleAuth);
+      final GoogleSignInAuthentication googleAuth =
+          await _authRepository.getGoogleAuth(googleUser);
+      final AuthCredential credential =
+          _authRepository.getGoogleCredential(googleAuth);
 
-      UserCredential userCredential = await _authRepository.signInWithGoogleCredential(credential);
+      UserCredential userCredential =
+          await _authRepository.signInWithGoogleCredential(credential);
       User? firebaseUser = userCredential.user;
 
       if (firebaseUser != null) {
-        DocumentSnapshot userDoc = await _authRepository.getUserData(firebaseUser.uid);
+        DocumentSnapshot userDoc =
+            await _authRepository.getUserData(firebaseUser.uid);
 
         if (!userDoc.exists) {
           AppUser newUser = AppUser(
@@ -175,7 +188,8 @@ class AuthServiceProvider extends ChangeNotifier {
         }
 
         _showToast('Google sign in successful');
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()));
       }
     } catch (e) {
       _handleError('Google Sign-In Error: $e');
@@ -189,28 +203,38 @@ class AuthServiceProvider extends ChangeNotifier {
   Future<void> updateUserProfile({
     String? displayName,
     String? photoUrl,
-    UserPreferences? preferences,
+    String? email,
   }) async {
     if (_currentUser == null) return;
 
     Map<String, dynamic> updates = {};
     if (displayName != null) updates['displayName'] = displayName;
-    if (photoUrl != null) updates['photoUrl'] = photoUrl;
-    if (preferences != null) updates['preferences'] = preferences.toMap();
+    if (email != null) updates['email'] = email; // Correctly update email
+    if (photoUrl != null) updates['photoUrl'] = photoUrl; // Correctly update photoUrl
 
     await _authRepository.updateUserProfile(_currentUser!.uid, updates);
 
     // Update local user model
     _currentUser = AppUser(
       uid: _currentUser!.uid,
-      email: _currentUser!.email,
+      email: email ?? _currentUser!.email, // Ensure email is updated correctly
       displayName: displayName ?? _currentUser!.displayName,
       photoUrl: photoUrl ?? _currentUser!.photoUrl,
       createdAt: _currentUser!.createdAt,
-      preferences: preferences ?? _currentUser!.preferences,
+      preferences: _currentUser!.preferences,
     );
 
     notifyListeners();
+  }
+
+  Future<String> uploadProfilePhoto(File imageFile) async {
+    // Example: Upload the image to Firebase Storage or your backend
+    final storageRef = FirebaseStorage.instance
+        .ref()
+        .child('profile_photos/${currentUser!.uid}.jpg');
+
+    final uploadTask = await storageRef.putFile(imageFile);
+    return await uploadTask.ref.getDownloadURL(); // Return the photo URL
   }
 
   // Sign Out
@@ -221,7 +245,8 @@ class AuthServiceProvider extends ChangeNotifier {
 
     _currentUser = null;
     _showToast('Signed out successfully');
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => LoginScreen()));
   }
 
   // Error Handling

@@ -1,7 +1,10 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/ui/providers/auth_provider.dart';
+import 'package:tourism_app/ui/screens/chat_bot/chat_screen.dart';
 import 'package:tourism_app/ui/screens/home/detail_home_pages.dart';
 import 'package:tourism_app/ui/screens/profiles/profile_screen.dart';
 import 'package:tourism_app/ui/widgets/navigationBar.dart';
@@ -57,78 +60,69 @@ class HomeScreen extends StatelessWidget {
         (currentUser?.email.split('@')[0] ?? 'User');
     // Get all provinces as a list
     final List<Province> provinces = Province.values;
-
     return Scaffold(
+      // header 
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        title: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+              },
+              child: CircleAvatar(
+                radius: 20,
+                backgroundImage: currentUser?.photoUrl != null
+                    ? NetworkImage(currentUser!.photoUrl!)
+                    : const AssetImage('assets/images/avatar.jpg')
+                        as ImageProvider,
+              ),
+            ),
+            const SizedBox(width: 15),
+            Text(
+              'Hello, $displayName',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: Colors.black,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined, color: Colors.black),
+            onPressed: () {},
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header with profile and icons
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ProfileScreen(),
-                          ),
-                        );
-                      },
-                      child: CircleAvatar(
-                        radius: 20,
-                        backgroundImage: currentUser?.photoUrl != null
-                            ? NetworkImage(currentUser!.photoUrl!)
-                            : const AssetImage('assets/images/avatar.jpg')
-                                as ImageProvider,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Hello, $displayName',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      icon: const Icon(Icons.notifications_outlined),
-                      onPressed: () {},
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.search),
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
-              ),
-
-              // Hero image and search bar
-              Stack(
-                children: [
-                  Image.asset(
+              Container(
+                width: double.infinity,
+                height: 200,
+                margin: const EdgeInsets.symmetric(horizontal: 1),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.asset(
                     'assets/place_images/Angkor.jpg',
                     width: double.infinity,
-                    height: 200,
+                    height: 250,
                     fit: BoxFit.cover,
                   ),
-                  Positioned(
-                    left: 16,
-                    right: 16,
-                    bottom: 16,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
 
               // Popular destination section
@@ -305,6 +299,36 @@ class HomeScreen extends StatelessWidget {
 
               const SizedBox(height: 80), // Bottom padding for navigation bar
             ],
+          ),
+        ),
+      ),
+      floatingActionButton: Container(
+        margin: const EdgeInsets.only(bottom: 20, right: 16),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3), // Shadow color
+              spreadRadius: 2,
+              blurRadius: 8,
+              offset: const Offset(2, 4), // Changes position of shadow
+            ),
+          ],
+        ),
+        child: FloatingActionButton(
+          onPressed: () {
+            print("Chatbot button clicked");
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => ChatScreen()));
+            // Add navigation or functionality here
+          },
+          backgroundColor: Colors.white,
+          shape: const CircleBorder(),
+          elevation: 0, // Set to 0 to use the custom shadow
+          child: Image.asset(
+            'assets/images/chatbot.jpg', // Replace with the actual asset path
+            width: 40, // Adjust size as needed
+            height: 40,
           ),
         ),
       ),

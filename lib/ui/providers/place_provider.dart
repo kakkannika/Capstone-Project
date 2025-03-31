@@ -25,16 +25,16 @@ class PlaceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Future<void> filterByProvince(String provinceName) async {
-  //   _setLoading(true);
-  //   notifyListeners();
-  //   try {
-  //     _places = await _placeRepository.fetchPlacesByProvince(provinceName);
-  //   } catch (e) {
-  //     _setLoading(false);
-  //     notifyListeners();
-  //   }
-  // }
+  Future<void> filterByProvince(String provinceName) async {
+    _setLoading(true);
+    notifyListeners();
+    try {
+      _places = await _placeRepository.fetchPlacesByProvince(provinceName);
+    } catch (e) {
+      _setLoading(false);
+      notifyListeners();
+    }
+  }
 
   Future<void> fetchAllPlaces() async {
     _setLoading(true);
@@ -59,28 +59,28 @@ class PlaceProvider extends ChangeNotifier {
     return null;
   }
 
-  // Future<void> fetchPlacesByCategory(String category) async {
-  //   _setLoading(true);
-  //   try {
-  //     _places = await _placeRepository.fetchPlacesByCategory(category);
-  //     _setError(null);
-  //   } catch (e) {
-  //     _setError('Failed to fetch places by category');
-  //   }
-  //   _setLoading(false);
-  // }
+  Future<void> fetchPlacesByCategory(String category) async {
+    _setLoading(true);
+    try {
+      _places = await _placeRepository.fetchPlacesByCategory(category);
+      _setError(null);
+    } catch (e) {
+      _setError('Failed to fetch places by category');
+    }
+    _setLoading(false);
+  }
 
-  // Future<void> fetchHighlyRatedPlaces(double minRating, String province) async {
-  //   _setLoading(true);
-  //   try {
-  //     _places =
-  //         await _placeRepository.fetchHightlyRatedPlaces(minRating, province);
-  //     _setError(null);
-  //   } catch (e) {
-  //     _setError('Failed to fetch places by highly rating');
-  //   }
-  //   _setLoading(false);
-  // }
+  Future<void> fetchHighlyRatedPlaces(double minRating, String province) async {
+    _setLoading(true);
+    try {
+      _places =
+          await _placeRepository.fetchHightlyRatedPlaces(minRating, province);
+      _setError(null);
+    } catch (e) {
+      _setError('Failed to fetch places by highly rating');
+    }
+    _setLoading(false);
+  }
 
   Future<void> searchPlace(String query) async {
     _setLoading(true);

@@ -36,32 +36,32 @@ class PlaceFirebaseRepository extends PlaceRepository {
   }
 
   // Get place by category
-  // @override
-  // Future<List<Place>> fetchPlacesByCategory(String category) async {
-  //   try {
-  //     QuerySnapshot querySnapshot = await _firestore
-  //         .collection(collectionName)
-  //         .where('category', isEqualTo: category)
-  //         .get();
-  //     return querySnapshot.docs.map((doc) => Place.fromFirestore(doc)).toList();
-  //   } catch (e) {
-  //     throw Exception('Error fetching place by category : $e');
-  //   }
-  // }
+  @override
+  Future<List<Place>> fetchPlacesByCategory(String category) async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection(collectionName)
+          .where('category', isEqualTo: category)
+          .get();
+      return querySnapshot.docs.map((doc) => Place.fromFirestore(doc)).toList();
+    } catch (e) {
+      throw Exception('Error fetching place by category : $e');
+    }
+  }
 
-  // // Get popular place
-  // @override
-  // Future<List<Place>> fetchHightlyRatedPlaces(double minRating, String province) async {
-  //   try {
-  //     QuerySnapshot querySnapshot = await _firestore
-  //         .collection(collectionName)
-  //         .where('averageRating', isGreaterThanOrEqualTo: minRating).where('province', isEqualTo: province)
-  //         .get();
-  //     return querySnapshot.docs.map((doc) => Place.fromFirestore(doc)).toList();
-  //   } catch (e) {
-  //     throw Exception('Erorr fetching place by hight rating : $e');
-  //   }
-  // }
+  // Get popular place
+  @override
+  Future<List<Place>> fetchHightlyRatedPlaces(double minRating, String province) async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore
+          .collection(collectionName)
+          .where('averageRating', isGreaterThanOrEqualTo: minRating).where('province', isEqualTo: province)
+          .get();
+      return querySnapshot.docs.map((doc) => Place.fromFirestore(doc)).toList();
+    } catch (e) {
+      throw Exception('Erorr fetching place by hight rating : $e');
+    }
+  }
 
   //
   @override
@@ -93,18 +93,18 @@ class PlaceFirebaseRepository extends PlaceRepository {
     }
   }
 
-  // @override
-  // Future<List<Place>> fetchPlacesByProvince(String province) async {
-  //   try {
-  //     final querySnapshot = await _firestore
-  //         .collection('places')
-  //         .where('province', isEqualTo: province)
-  //         .get();
+  @override
+  Future<List<Place>> fetchPlacesByProvince(String province) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('places')
+          .where('province', isEqualTo: province)
+          .get();
 
-  //     return querySnapshot.docs.map((doc) => Place.fromFirestore(doc)).toList();
-  //   } catch (e) {
-  //     print('Error fetching places: $e');
-  //     return [];
-  //   }
-  // }
+      return querySnapshot.docs.map((doc) => Place.fromFirestore(doc)).toList();
+    } catch (e) {
+      print('Error fetching places: $e');
+      return [];
+    }
+  }
 }

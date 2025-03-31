@@ -2,9 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tourism_app/ui/screens/trip/screen/trip_planner_screen.dart';
+import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/screens/trip/screen/widget/trip_planner_screen.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
 import 'package:intl/intl.dart';
+import 'package:tourism_app/ui/widgets/dertam_textfield.dart';
 
 class PlanNewTripScreen extends StatefulWidget {
   const PlanNewTripScreen({super.key});
@@ -50,8 +52,8 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFF0D3E4C),
+            colorScheme: ColorScheme.light(
+              primary: DertamColors.primary,
               onPrimary: Colors.white,
               surface: Colors.white,
               onSurface: Colors.black,
@@ -94,9 +96,9 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
 
       if (tripId != null && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Trip created successfully!'),
-            backgroundColor: Colors.green,
+            backgroundColor: DertamColors.green,
           ),
         );
 
@@ -119,7 +121,7 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error creating trip: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: DertamColors.red,
         ),
       );
     }
@@ -131,13 +133,6 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Add map functionality if needed
-        },
-        backgroundColor: const Color(0xFF0D3E4C),
-        child: const Icon(Icons.map_outlined),
-      ),
       body: Form(
         key: _formKey,
         child: Padding(
@@ -147,11 +142,11 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: DertamColors.white,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
+                      color: DertamColors.grey.withOpacity(0.1),
                       spreadRadius: 1,
                       blurRadius: 5,
                       offset: const Offset(0, 2),
@@ -162,38 +157,33 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Text(
+                    Text(
                       'Plan a new Trip',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0D3E4C),
+                        color: DertamColors.primary,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       'Build an itinerary and organize your\nupcoming travel plans',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey,
+                        color: DertamColors.grey,
                       ),
                     ),
                     const SizedBox(height: 24),
-                    TextFormField(
+                    DertamTextfield(
+                      label: 'Trip Name',
                       controller: _tripNameController,
-                      decoration: InputDecoration(
-                        hintText: 'Enter trip name',
-                        labelText: 'Trip Name',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        prefixIcon: const Icon(Icons.trip_origin,
-                            color: Color(0xFF0D3E4C)),
-                      ),
+                      keyboardType: TextInputType.text,
+                      borderColor: DertamColors.grey,
+                      focusedBorderColor: DertamColors.primary,
+                      textColor: DertamColors.black,
+                      backgroundColor: DertamColors.white,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter a trip name';
@@ -207,125 +197,132 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
                     ),
                     const SizedBox(height: 20),
                     // Date Selection Row
+                    // ...existing code...
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         // Start Date
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Start Date',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF0D3E4C),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Start Date',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: DertamColors.primary,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 4),
-                            InkWell(
-                              onTap: () => _selectDate(context, true),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                  horizontal: 12,
-                                ),
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey[300]!),
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: startDate != null
-                                      ? Colors.teal.withOpacity(0.1)
-                                      : null,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      startDate != null
-                                          ? formatDate(startDate)
-                                          : 'Select',
-                                      style: TextStyle(
-                                        color: startDate != null
-                                            ? Colors.black
-                                            : Colors.grey[600],
-                                        fontWeight: startDate != null
-                                            ? FontWeight.w500
-                                            : FontWeight.normal,
+                              const SizedBox(height: 4),
+                              InkWell(
+                                onTap: () => _selectDate(context, true),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                    horizontal: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Colors.grey[300]!),
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: startDate != null
+                                        ? Colors.teal.withOpacity(0.1)
+                                        : null,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        startDate != null
+                                            ? formatDate(startDate)
+                                            : 'Select',
+                                        style: TextStyle(
+                                          color: startDate != null
+                                              ? Colors.black
+                                              : Colors.grey[600],
+                                          fontWeight: startDate != null
+                                              ? FontWeight.w500
+                                              : FontWeight.normal,
+                                        ),
                                       ),
-                                    ),
-                                    Icon(
-                                      Icons.calendar_today,
-                                      color: startDate != null
-                                          ? Colors.teal[600]
-                                          : Colors.grey[600],
-                                      size: 16,
-                                    ),
-                                  ],
+                                      Icon(
+                                        Icons.calendar_today,
+                                        color: startDate != null
+                                            ? DertamColors.primary
+                                            : DertamColors.grey,
+                                        size: 16,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
 
                         const SizedBox(width: 16),
-                        // Return Date
 
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Return Date',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xFF0D3E4C),
+                        // Return Date
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Return Date',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: DertamColors.primary,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 4),
-                            InkWell(
-                              onTap: () => _selectDate(context, false),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                  horizontal: 12,
-                                ),
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey[300]!),
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: returnDate != null
-                                      ? Colors.teal.withOpacity(0.1)
-                                      : null,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      returnDate != null
-                                          ? formatDate(returnDate)
-                                          : 'Select',
-                                      style: TextStyle(
-                                        color: returnDate != null
-                                            ? Colors.black
-                                            : Colors.grey[600],
-                                        fontWeight: returnDate != null
-                                            ? FontWeight.w500
-                                            : FontWeight.normal,
+                              const SizedBox(height: 4),
+                              InkWell(
+                                onTap: () => _selectDate(context, false),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                    horizontal: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Colors.grey[300]!),
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: returnDate != null
+                                        ? Colors.teal.withOpacity(0.1)
+                                        : null,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        returnDate != null
+                                            ? formatDate(returnDate)
+                                            : 'Select',
+                                        style: TextStyle(
+                                          color: returnDate != null
+                                              ? DertamColors.black
+                                              : DertamColors.grey,
+                                          fontWeight: returnDate != null
+                                              ? FontWeight.w500
+                                              : FontWeight.normal,
+                                        ),
                                       ),
-                                    ),
-                                    Icon(
-                                      Icons.calendar_today,
-                                      color: returnDate != null
-                                          ? Colors.teal[600]
-                                          : Colors.grey[600],
-                                      size: 16,
-                                    ),
-                                  ],
+                                      Icon(
+                                        Icons.calendar_today,
+                                        color: returnDate != null
+                                            ? DertamColors.primary
+                                            : DertamColors.grey,
+                                        size: 16,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -347,7 +344,7 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
                           ? null
                           : _createTrip,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF0D3E4C),
+                        backgroundColor: DertamColors.primary,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/models/trips/trips.dart';
-import 'package:tourism_app/ui/screens/trip/screen/plan_trip_detial.dart';
+import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/screens/trip/screen/trip_detail_screen.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
-
 
 class TripPlannerScreen extends StatefulWidget {
   final List<String?> selectedDestinations;
@@ -11,7 +11,7 @@ class TripPlannerScreen extends StatefulWidget {
   final DateTime? returnDate;
   final String tripName;
   final String? tripId;
-  
+
   const TripPlannerScreen({
     super.key,
     required this.selectedDestinations,
@@ -20,7 +20,7 @@ class TripPlannerScreen extends StatefulWidget {
     required this.tripName,
     this.tripId,
   });
-  
+
   @override
   _TripPlannerScreenState createState() => _TripPlannerScreenState();
 }
@@ -36,7 +36,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
       });
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,18 +52,19 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                 children: [
                   InkWell(
                     onTap: () => Navigator.pop(context),
-                    child: const Icon(Icons.arrow_back, color: Colors.black),
+                    child: Icon(Icons.arrow_back, color: DertamColors.black),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Text(
                       widget.tripName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 25,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        color: DertamColors.primary,
                       ),
                       overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ],
@@ -73,16 +74,21 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
             Expanded(
               child: widget.tripId != null
                   ? StreamBuilder<List<Trip>>(
-                      stream: Provider.of<TripProvider>(context, listen: false).getTripsStream(),
+                      stream: Provider.of<TripProvider>(context, listen: false)
+                          .getTripsStream(),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
-                          return const Center(child: CircularProgressIndicator());
+                        if (snapshot.connectionState ==
+                                ConnectionState.waiting &&
+                            !snapshot.hasData) {
+                          return const Center(
+                              child: CircularProgressIndicator());
                         }
-                        
+
                         if (snapshot.hasError) {
-                          return Center(child: Text('Error: ${snapshot.error}'));
+                          return Center(
+                              child: Text('Error: ${snapshot.error}'));
                         }
-                        
+
                         final trips = snapshot.data ?? [];
                         trips.firstWhere(
                           (t) => t.id == widget.tripId,
@@ -91,11 +97,12 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                             userId: '',
                             tripName: widget.tripName,
                             startDate: widget.startDate,
-                            endDate: widget.returnDate ?? widget.startDate.add(const Duration(days: 7)),
+                            endDate: widget.returnDate ??
+                                widget.startDate.add(const Duration(days: 7)),
                             days: [],
                           ),
                         );
-                        
+
                         return ItineraryPage(tripId: widget.tripId);
                       },
                     )

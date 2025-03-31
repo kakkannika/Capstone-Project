@@ -6,8 +6,9 @@ import 'package:tourism_app/ui/screens/home/detail_each_place.dart';
 
 class PlacePicker extends StatefulWidget {
   final Place? initPlace;
+  final String province;
 
-  const PlacePicker({super.key, this.initPlace});
+  const PlacePicker({super.key, this.initPlace, required this.province});
 
   @override
   State<PlacePicker> createState() => _PlacePickerState();
@@ -36,7 +37,9 @@ class _PlacePickerState extends State<PlacePicker> {
       final provider = Provider.of<PlaceProvider>(context, listen: false);
       provider.searchPlace(searchText).then((_) {
         setState(() {
-          filteredPlaces = provider.places;
+          filteredPlaces = provider.places
+              .where((place) => place.province == widget.province)
+              .toList();
           hasSearched = true; // Set the flag when search is performed
         });
       });

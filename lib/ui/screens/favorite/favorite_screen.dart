@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'package:iconsax/iconsax.dart';
 import 'package:tourism_app/models/place/place.dart';
+import 'package:tourism_app/theme/theme.dart';
 import 'package:tourism_app/ui/providers/favorite_provider.dart';
 import 'package:tourism_app/ui/screens/home/detail_each_place.dart';
 import 'package:tourism_app/ui/widgets/navigationBar.dart';
@@ -28,10 +29,16 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Favorites'),
+        automaticallyImplyLeading: false,
+        title: Text(
+          'My Favorites',
+          style: TextStyle(
+              color: DertamColors.primary, fontWeight: FontWeight.bold),
+        ),
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
+        centerTitle: true,
       ),
       body: Consumer<FavoriteProvider>(
         builder: (context, favoriteProvider, child) {
@@ -166,19 +173,17 @@ class _FavoriteItemState extends State<_FavoriteItem> {
                       ),
                       onPressed: () {
                         // Get provider without listening to changes
-                        final provider = Provider.of<FavoriteProvider>(
-                          context, 
-                          listen: false
-                        );
-                        
+                        final provider = Provider.of<FavoriteProvider>(context,
+                            listen: false);
+
                         // Update local state immediately
                         setState(() {
                           _removed = true;
                         });
-                        
+
                         // Notify parent to refresh if needed
                         widget.onRemove();
-                        
+
                         // Update provider in the background
                         provider.toggleFavorite(widget.place.id);
                       },
@@ -248,9 +253,9 @@ class _FavoriteItemState extends State<_FavoriteItem> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    widget.place.description.length > 120 
-                      ? '${widget.place.description.substring(0, 120)}...'
-                      : widget.place.description,
+                    widget.place.description.length > 120
+                        ? '${widget.place.description.substring(0, 120)}...'
+                        : widget.place.description,
                     style: TextStyle(
                       color: Colors.grey[700],
                       fontSize: 14,

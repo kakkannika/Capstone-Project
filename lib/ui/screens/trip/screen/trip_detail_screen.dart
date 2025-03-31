@@ -6,13 +6,16 @@ import 'package:provider/provider.dart';
 import 'package:tourism_app/models/place/place.dart';
 import 'package:tourism_app/models/trips/trip_days.dart';
 import 'package:tourism_app/models/trips/trips.dart';
+import 'package:tourism_app/theme/theme.dart';
 import 'package:tourism_app/ui/screens/budget/expend_screen.dart';
 import 'package:tourism_app/ui/screens/budget/selected_currency_screen.dart';
+import 'package:tourism_app/ui/screens/home/detail_each_place.dart';
 
 import 'package:tourism_app/ui/screens/trip/screen/search_place_screen.dart';
 import 'package:tourism_app/ui/providers/budget_provider.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:tourism_app/ui/screens/trip/screen/trip_map_screen.dart';
 
 class ItineraryPage extends StatefulWidget {
   final String? tripId;
@@ -28,7 +31,6 @@ class ItineraryPage extends StatefulWidget {
 
 class _ItineraryPageState extends State<ItineraryPage> {
   final PageController _pageController = PageController(initialPage: 1);
-  int _selectedIndex = 1; // Set initial index to 1 for Itinerary
   int _selectedDayIndex = 0; // Track the selected day tab
   Day? _selectedDay; // Track the currently selected day
   bool _isLoadingBudget = false;
@@ -80,7 +82,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: $e'),
-          backgroundColor: Colors.red,
+          backgroundColor: DertamColors.red,
         ),
       );
     } finally {
@@ -134,15 +136,6 @@ class _ItineraryPageState extends State<ItineraryPage> {
               body: Column(
                 children: [
                   // Tab Bar
-                  Container(
-                    color: Colors.white,
-                    child: Row(
-                      children: [
-                        _buildTabButton('Itinerary', 1),
-                        _buildTabButton('\$', 2),
-                      ],
-                    ),
-                  ),
 
                   // Divider
                   Container(
@@ -152,19 +145,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
 
                   // PageView
                   Expanded(
-                    child: PageView(
-                      controller: _pageController,
-                      onPageChanged: (index) {
-                        setState(() {
-                          _selectedIndex = index;
-                        });
-                      },
-                      children: [
-                        const Center(child: Text('Overview Page')),
-                        _buildItineraryPage(trip),
-                        const Center(child: Text('Budget Page')),
-                      ],
-                    ),
+                    child: _buildItineraryPage(trip),
                   ),
                 ],
               ),
@@ -175,8 +156,9 @@ class _ItineraryPageState extends State<ItineraryPage> {
                     onPressed: _isLoadingBudget
                         ? null
                         : () => _navigateToBudgetScreen(trip),
-                    backgroundColor: const Color(0xFF0D3E4C),
+                    backgroundColor: DertamColors.primary,
                     heroTag: 'Budget',
+                    shape: CircleBorder(),
                     child: _isLoadingBudget
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Icon(Icons.money, color: Colors.white),
@@ -186,10 +168,25 @@ class _ItineraryPageState extends State<ItineraryPage> {
                     onPressed: () {
                       if (trip.days.isNotEmpty &&
                           _selectedDayIndex < trip.days.length) {
+                        // Navigate to map screen
+                        _navigateToMapScreen(trip.days[_selectedDayIndex]);
+                      }
+                    },
+                    backgroundColor: DertamColors.primary,
+                    heroTag: 'map',
+                    shape: CircleBorder(),
+                    child: const Icon(Icons.map, color: Colors.white),
+                  ),
+                  const SizedBox(height: 16),
+                  FloatingActionButton(
+                    onPressed: () {
+                      if (trip.days.isNotEmpty &&
+                          _selectedDayIndex < trip.days.length) {
                         _navigateToSearchPlace(trip.days[_selectedDayIndex]);
                       }
                     },
-                    backgroundColor: const Color(0xFF0D3E4C),
+                    backgroundColor: DertamColors.primary,
+                    shape: CircleBorder(),
                     heroTag: 'add',
                     child: const Icon(Icons.add, color: Colors.white),
                   ),
@@ -221,35 +218,16 @@ class _ItineraryPageState extends State<ItineraryPage> {
     // The UI will update automatically through the StreamBuilder
   }
 
-  Widget _buildTabButton(String title, int index) {
-    bool isSelected = _selectedIndex == index;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            _selectedIndex = index;
-          });
-          _pageController.jumpToPage(index);
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color:
-                    isSelected ? const Color(0xFF0D3E4C) : Colors.transparent,
-                width: 2,
-              ),
-            ),
-          ),
-          child: Text(
-            title,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: isSelected ? const Color(0xFF0D3E4C) : Colors.grey,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+  void _navigateToMapScreen(Day day) async {
+    final tripProvider = context.read<TripProvider>();
+    if (tripProvider.selectedTrip == null) return;
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TripMapScreen(
+          tripId: tripProvider.selectedTrip!.id,
+          dayId: day.id,
         ),
       ),
     );
@@ -276,8 +254,8 @@ class _ItineraryPageState extends State<ItineraryPage> {
             Container(
               width: 36,
               height: 36,
-              decoration: const BoxDecoration(
-                color: Color(0xFF0D3E4C),
+              decoration: BoxDecoration(
+                color: DertamColors.primary,
                 shape: BoxShape.circle,
               ),
               child: const Icon(Icons.edit_calendar_rounded,
@@ -341,10 +319,10 @@ class _ItineraryPageState extends State<ItineraryPage> {
           children: [
             Text(
               dateStr,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0D3E4C),
+                color: DertamColors.primary,
               ),
             ),
             const SizedBox(width: 10),
@@ -394,9 +372,14 @@ class _ItineraryPageState extends State<ItineraryPage> {
               itemCount: places.length,
               itemBuilder: (context, index) {
                 final place = places[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
-                  child: _buildPlaceCard(place),
+                return ListTile(
+                  title: _buildPlaceCard(place),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailEachPlace(placeId: place.id),
+                    ),
+                  ),
                 );
               },
             );
@@ -409,24 +392,22 @@ class _ItineraryPageState extends State<ItineraryPage> {
         const SizedBox(height: 24),
 
         // Recommended Places
-        _buildRecommendedPlacesSection(),
       ],
     );
   }
 
   Widget _buildDatePill(String date, bool isSelected) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: isSelected
-            ? const Color(0xFF0D3E4C).withOpacity(0.2)
-            : Colors.grey[200],
+        color:
+            isSelected ? DertamColors.blueSky : DertamColors.backgroundAccent,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         date,
         style: TextStyle(
-          color: isSelected ? const Color(0xFF0D3E4C) : Colors.black,
+          color: isSelected ? DertamColors.primary : DertamColors.black,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         ),
       ),
@@ -583,101 +564,6 @@ class _ItineraryPageState extends State<ItineraryPage> {
       ),
     );
   }
-
-  Widget _buildRecommendedPlacesSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Recommended places',
-          style: TextStyle(
-            color: Colors.grey,
-            fontSize: 14,
-          ),
-        ),
-        const SizedBox(height: 12),
-        // Row(
-        //   children: [
-        //     _buildRecommendedPlace(
-        //         'Royal Palaces', 'assets/images/royal_palace.jpg'),
-        //     const SizedBox(width: 16),
-        //     _buildRecommendedPlace(
-        //         'Angkor Wat', 'assets/images/angkor_wat.jpg'),
-        //   ],
-        // ),
-      ],
-    );
-  }
-
-  // Widget _buildRecommendedPlace(String name, String imageUrl) {
-  //   return Expanded(
-  //     child: GestureDetector(
-  //       onTap: () {
-  //         // In a real app, this would navigate to place details or add it directly
-  //       },
-  //       child: Container(
-  //         decoration: BoxDecoration(
-  //           border: Border.all(color: Colors.grey[300]!),
-  //           borderRadius: BorderRadius.circular(8),
-  //         ),
-  //         child: Stack(
-  //           children: [
-  //             Column(
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               children: [
-  //                 // Image
-  //                 Container(
-  //                   height: 80,
-  //                   decoration: BoxDecoration(
-  //                     borderRadius: const BorderRadius.only(
-  //                       topLeft: Radius.circular(8),
-  //                       topRight: Radius.circular(8),
-  //                     ),
-  //                     image: DecorationImage(
-  //                       image: AssetImage(imageUrl),
-  //                       fit: BoxFit.cover,
-  //                     ),
-  //                   ),
-  //                 ),
-
-  //                 // Title
-  //                 Padding(
-  //                   padding: const EdgeInsets.all(8.0),
-  //                   child: Text(
-  //                     name,
-  //                     style: const TextStyle(
-  //                       fontWeight: FontWeight.bold,
-  //                       fontSize: 12,
-  //                     ),
-  //                     maxLines: 1,
-  //                     overflow: TextOverflow.ellipsis,
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-
-  //             // Add button
-  //             Positioned(
-  //               right: 8,
-  //               top: 8,
-  //               child: Container(
-  //                 width: 24,
-  //                 height: 24,
-  //                 decoration: const BoxDecoration(
-  //                   color: Colors.white,
-  //                   shape: BoxShape.circle,
-  //                 ),
-  //                 child: const Center(
-  //                   child: Icon(Icons.add, size: 16),
-  //                 ),
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Future<void> _deletePlaceFromTrip(String placeId, String dayId) async {
     try {
