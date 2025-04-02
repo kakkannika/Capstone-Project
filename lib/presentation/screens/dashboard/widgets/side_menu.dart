@@ -127,7 +127,7 @@ class _SideMenuState extends State<SideMenu> {
                             backgroundImage: user?.photoUrl != null
                                 ? NetworkImage(user!.photoUrl!) as ImageProvider
                                 : const AssetImage(
-                                    'lib/assets/images/kannika.jpg'),
+                                    'lib/assets/images/user_profile.jpg'),
                           ),
                         ),
                         const SizedBox(height: DertamSpacings.s),

@@ -195,25 +195,25 @@ class UsersScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Spacer(),
-                    // Search Bar
-                    Container(
-                      width: 300,
-                      height: 40,
-                      padding: EdgeInsets.only(top: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Search...',
-                          prefixIcon: Icon(Icons.search),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                        ),
-                      ),
-                    ),
+                    // Spacer(),
+                    // // Search Bar
+                    // Container(
+                    //   width: 300,
+                    //   height: 40,
+                    //   padding: EdgeInsets.only(top: 5),
+                    //   decoration: BoxDecoration(
+                    //     color: Colors.grey[100],
+                    //     borderRadius: BorderRadius.circular(8),
+                    //   ),
+                    //   child: TextField(
+                    //     decoration: InputDecoration(
+                    //       hintText: 'Search...',
+                    //       prefixIcon: Icon(Icons.search),
+                    //       border: InputBorder.none,
+                    //       contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                    //     ),
+                    //   ),
+                    // ),
                     SizedBox(width: DertamSpacings.m),
                   ],
                 ),
