@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +23,7 @@ class TripsScreen extends StatelessWidget {
           title: Text(
             'My Trips',
             style: TextStyle(
-              color: DertamColors.primary,
+              color: DertamColors.black,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -82,47 +82,51 @@ class TripsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<Trip>>(
-      stream: Provider.of<TripProvider>(context, listen: true).getTripsStream(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting &&
-            !snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
-        final trips = snapshot.data ?? [];
+    return Container(
+      color: DertamColors.white,
+      child: StreamBuilder<List<Trip>>(
+        stream:
+            Provider.of<TripProvider>(context, listen: true).getTripsStream(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting &&
+              !snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+          final trips = snapshot.data ?? [];
 
-        final upcomingTrips = trips.where((trip) {
-          return trip.endDate.isAfter(DateTime.now());
-        }).toList();
+          final upcomingTrips = trips.where((trip) {
+            return trip.endDate.isAfter(DateTime.now());
+          }).toList();
 
-        final pastTrips = trips.where((trip) {
-          return trip.endDate.isBefore(DateTime.now());
-        }).toList();
+          final pastTrips = trips.where((trip) {
+            return trip.endDate.isBefore(DateTime.now());
+          }).toList();
 
-        return TabBarView(
-          children: [
-            // Upcoming Trips Tab
-            upcomingTrips.isEmpty
-                ? const EmptyState(
-                    title: 'No upcoming trips',
-                    subtitle: 'Plan a new trip to get started!',
-                    isPastTrips: false,
-                  )
-                : TripsList(trips: upcomingTrips),
-            // Past Trips Tab
-            pastTrips.isEmpty
-                ? const EmptyState(
-                    title: 'No past trips',
-                    subtitle: 'Your completed trips will appear here.',
-                    isPastTrips: true,
-                  )
-                : TripsList(trips: pastTrips),
-          ],
-        );
-      },
+          return TabBarView(
+            children: [
+              // Upcoming Trips Tab
+              upcomingTrips.isEmpty
+                  ? const EmptyState(
+                      title: 'No upcoming trips',
+                      subtitle: 'Plan a new trip to get started!',
+                      isPastTrips: false,
+                    )
+                  : TripsList(trips: upcomingTrips),
+              // Past Trips Tab
+              pastTrips.isEmpty
+                  ? const EmptyState(
+                      title: 'No past trips',
+                      subtitle: 'Your completed trips will appear here.',
+                      isPastTrips: true,
+                    )
+                  : TripsList(trips: pastTrips),
+            ],
+          );
+        },
+      ),
     );
   }
 }
@@ -177,10 +181,9 @@ class EmptyState extends StatelessWidget {
                       builder: (context) => const PlanNewTripScreen()),
                 );
               },
-              
               child: Text(
                 'Plan a Trip',
-                style: TextStyle(color: DertamColors.primary,fontSize: 25),
+                style: TextStyle(color: DertamColors.primary, fontSize: 25),
               ),
             ),
         ],
@@ -352,6 +355,7 @@ class TripCard extends StatelessWidget {
             : '${trip.endDate.difference(DateTime.now()).inDays} days left';
 
     return Card(
+      color: DertamColors.white,
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),

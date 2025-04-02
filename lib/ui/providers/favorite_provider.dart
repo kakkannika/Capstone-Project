@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tourism_app/models/place/place.dart';
 import 'package:tourism_app/data/repository/favorite_repository.dart';
-import 'package:tourism_app/data/repository/firebase/favorite_firebase_repository.dart';
 
 class FavoriteProvider extends ChangeNotifier {
-  final FavoriteRepository _favoriteRepository = FavoriteFirebaseRepository();
+  final FavoriteRepository _favoriteRepository;
+
   final List<String> _favoritePlaceIds = [];
   List<Place> _favoritePlaces = [];
   bool _isLoading = false;
@@ -23,7 +23,7 @@ class FavoriteProvider extends ChangeNotifier {
   List<Place> get favoritePlaces => _favoritePlaces;
   bool get isLoading => _isLoading;
 
-  FavoriteProvider() {
+  FavoriteProvider(this._favoriteRepository) {
     // Get current user ID on initialization
     _userId = FirebaseAuth.instance.currentUser?.uid;
 
@@ -54,9 +54,11 @@ class FavoriteProvider extends ChangeNotifier {
 
     try {
       _favoritePlaceIds.clear();
-      _favoritePlaceIds.addAll(await _favoriteRepository.loadFavorites(_userId!));
+      _favoritePlaceIds
+          .addAll(await _favoriteRepository.loadFavorites(_userId!));
       _updateLocalCache();
-      _favoritePlaces = await _favoriteRepository.fetchFavoritePlaces(_favoritePlaceIds);
+      _favoritePlaces =
+          await _favoriteRepository.fetchFavoritePlaces(_favoritePlaceIds);
     } catch (e) {
       print('Error loading favorites: $e');
     }
@@ -75,7 +77,8 @@ class FavoriteProvider extends ChangeNotifier {
 
   // Toggle favorite status
   void toggleFavorite(String placeId) {
-    final bool newState = !_localFavoriteCache.containsKey(placeId) || !_localFavoriteCache[placeId]!;
+    final bool newState = !_localFavoriteCache.containsKey(placeId) ||
+        !_localFavoriteCache[placeId]!;
     _localFavoriteCache[placeId] = newState;
 
     if (newState) {
@@ -134,6 +137,7 @@ class FavoriteProvider extends ChangeNotifier {
 
   // Check if a place is favorite
   bool isFavorite(String placeId) {
-    return _localFavoriteCache.containsKey(placeId) && _localFavoriteCache[placeId]!;
+    return _localFavoriteCache.containsKey(placeId) &&
+        _localFavoriteCache[placeId]!;
   }
 }

@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tourism_app/theme/theme.dart';
 import 'package:tourism_app/ui/screens/chat_bot/chat_input_field.dart';
 import 'package:tourism_app/ui/screens/chat_bot/message_list.dart';
 import 'package:tourism_app/ui/screens/chat_bot/widget/custom_chatbot_bar.dart';
-import 'package:tourism_app/ui/screens/chat_bot/widget/custom_chatbot_drawer.dart';
 import 'package:tourism_app/ui/providers/chatbot_provider.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -52,7 +52,8 @@ class _ChatScreenState extends State<ChatScreen> {
     });
 
     try {
-      final chatbotProvider = Provider.of<ChatbotProvider>(context, listen: false);
+      final chatbotProvider =
+          Provider.of<ChatbotProvider>(context, listen: false);
       await chatbotProvider.sendMessage(message);
       _animateAIResponse(chatbotProvider.response ?? "No response");
     } catch (e) {
@@ -87,20 +88,10 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  void _selectMessage(Map<String, String> message) {
-    Navigator.of(context).pop();
-    setState(() {
-      _messages.add(message);
-      _hasStartedConversation = true;
-    });
-    _scrollToBottom();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(),
-      drawer: CustomDrawer(messages: _messages, onSelectMessage: _selectMessage),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -111,13 +102,14 @@ class _ChatScreenState extends State<ChatScreen> {
                 onTap: () => _sendMessage("Hello!"),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.blueAccent,
+                    color: DertamColors.primary,
                     borderRadius: BorderRadius.circular(15),
                     boxShadow: [
                       BoxShadow(color: Colors.black26, blurRadius: 6)
                     ],
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                   child: Text(
                     "Start Chatting with our AI Assistant!",
                     style: TextStyle(
@@ -135,7 +127,8 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
             // Custom Input Field
-            ChatInputField(controller: _controller, onSendMessage: _sendMessage),
+            ChatInputField(
+                controller: _controller, onSendMessage: _sendMessage),
           ],
         ),
       ),

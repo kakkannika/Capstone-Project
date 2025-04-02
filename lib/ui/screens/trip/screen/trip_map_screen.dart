@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/models/place/place.dart';
+import 'package:tourism_app/theme/theme.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
 import 'dart:ui' as ui;
 import 'package:cloud_firestore/cloud_firestore.dart' as firestore;
@@ -767,13 +768,15 @@ class _TripMapScreenState extends State<TripMapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: DertamColors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: const Text(
+        title:  Text(
           'Trip Route Map',
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: DertamColors.black,fontWeight: FontWeight.bold),
         ),
+        centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.black),
         actions: [
           IconButton(

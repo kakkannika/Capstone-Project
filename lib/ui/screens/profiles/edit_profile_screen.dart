@@ -130,24 +130,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     // Access the auth provider
-    return Consumer<AuthServiceProvider>(
-      builder: (context, authProvider, child) {
-        return Scaffold(
-          appBar: AppBar(
-            centerTitle: true,
-            title: Text(
-              'Edit Profile',
-              style: TextStyle(
-                  color: DertamColors.primary, fontWeight: FontWeight.bold),
-            ),
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back, color: DertamColors.black),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ),
-          body: SingleChildScrollView(
+    return Scaffold(
+      backgroundColor: DertamColors.white,
+      appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: DertamColors.white,
+        title: Text(
+          'Edit Profile',
+          style:
+              TextStyle(color: DertamColors.black, fontWeight: FontWeight.bold),
+        ),
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: DertamColors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: Consumer<AuthServiceProvider>(
+        builder: (context, authProvider, child) {
+          return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               children: [
@@ -160,7 +161,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         ? FileImage(_selectedImage!) as ImageProvider
                         : (authProvider.currentUser?.photoUrl != null
                             ? NetworkImage(authProvider.currentUser!.photoUrl!)
-                            : const AssetImage('lib/assets/images/avatar.jpg')),
+                            : const AssetImage('assets/images/avatar.jpg')),
                     child: Align(
                       alignment: Alignment.bottomRight,
                       child: CircleAvatar(
@@ -198,9 +199,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 ),
               ],
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

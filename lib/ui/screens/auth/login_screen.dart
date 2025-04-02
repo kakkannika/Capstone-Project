@@ -20,6 +20,7 @@ class LoginScreen extends StatelessWidget {
     return Consumer<AuthServiceProvider>(
       builder: (context, authService, child) {
         return Scaffold(
+            backgroundColor: DertamColors.white,
             resizeToAvoidBottomInset: true, // Prevent keyboard overflow
             body: SafeArea(
               child: SingleChildScrollView(

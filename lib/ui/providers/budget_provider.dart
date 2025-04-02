@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:tourism_app/data/repository/budget_repository.dart';
 import 'package:tourism_app/data/repository/firebase/budget_firebase_repository.dart';
+import 'package:tourism_app/data/repository/firebase/trip_firebase_repository.dart';
 import 'package:tourism_app/models/budget/budget.dart';
 import 'package:tourism_app/models/budget/expend.dart';
 import 'package:tourism_app/models/trips/trips.dart';
@@ -9,7 +10,8 @@ import 'package:tourism_app/ui/providers/trip_provider.dart';
 
 class BudgetProvider with ChangeNotifier {
   final BudgetRepository _budgetService = BudgetFirebaseRepository();
-  final TripProvider _tripProvider = TripProvider();
+
+  final TripProvider _tripProvider = TripProvider(TripFirebaseRepository());
 
   Budget? _selectedBudget;
   bool _isLoading = false;
@@ -210,7 +212,6 @@ class BudgetProvider with ChangeNotifier {
       }
 
       // Debug information - remove in production
-  
 
       final budgetId = await _budgetService.createBudget(
         tripId: tripId,

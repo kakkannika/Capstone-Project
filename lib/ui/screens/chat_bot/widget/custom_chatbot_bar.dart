@@ -13,7 +13,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       flexibleSpace: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [DertamColors.primary, Colors.lightBlueAccent],
+            colors: [DertamColors.primary, DertamColors.primary],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -21,25 +21,19 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       leading: Builder(
         builder: (context) => IconButton(
-          icon: const Icon(Icons.menu, color: Colors.white),
-          onPressed: () {
-            Scaffold.of(context).openDrawer();
-          },
-        ),
-      ),
-      title: const Row(
-        children: [
-          Text("AI Chat", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-        ],
-      ),
-      actions: [
-        IconButton(
           icon: const Icon(Icons.home, color: Colors.white),
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeScreen()));
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => HomeScreen()));
           },
         ),
-      ],
+      ),
+      title: Text(
+        "Dertam Chatbot",
+        style: TextStyle(
+            color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      centerTitle: true,
     );
   }
 
