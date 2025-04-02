@@ -36,7 +36,7 @@ class JsonUploaderScreen extends StatefulWidget {
 
 class _JsonUploaderScreenState extends State<JsonUploaderScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  String _collectionName = 'myCollection';
+  String _collectionName = 'places';
   bool _isUploading = false;
   String _statusMessage = '';
   int _totalDocuments = 0;
@@ -89,7 +89,7 @@ class _JsonUploaderScreenState extends State<JsonUploaderScreen> {
       });
 
       // Load the bundled JSON file
-      String jsonContent = await rootBundle.loadString('lib/assets/place.json');
+      String jsonContent = await rootBundle.loadString('assets/place.json');
       
       // Parse JSON
       dynamic jsonData = jsonDecode(jsonContent);

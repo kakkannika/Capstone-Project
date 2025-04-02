@@ -1,4 +1,4 @@
-// ignore_for_file: constant_identifier_names
+// ignore_for_file: constant_identifier_names, avoid_print
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -12,6 +12,7 @@ class Place {
   final double averageRating;
   final double entranceFees;
   final String openingHours;
+  final String province; 
 
   Place({
     required this.id,
@@ -23,6 +24,7 @@ class Place {
     required this.averageRating,
     required this.entranceFees,
     required this.openingHours,
+    required this.province, 
   });
 
   factory Place.fromFirestore(DocumentSnapshot doc) {
@@ -55,11 +57,12 @@ class Place {
       averageRating: (data['averageRating'] ?? 0).toDouble(),
       entranceFees: (data['entranceFees'] ?? 0).toDouble(),
       openingHours: data['openingHours'] ?? '',
+      province: data['province'] ?? '', // New field
     );
   }
+
   @override
   String toString() {
-    return 'Place{id: $id, name: $name, category: $category, imageUrls: $imageURL}';
+    return 'Place{id: $id, name: $name, category: $category, imageUrls: $imageURL, province: $province}';
   }
-}       
-
+}
