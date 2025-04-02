@@ -68,7 +68,7 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                       style: TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
-                        color: DertamColors.primary,
+                        color: DertamColors.black,
                       ),
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,

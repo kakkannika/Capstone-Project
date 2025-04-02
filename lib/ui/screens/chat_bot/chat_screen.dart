@@ -1,20 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-<<<<<<< HEAD:lib/presentation/screens/chat_bot/chat_screen.dart
-import 'package:tourism_app/presentation/screens/chat_bot/chat_input_field.dart';
-import 'package:tourism_app/presentation/screens/chat_bot/message_list.dart';
-import 'package:tourism_app/presentation/screens/chat_bot/widget/custom_chatbot_bar.dart';
-import 'package:tourism_app/presentation/screens/chat_bot/widget/custom_chatbot_drawer.dart';
-import 'package:tourism_app/providers/chatbot_provider.dart';
-import 'package:tourism_app/theme/theme.dart';
-=======
 import 'package:provider/provider.dart';
+import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/providers/chatbot_provider.dart';
 import 'package:tourism_app/ui/screens/chat_bot/chat_input_field.dart';
 import 'package:tourism_app/ui/screens/chat_bot/message_list.dart';
 import 'package:tourism_app/ui/screens/chat_bot/widget/custom_chatbot_bar.dart';
-import 'package:tourism_app/ui/screens/chat_bot/widget/custom_chatbot_drawer.dart';
-import 'package:tourism_app/ui/providers/chatbot_provider.dart';
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/chat_bot/chat_screen.dart
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -61,7 +52,8 @@ class _ChatScreenState extends State<ChatScreen> {
     });
 
     try {
-      final chatbotProvider = Provider.of<ChatbotProvider>(context, listen: false);
+      final chatbotProvider =
+          Provider.of<ChatbotProvider>(context, listen: false);
       await chatbotProvider.sendMessage(message);
       _animateAIResponse(chatbotProvider.response ?? "No response");
     } catch (e) {
@@ -96,20 +88,10 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
-  void _selectMessage(Map<String, String> message) {
-    Navigator.of(context).pop();
-    setState(() {
-      _messages.add(message);
-      _hasStartedConversation = true;
-    });
-    _scrollToBottom();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(),
-      drawer: CustomDrawer(messages: _messages, onSelectMessage: _selectMessage),
       body: Padding(
         padding: EdgeInsets.all(DertamSpacings.m),
         child: Column(
@@ -120,8 +102,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 onTap: () => _sendMessage("Hello!"),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.blueAccent,
-                    borderRadius: BorderRadius.circular(DertamSpacings.radius),
+                    color: DertamColors.primary,
+                    borderRadius: BorderRadius.circular(15),
                     boxShadow: [
                       BoxShadow(
                         color: DertamColors.black.withOpacity(0.2),
@@ -129,15 +111,14 @@ class _ChatScreenState extends State<ChatScreen> {
                       ),
                     ],
                   ),
-<<<<<<< HEAD:lib/presentation/screens/chat_bot/chat_screen.dart
+
                   padding:
                       const EdgeInsets.symmetric(
                         vertical: DertamSpacings.m,
                         horizontal: DertamSpacings.l,
                         ),
-=======
-                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/chat_bot/chat_screen.dart
+        
+
                   child: Text(
                     "Start Chatting with our AI Assistant!",
                     style: DertamTextStyles.title.copyWith(
@@ -154,7 +135,8 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
             // Custom Input Field
-            ChatInputField(controller: _controller, onSendMessage: _sendMessage),
+            ChatInputField(
+                controller: _controller, onSendMessage: _sendMessage),
           ],
         ),
       ),

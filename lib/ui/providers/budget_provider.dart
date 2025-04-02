@@ -1,25 +1,17 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-<<<<<<< HEAD:lib/providers/budget_provider.dart
-import 'package:tourism_app/models/budget/budget.dart';
-import 'package:tourism_app/models/budget/expend.dart';
-import 'package:tourism_app/models/trips/trips.dart';
-import 'package:tourism_app/providers/trip_provider.dart';
-import 'package:tourism_app/repository/budget_repository.dart';
-import 'package:tourism_app/repository/firebase/budget_firebase_repository.dart';
-
-=======
 import 'package:tourism_app/data/repository/budget_repository.dart';
 import 'package:tourism_app/data/repository/firebase/budget_firebase_repository.dart';
+import 'package:tourism_app/data/repository/firebase/trip_firebase_repository.dart';
 import 'package:tourism_app/models/budget/budget.dart';
 import 'package:tourism_app/models/budget/expend.dart';
 import 'package:tourism_app/models/trips/trips.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/providers/budget_provider.dart
 
 class BudgetProvider with ChangeNotifier {
   final BudgetRepository _budgetService = BudgetFirebaseRepository();
-  final TripProvider _tripProvider = TripProvider();
+
+  final TripProvider _tripProvider = TripProvider(TripFirebaseRepository());
 
   Budget? _selectedBudget;
   bool _isLoading = false;
@@ -220,7 +212,6 @@ class BudgetProvider with ChangeNotifier {
       }
 
       // Debug information - remove in production
-  
 
       final budgetId = await _budgetService.createBudget(
         tripId: tripId,

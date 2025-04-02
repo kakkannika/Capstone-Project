@@ -3,11 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/models/trips/trips.dart';
-import 'package:tourism_app/presentation/screens/budget/expend_screen.dart';
-import 'package:tourism_app/presentation/widgets/dertam_textfield.dart';
-import 'package:tourism_app/providers/budget_provider.dart';
-import 'package:tourism_app/providers/trip_provider.dart';
 import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/providers/budget_provider.dart';
+import 'package:tourism_app/ui/providers/trip_provider.dart';
+import 'package:tourism_app/ui/screens/budget/expend_screen.dart';
+import 'package:tourism_app/ui/widgets/dertam_textfield.dart';
 
 class BudgetScreen extends StatefulWidget {
   final String tripId;

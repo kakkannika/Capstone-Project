@@ -115,7 +115,6 @@ class _ItineraryPageState extends State<ItineraryPage> {
     if (widget.tripId == null) {
       return const Center(child: Text('No trip selected'));
     }
-
     return StreamBuilder<List<Trip>>(
         stream:
             Provider.of<TripProvider>(context, listen: false).getTripsStream(),
@@ -130,18 +129,25 @@ class _ItineraryPageState extends State<ItineraryPage> {
           }
 
           final trips = snapshot.data ?? [];
-          final trip = trips.firstWhere(
-            (t) => t.id == widget.tripId,
-            orElse: () => Trip(
-              id: widget.tripId!,
-              userId: '',
-              tripName: 'Trip not found',
-              startDate: DateTime.now(),
-              endDate: DateTime.now().add(const Duration(days: 1)),
-              days: [],
-            ),
-          );
+          final trip = trips.firstWhere((t) => t.id == widget.tripId);
 
+          return Scaffold(
+            backgroundColor: DertamColors.white,
+            appBar: AppBar(
+              automaticallyImplyLeading: false, // Remove auto back button
+              backgroundColor: DertamColors.white,
+
+              elevation: 0,
+            ),
+            body: Column(
+              children: [
+                // Divider
+                Container(
+                  height: 1,
+                  color: Colors.grey[300],
+                ),
+
+<<<<<<< HEAD
           return WillPopScope(
             onWillPop: () async => false, // Disable back button
             child: Scaffold(
@@ -229,6 +235,56 @@ class _ItineraryPageState extends State<ItineraryPage> {
                   ),
                 ],
               ),
+=======
+                // PageView
+                Expanded(
+                  child: _buildItineraryPage(trip),
+                ),
+              ],
+            ),
+            floatingActionButton: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                FloatingActionButton(
+                  onPressed: _isLoadingBudget
+                      ? null
+                      : () => _navigateToBudgetScreen(trip),
+                  backgroundColor: DertamColors.primary,
+                  heroTag: 'Budget',
+                  shape: CircleBorder(),
+                  child: _isLoadingBudget
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Icon(Icons.wallet, color: Colors.white),
+                ),
+                const SizedBox(height: 16),
+                FloatingActionButton(
+                  onPressed: () {
+                    if (trip.days.isNotEmpty &&
+                        _selectedDayIndex < trip.days.length) {
+                      // Navigate to map screen
+                      _navigateToMapScreen(trip.days[_selectedDayIndex]);
+                    }
+                  },
+                  backgroundColor: DertamColors.white,
+                  heroTag: 'map',
+                  shape: CircleBorder(),
+                  child: Icon(Icons.map, color: DertamColors.primary),
+                ),
+                const SizedBox(height: 16),
+                FloatingActionButton(
+                  onPressed: () {
+                    if (trip.days.isNotEmpty &&
+                        _selectedDayIndex < trip.days.length) {
+                      _navigateToSearchPlace(trip.days[_selectedDayIndex]);
+                    }
+                  },
+                  backgroundColor: DertamColors.primary,
+                  shape: CircleBorder(),
+                  heroTag: 'add',
+                  child: const Icon(Icons.add, color: Colors.white),
+                ),
+              ],
+>>>>>>> db76e5e9e5522789ba9cc73223b2a04c699a82ad
             ),
           );
         });
@@ -277,8 +333,11 @@ class _ItineraryPageState extends State<ItineraryPage> {
     if (trip.days.isEmpty) {
       return const Center(child: Text('No days in this trip'));
     }
+<<<<<<< HEAD
 
 >>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/trip/screen/trip_detail_screen.dart
+=======
+>>>>>>> db76e5e9e5522789ba9cc73223b2a04c699a82ad
     // Ensure _selectedDayIndex is within bounds
     if (_selectedDayIndex >= trip.days.length) {
       _selectedDayIndex = 0;
@@ -303,9 +362,14 @@ class _ItineraryPageState extends State<ItineraryPage> {
                 color: DertamColors.primary,
                 shape: BoxShape.circle,
               ),
+<<<<<<< HEAD
               child: const Icon(Icons.edit_calendar_rounded,
                   color: Colors.white, size: 20),
 >>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/trip/screen/trip_detail_screen.dart
+=======
+              child: Icon(Icons.edit_calendar_rounded,
+                  color: DertamColors.white, size: 20),
+>>>>>>> db76e5e9e5522789ba9cc73223b2a04c699a82ad
             ),
 
             // Date Pills
@@ -397,7 +461,6 @@ class _ItineraryPageState extends State<ItineraryPage> {
         ),
 
         const SizedBox(height: 16),
-
         // Places for this day - Using StreamBuilder for real-time updates
         StreamBuilder<List<Place>>(
           stream: tripProvider.getPlacesForDayStream(
@@ -501,8 +564,8 @@ class _ItineraryPageState extends State<ItineraryPage> {
             onPressed: (context) {
               _deletePlaceFromTrip(place.id, currentDay!.id);
             },
-            backgroundColor: Colors.red,
-            foregroundColor: Colors.white,
+            backgroundColor: DertamColors.red,
+            foregroundColor: DertamColors.white,
             icon: Icons.delete,
             label: 'Delete',
           ),
@@ -510,7 +573,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: DertamColors.white,
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(

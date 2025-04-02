@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/data/repository/firebase/place_firebase_repository.dart';
 import 'package:tourism_app/data/repository/place_repository.dart';
 import 'package:tourism_app/models/place/place.dart';
 
 class PlaceProvider extends ChangeNotifier {
-  final PlaceRepository _placeRepository = PlaceFirebaseRepository();
-  // final PlaceRepository _placeRepository = PlaceMockRepository();
+  final PlaceRepository _placeRepository;
+  PlaceProvider(this._placeRepository) {
+    // Initialize the provider by fetching all places
+    fetchAllPlaces();
+  }
 
   List<Place> _places = [];
   bool _isLoading = false;
@@ -14,7 +16,7 @@ class PlaceProvider extends ChangeNotifier {
   List<Place> get places => _places;
   bool get isLoading => _isLoading;
   String? get error => _error;
-
+  
   void _setLoading(bool loading) {
     _isLoading = loading;
     notifyListeners();
@@ -59,18 +61,22 @@ class PlaceProvider extends ChangeNotifier {
     return null;
   }
 
-  Future<void> fetchPlacesByCategory(String category) async {
+  Future<List<Place?>> fetchPlacesByCategory(
+      String category, String province) async {
     _setLoading(true);
     try {
-      _places = await _placeRepository.fetchPlacesByCategory(category);
+      _places =
+          await _placeRepository.fetchPlacesByCategory(category, province);
       _setError(null);
     } catch (e) {
       _setError('Failed to fetch places by category');
     }
     _setLoading(false);
+    return _places;
   }
 
-  Future<void> fetchHighlyRatedPlaces(double minRating, String province) async {
+  Future<List<Place>> fetchHighlyRatedPlaces(
+      double minRating, String province) async {
     _setLoading(true);
     try {
       _places =
@@ -79,7 +85,8 @@ class PlaceProvider extends ChangeNotifier {
     } catch (e) {
       _setError('Failed to fetch places by highly rating');
     }
-    _setLoading(false);
+    notifyListeners();
+    return _places;
   }
 
   Future<void> searchPlace(String query) async {

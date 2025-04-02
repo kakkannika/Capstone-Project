@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:provider/provider.dart';
+import 'package:tourism_app/theme/theme.dart';
 import 'package:tourism_app/ui/providers/auth_provider.dart';
 import 'package:tourism_app/ui/screens/chat_bot/chat_screen.dart';
 import 'package:tourism_app/ui/screens/home/detail_home_pages.dart';
@@ -64,9 +65,8 @@ class HomeScreen extends StatelessWidget {
       // header 
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        
         elevation: 0,
-        backgroundColor: Colors.transparent,
+        backgroundColor: DertamColors.white,
         title: Row(
           children: [
             GestureDetector(
@@ -89,216 +89,213 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(width: 15),
             Text(
               'Hello, $displayName',
-              style: const TextStyle(
+              style:  TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
-                color: Colors.black,
+                color: DertamColors.black,
               ),
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: Colors.black),
-            onPressed: () {},
-          ),
-          const SizedBox(width: 8),
-        ],
+       
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: double.infinity,
-                height: 200,
-                margin: const EdgeInsets.symmetric(horizontal: 1),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.asset(
-                    'assets/place_images/Angkor.jpg',
-                    width: double.infinity,
-                    height: 250,
-                    fit: BoxFit.cover,
+      body: Container(
+        color: DertamColors.white,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: 200,
+                  margin: const EdgeInsets.symmetric(horizontal: 1),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.asset(
+                      'assets/place_images/Angkor.jpg',
+                      width: double.infinity,
+                      height: 250,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
-              ),
-
-              // Popular destination section
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Popular Provinces',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+        
+                // Popular destination section
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Popular Provinces',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-
-              // Popular destination carousel slider
-              CarouselSlider(
-                options: CarouselOptions(
-                  height: 200,
-                  enlargeCenterPage: true,
-                  autoPlay: true,
-                  aspectRatio: 16 / 9,
-                  autoPlayCurve: Curves.fastOutSlowIn,
-                  enableInfiniteScroll: true,
-                  autoPlayAnimationDuration: const Duration(milliseconds: 800),
-                  viewportFraction: 0.8,
-                ),
-                items: provinces.take(4).map((province) {
-                  return Builder(
-                    builder: (BuildContext context) {
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DetailHomePages(
-                                province: province.displayName,
-                              ),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.all(5.0),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10.0),
-                            image: DecorationImage(
-                              image: AssetImage(province.imagePath),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          child: Stack(
-                            children: [
-                              Positioned(
-                                bottom: 10,
-                                left: 10,
-                                child: Text(
-                                  province.displayName,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    shadows: [
-                                      Shadow(
-                                        blurRadius: 10.0,
-                                        color: Colors.black,
-                                        offset: Offset(2.0, 2.0),
-                                      ),
-                                    ],
-                                  ),
+        
+                // Popular destination carousel slider
+                CarouselSlider(
+                  options: CarouselOptions(
+                    height: 200,
+                    enlargeCenterPage: true,
+                    autoPlay: true,
+                    aspectRatio: 16 / 9,
+                    autoPlayCurve: Curves.fastOutSlowIn,
+                    enableInfiniteScroll: true,
+                    autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                    viewportFraction: 0.8,
+                  ),
+                  items: provinces.take(4).map((province) {
+                    return Builder(
+                      builder: (BuildContext context) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailHomePages(
+                                  province: province.displayName,
                                 ),
                               ),
-                            ],
+                            );
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.all(5.0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              image: DecorationImage(
+                                image: AssetImage(province.imagePath),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  bottom: 10,
+                                  left: 10,
+                                  child: Text(
+                                    province.displayName,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      shadows: [
+                                        Shadow(
+                                          blurRadius: 10.0,
+                                          color: Colors.black,
+                                          offset: Offset(2.0, 2.0),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  );
-                }).toList(),
-              ),
-
-              // Explore Destination section
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text(
-                  'Explore Destination',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                        );
+                      },
+                    );
+                  }).toList(),
+                ),
+        
+                // Explore Destination section
+                const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    'Explore Destination',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-
-              // Destination grid using Province enum
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 1.1,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                ),
-                itemCount: 4,
-                itemBuilder: (context, index) {
-                  final province = provinces[index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DetailHomePages(
-                            province: province.displayName,
+        
+                // Destination grid using Province enum
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 1.1,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                  ),
+                  itemCount: 4,
+                  itemBuilder: (context, index) {
+                    final province = provinces[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailHomePages(
+                              province: province.displayName,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                    child: ProvincesCard(
-                      image: province.imagePath,
-                      title: province.displayName,
+                        );
+                      },
+                      child: ProvincesCard(
+                        image: province.imagePath,
+                        title: province.displayName,
+                      ),
+                    );
+                  },
+                ),
+        
+                // Weekend Trips section
+                const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    'Weekend Trips',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
-                  );
-                },
-              ),
-
-              // Weekend Trips section
-              const Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text(
-                  'Weekend Trips',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
-
-              // Weekend trips grid using Province enum
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 1.1,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                ),
-                itemCount: provinces.length,
-                itemBuilder: (context, index) {
-                  final province = provinces[index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DetailHomePages(
-                            province: province.displayName,
+        
+                // Weekend trips grid using Province enum
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 1.1,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                  ),
+                  itemCount: provinces.length,
+                  itemBuilder: (context, index) {
+                    final province = provinces[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailHomePages(
+                              province: province.displayName,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                    child: ProvincesCard(
-                      image: province.imagePath,
-                      title: province.displayName,
-                    ),
-                  );
-                },
-              ),
-
-              const SizedBox(height: 80), // Bottom padding for navigation bar
-            ],
+                        );
+                      },
+                      child: ProvincesCard(
+                        image: province.imagePath,
+                        title: province.displayName,
+                      ),
+                    );
+                  },
+                ),
+        
+                const SizedBox(height: 80), // Bottom padding for navigation bar
+              ],
+            ),
           ),
         ),
       ),

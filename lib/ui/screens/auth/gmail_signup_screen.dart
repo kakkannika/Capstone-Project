@@ -30,6 +30,7 @@ class _RegisterScreenState extends State<EmailRegisterScreen> {
     return Consumer<AuthServiceProvider>(
       builder: (context, authService, child) {
         return Scaffold(
+          backgroundColor: DertamColors.white,
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),

@@ -29,7 +29,7 @@ class ProfileScreen extends StatelessWidget {
         physics: const BouncingScrollPhysics(),
         child: Container(
           width: double.infinity,
-          color: Colors.white,
+          color: DertamColors.white,
           child: Column(
             children: [
               const SizedBox(height: 24),

@@ -1,19 +1,8 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/models/trips/trips.dart';
-<<<<<<< HEAD:lib/presentation/screens/trip/screen/trips_screen.dart
-import 'package:tourism_app/presentation/screens/trip/screen/edit_trip_screen.dart';
-import 'package:tourism_app/presentation/screens/trip/screen/start_plan_screen.dart';
-import 'package:tourism_app/presentation/screens/trip/screen/trip_planner_screen.dart';
-import 'package:tourism_app/presentation/widgets/navigationBar.dart';
-import 'package:tourism_app/providers/trip_provider.dart';
-import 'package:tourism_app/theme/theme.dart';
-
-//this screen is used to show the trips of the user. It has two tabs: upcoming and history. The user can add a new trip by clicking on the floating action button.
-class TripsScreen extends StatefulWidget {
-=======
 import 'package:tourism_app/theme/theme.dart';
 import 'package:tourism_app/ui/screens/trip/screen/edit_trip_screen.dart';
 import 'package:tourism_app/ui/screens/trip/screen/start_plan_screen.dart';
@@ -22,7 +11,6 @@ import 'package:tourism_app/ui/widgets/navigationBar.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
 
 class TripsScreen extends StatelessWidget {
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/trip/trips_screen.dart
   const TripsScreen({super.key});
 
   @override
@@ -35,7 +23,7 @@ class TripsScreen extends StatelessWidget {
           title: Text(
             'My Trips',
             style: TextStyle(
-              color: DertamColors.primary,
+              color: DertamColors.black,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -94,82 +82,6 @@ class TripsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD:lib/presentation/screens/trip/screen/trips_screen.dart
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'My Trips',
-          style: TextStyle(
-            color: DertamColors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        backgroundColor: DertamColors.white,
-        elevation: 0,
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: DertamColors.primary,
-          unselectedLabelColor: DertamColors.grey,
-          indicatorColor: DertamColors.primary,
-          tabs: const [
-            Tab(text: 'Upcoming'),
-            Tab(text: 'History'),
-          ],
-        ),
-      ),
-      body: StreamBuilder<List<Trip>>(
-        stream:
-            Provider.of<TripProvider>(context, listen: true).getTripsStream(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting &&
-              !snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
-          final trips = snapshot.data ?? [];
-
-          final upcomingTrips = trips.where((trip) {
-            return trip.endDate.isAfter(DateTime.now());
-          }).toList();
-
-          final pastTrips = trips.where((trip) {
-            return trip.endDate.isBefore(DateTime.now());
-          }).toList();
-
-          return TabBarView(
-            controller: _tabController,
-            children: [
-              // Upcoming Trips Tab
-              upcomingTrips.isEmpty
-                  ? _buildEmptyState(
-                      'No upcoming trips', 'Ready to go? Plan your next trip now!',showButton: true)
-                  : _buildTripsList(upcomingTrips),
-              // Past Trips Tab
-              pastTrips.isEmpty
-                  ? _buildEmptyState(
-                      'No completed trips yet!', 'Once you finish a trip, you’ll see it here',showButton: false)
-                  : _buildTripsList(pastTrips),
-            ],
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const PlanNewTripScreen()),
-          );
-        },
-        
-        backgroundColor: DertamColors.white,
-        shape: const CircleBorder(),
-        child: Icon(Icons.add,
-            color: DertamColors.primary, size: 30),
-      ),
-      bottomNavigationBar: const Navigationbar(currentIndex: 1),
-=======
     return StreamBuilder<List<Trip>>(
       stream: Provider.of<TripProvider>(context, listen: true).getTripsStream(),
       builder: (context, snapshot) {
@@ -182,13 +94,13 @@ class TripsBody extends StatelessWidget {
         }
         final trips = snapshot.data ?? [];
 
-        final upcomingTrips = trips.where((trip) {
-          return trip.endDate.isAfter(DateTime.now());
-        }).toList();
+          final upcomingTrips = trips.where((trip) {
+            return trip.endDate.isAfter(DateTime.now());
+          }).toList();
 
-        final pastTrips = trips.where((trip) {
-          return trip.endDate.isBefore(DateTime.now());
-        }).toList();
+          final pastTrips = trips.where((trip) {
+            return trip.endDate.isBefore(DateTime.now());
+          }).toList();
 
         return TabBarView(
           children: [
@@ -211,14 +123,13 @@ class TripsBody extends StatelessWidget {
           ],
         );
       },
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/trip/trips_screen.dart
     );
   }
 }
 
-<<<<<<< HEAD:lib/presentation/screens/trip/screen/trips_screen.dart
-  Widget _buildEmptyState(String title, String subtitle,{bool showButton = true}) {
-=======
+class TripsList {
+}
+
 class EmptyState extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -234,17 +145,12 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/trip/trips_screen.dart
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Image.asset(
-<<<<<<< HEAD:lib/presentation/screens/trip/screen/trips_screen.dart
-            'lib/assets/images/empty.png',
-=======
             'assets/images/empty.png',
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/trip/trips_screen.dart
             width: 80,
             height: 80,
           ),
@@ -263,28 +169,6 @@ class EmptyState extends StatelessWidget {
               color: DertamColors.grey,
             ),
           ),
-<<<<<<< HEAD:lib/presentation/screens/trip/screen/trips_screen.dart
-          //SizedBox(height: DertamSpacings.s-4),
-          if (showButton)
-          TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const PlanNewTripScreen(),
-                ),
-              );
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: DertamColors.primary,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              textStyle: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            child: const Text('Start Planning'),
-=======
           const SizedBox(height: 24),
           // Only show the button if it's not the past trips tab
           if (!isPastTrips)
@@ -296,10 +180,9 @@ class EmptyState extends StatelessWidget {
                       builder: (context) => const PlanNewTripScreen()),
                 );
               },
-              
               child: Text(
                 'Plan a Trip',
-                style: TextStyle(color: DertamColors.primary,fontSize: 25),
+                style: TextStyle(color: DertamColors.primary, fontSize: 25),
               ),
             ),
         ],
@@ -412,7 +295,6 @@ class TripsList extends StatelessWidget {
             },
             style: TextButton.styleFrom(foregroundColor: DertamColors.red),
             child: const Text('Delete'),
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/trip/trips_screen.dart
           ),
         ],
       ),
@@ -472,6 +354,7 @@ class TripCard extends StatelessWidget {
             : '${trip.endDate.difference(DateTime.now()).inDays} days left';
 
     return Card(
+      color: DertamColors.white,
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),

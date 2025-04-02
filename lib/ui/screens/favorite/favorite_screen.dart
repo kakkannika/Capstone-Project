@@ -33,64 +33,67 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
         title: Text(
           'My Favorites',
           style: TextStyle(
-              color: DertamColors.primary, fontWeight: FontWeight.bold),
+              color: DertamColors.black, fontWeight: FontWeight.bold),
         ),
         elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: DertamColors.white,
+        foregroundColor: DertamColors.black,
         centerTitle: true,
       ),
-      body: Consumer<FavoriteProvider>(
-        builder: (context, favoriteProvider, child) {
-          if (favoriteProvider.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          if (favoriteProvider.favoritePlaces.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.favorite_border,
-                    size: 80,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'No favorites yet',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Start exploring and add places to your favorites',
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            );
-          }
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: favoriteProvider.favoritePlaces.length,
-            itemBuilder: (context, index) {
-              final place = favoriteProvider.favoritePlaces[index];
-              return _FavoriteItem(
-                place: place,
-                onRemove: () {
-                  // Remove locally first for immediate UI feedback
-                  setState(() {});
-                },
+      body: Container(
+        color: DertamColors.white,
+        child: Consumer<FavoriteProvider>(
+          builder: (context, favoriteProvider, child) {
+            if (favoriteProvider.isLoading) {
+              return const Center(
+                child: CircularProgressIndicator(),
               );
-            },
-          );
-        },
+            }
+
+            if (favoriteProvider.favoritePlaces.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.favorite_border,
+                      size: 80,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'No favorites yet',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Start exploring and add places to your favorites',
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: favoriteProvider.favoritePlaces.length,
+              itemBuilder: (context, index) {
+                final place = favoriteProvider.favoritePlaces[index];
+                return _FavoriteItem(
+                  place: place,
+                  onRemove: () {
+                    // Remove locally first for immediate UI feedback
+                    setState(() {});
+                  },
+                );
+              },
+            );
+          },
+        ),
       ),
       bottomNavigationBar: const Navigationbar(currentIndex: 2),
     );

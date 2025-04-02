@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:tourism_app/data/repository/trip_repository.dart';
 import 'package:tourism_app/models/place/place.dart';
 import 'package:tourism_app/models/trips/trips.dart';
-import 'package:tourism_app/data/repository/firebase/trip_firebase_repository.dart';
 
 class TripProvider with ChangeNotifier {
-  final TripRepository _tripService = TripFirebaseRepository();
+  final TripRepository _tripService;
+  TripProvider(this._tripService) {
+    // Initialize the provider by fetching all trips
+    fetchTripsForCurrentUser();
+  }
   List<Trip> _trips = [];
   Trip? _selectedTrip;
   bool _isLoading = false;
@@ -334,7 +337,6 @@ class TripProvider with ChangeNotifier {
       return null;
     }
   }
-  
 
   @override
   void dispose() {

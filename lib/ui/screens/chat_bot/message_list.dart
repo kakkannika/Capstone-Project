@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-<<<<<<< HEAD:lib/presentation/screens/chat_bot/message_list.dart
-import 'package:tourism_app/providers/auth_provider.dart';
 import 'package:tourism_app/theme/theme.dart';
-=======
 import 'package:tourism_app/ui/providers/auth_provider.dart';
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/chat_bot/message_list.dart
 
 class MessageList extends StatelessWidget {
   final List<Map<String, String>> messages;

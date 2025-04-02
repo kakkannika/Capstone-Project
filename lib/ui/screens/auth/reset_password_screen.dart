@@ -23,6 +23,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return Consumer<AuthServiceProvider>(
       builder: (context, authService, child) {
         return Scaffold(
+          backgroundColor: DertamColors.white,
             body: SafeArea(
           child: SingleChildScrollView(
             child: Form(

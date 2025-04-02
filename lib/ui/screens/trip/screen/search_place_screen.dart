@@ -51,6 +51,7 @@ class _SearchPlaceScreenState extends State<SearchPlaceScreen> {
     return Consumer<PlaceProvider>(
       builder: (context, placeProvider, child) {
         return Scaffold(
+          backgroundColor: DertamColors.white,
           body: SafeArea(
             child: Column(
               children: [

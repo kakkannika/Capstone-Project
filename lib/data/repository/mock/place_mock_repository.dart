@@ -21,9 +21,13 @@ class PlaceMockRepository implements PlaceRepository {
   }
 
   @override
-  Future<List<Place>> fetchPlacesByCategory(String category) async {
+  Future<List<Place>> fetchPlacesByCategory(
+      String category, String province) async {
     return Future.delayed(Duration(seconds: 1), () {
-      return _places.where((place) => place.category == category).toList();
+      return _places
+          .where((place) => place.category == category)
+          .where((place) => place.province == province)
+          .toList();
     });
   }
 
@@ -50,5 +54,4 @@ class PlaceMockRepository implements PlaceRepository {
           .toList();
     });
   }
-
 }

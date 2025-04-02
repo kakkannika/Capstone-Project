@@ -63,230 +63,234 @@ class _HomeScreenState extends State<DetailHomePages> {
           .toList();
 
       return Scaffold(
+        backgroundColor: DertamColors.white,
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          title: Row(
-            children: [
-              // Header Section
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    HomeScreen())); // Navigate back to the previous screen
-                      },
-                      child:  Icon(Icons.home, size: 24,),
-                    ),
-                    SizedBox(
-                      width: 50,
-                    ),
-                    Text(
-                      widget.province, // Display the province name
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: DertamColors.primary,
-                      ),
-                    ),
-                    const SizedBox(width: 24), // Placeholder for alignment
-                  ],
-                ),
-              ),
-            ],
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          HomeScreen())); // Navigate back to the previous screen
+            },
+            child: Icon(
+              Icons.home,
+              size: 30,
+              color: DertamColors.grey,
+            ),
           ),
+          elevation: 0,
+          backgroundColor: DertamColors.white,
+          title: Text(
+            widget.province, // Display the province name
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: DertamColors.black,
+            ),
+          ),
+          centerTitle: true,
         ),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Hero Image & Search Bar
-                Stack(
-                  children: [
-                    Image.asset(
-                      province.imagePath,
-                      width: double.infinity,
-                      height: 250,
-                      fit: BoxFit.cover,
-                    ),
-                    Positioned(
-                      left: 16,
-                      right: 16,
-                      bottom: 16,
-                      child: TamSearchbar(
-                        onSearchTap: () {
-                          onBackPressed();
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-
-                // Popular Destination Section
-                // Popular Destination Section
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        body: Container(
+          color: DertamColors.white,
+          child: SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Hero Image & Search Bar
+                  Stack(
                     children: [
-                      const Text(
-                        'Popular Destinations',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      Image.asset(
+                        province.imagePath,
+                        width: double.infinity,
+                        height: 250,
+                        fit: BoxFit.cover,
+                      ),
+                      Positioned(
+                        left: 16,
+                        right: 16,
+                        bottom: 16,
+                        child: TamSearchbar(
+                          onSearchTap: () {
+                            onBackPressed();
+                          },
                         ),
                       ),
                     ],
                   ),
-                ),
 
-// If there are popular places, show the list; otherwise, show a message
-                popularPlaces.isNotEmpty
-                    ? SizedBox(
-                        height: 150,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          itemCount: popularPlaces.length,
-                          itemBuilder: (context, index) {
-                            return Stack(
-                              children: [
-                                GestureDetector(
-                                  onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => DetailEachPlace(
-                                          placeId: popularPlaces[index].id),
-                                    ),
-                                  ),
-                                  child: Container(
-                                    width: 280,
-                                    margin: const EdgeInsets.only(right: 16),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      image: DecorationImage(
-                                        image: NetworkImage(
-                                            popularPlaces[index].imageURL),
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Consumer<FavoriteProvider>(
-                                  builder: (context, favoriteProvider, _) {
-                                    return Positioned(
-                                      top: 8,
-                                      right: 24,
-                                      child: Container(
-                                        decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.white,
-                                        ),
-                                        child: _FavoriteButton(
-                                          placeId: popularPlaces[index].id,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      )
-                    : Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Center(
-                          child: Text(
-                            'No popular destinations available in ${widget.province}.',
-                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                  // Popular Destination Section
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Popular Destinations',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-
-                // Explore Destination Section
-                const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Text(
-                    'Explore Destination',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                      ],
                     ),
                   ),
-                ),
 
-                // Category Filter Chips
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      'all',
-                      'Museum',
-                      'Market',
-                      'Entertain Attraction',
-                      'Historical Place',
-                      'Restaurant',
-                      'Hotel',
-                    ]
-                        .map((category) => Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 3.0),
-                              child: FiltersChip(
-                                label: category,
-                                isSelected: selectedCategory == category,
-                                onTap: () {
-                                  setState(() {
-                                    selectedCategory = category;
-                                  });
-                                },
-                              ),
-                            ))
-                        .toList(),
-                  ),
-                ),
-
-                // Destination Grid View
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 1.1,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                  ),
-                  itemCount: filteredPlaces.length,
-                  itemBuilder: (context, index) {
-                    return DestinationCard(
-                      image: filteredPlaces[index].imageURL,
-                      title: filteredPlaces[index].name,
-                      rating: filteredPlaces[index].averageRating,
-                      placeId: filteredPlaces[index].id,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DetailEachPlace(
-                                placeId: filteredPlaces[index].id),
+                  // If there are popular places, show the list; otherwise, show a message
+                  popularPlaces.isNotEmpty
+                      ? SizedBox(
+                          height: 150,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            itemCount: popularPlaces.length,
+                            itemBuilder: (context, index) {
+                              return Stack(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => DetailEachPlace(
+                                            placeId: popularPlaces[index].id),
+                                      ),
+                                    ),
+                                    child: Container(
+                                      width: 280,
+                                      margin: const EdgeInsets.only(right: 16),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        image: DecorationImage(
+                                          image: NetworkImage(
+                                              popularPlaces[index].imageURL),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Consumer<FavoriteProvider>(
+                                    builder: (context, favoriteProvider, _) {
+                                      return Positioned(
+                                        top: 8,
+                                        right: 24,
+                                        child: Container(
+                                          decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.white,
+                                          ),
+                                          child: _FavoriteButton(
+                                            placeId: popularPlaces[index].id,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
                           ),
-                        );
-                      },
-                    );
-                  },
-                ),
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Center(
+                            child: Text(
+                              'No popular destinations available in ${widget.province}.',
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.grey),
+                            ),
+                          ),
+                        ),
 
-                const SizedBox(height: 80),
-              ],
+                  // Explore Destination Section
+                  const Padding(
+                    padding: EdgeInsets.all(12.0),
+                    child: Text(
+                      'Explore Destination',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+
+                  // Category Filter Chips
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      children: [
+                        'all',
+                        'Museum',
+                        'Market',
+                        'Entertain Attraction',
+                        'Historical Place',
+                        'Restaurant',
+                        'Hotel',
+                      ]
+                          .map((category) => Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 3.0),
+                                child: FiltersChip(
+                                  label: category,
+                                  isSelected: selectedCategory == category,
+                                  onTap: () {
+                                    setState(() {
+                                      selectedCategory = category;
+                                    });
+                                  },
+                                ),
+                              ))
+                          .toList(),
+                    ),
+                  ),
+
+                  // Destination Grid View
+                  filteredPlaces.isNotEmpty
+                      ? GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 1.1,
+                            crossAxisSpacing: 16,
+                            mainAxisSpacing: 16,
+                          ),
+                          itemCount: filteredPlaces.length,
+                          itemBuilder: (context, index) {
+                            return DestinationCard(
+                              image: filteredPlaces[index].imageURL,
+                              title: filteredPlaces[index].name,
+                              rating: filteredPlaces[index].averageRating,
+                              placeId: filteredPlaces[index].id,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => DetailEachPlace(
+                                        placeId: filteredPlaces[index].id),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Center(
+                            child: Text(
+                              'No destinations available in ${widget.province}.',
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.grey),
+                            ),
+                          ),
+                        ),
+
+                  const SizedBox(height: 80),
+                ],
+              ),
             ),
           ),
         ),

@@ -37,11 +37,12 @@ class PlaceFirebaseRepository extends PlaceRepository {
 
   // Get place by category
   @override
-  Future<List<Place>> fetchPlacesByCategory(String category) async {
+  Future<List<Place>> fetchPlacesByCategory(String category,String province) async {
     try {
       QuerySnapshot querySnapshot = await _firestore
           .collection(collectionName)
           .where('category', isEqualTo: category)
+          .where('catgory',isEqualTo: 'all')
           .get();
       return querySnapshot.docs.map((doc) => Place.fromFirestore(doc)).toList();
     } catch (e) {
