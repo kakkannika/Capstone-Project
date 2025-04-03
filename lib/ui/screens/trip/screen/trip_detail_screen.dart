@@ -6,18 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:tourism_app/models/place/place.dart';
 import 'package:tourism_app/models/trips/trip_days.dart';
 import 'package:tourism_app/models/trips/trips.dart';
-<<<<<<< HEAD:lib/presentation/screens/trip/screen/plan_trip_detial.dart
-import 'package:tourism_app/presentation/screens/budget/budget_screen.dart';
-import 'package:tourism_app/presentation/screens/budget/expend_screen.dart';
-import 'package:tourism_app/presentation/screens/trip/screen/search_place_screen.dart';
-import 'package:tourism_app/providers/budget_provider.dart';
-import 'package:tourism_app/providers/trip_provider.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:tourism_app/theme/theme.dart';
-=======
-import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/screens/budget/budget_screen.dart';
 import 'package:tourism_app/ui/screens/budget/expend_screen.dart';
-import 'package:tourism_app/ui/screens/budget/selected_currency_screen.dart';
 import 'package:tourism_app/ui/screens/home/detail_each_place.dart';
 
 import 'package:tourism_app/ui/screens/trip/screen/search_place_screen.dart';
@@ -25,9 +16,7 @@ import 'package:tourism_app/ui/providers/budget_provider.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:tourism_app/ui/screens/trip/screen/trip_map_screen.dart';
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/trip/screen/trip_detail_screen.dart
 
-//this is the itinerary page that shows the details of a trip, including the selected day and places to visit.
 class ItineraryPage extends StatefulWidget {
   final String? tripId;
 
@@ -41,10 +30,7 @@ class ItineraryPage extends StatefulWidget {
 }
 
 class _ItineraryPageState extends State<ItineraryPage> {
-<<<<<<< HEAD:lib/presentation/screens/trip/screen/plan_trip_detial.dart
-=======
   final PageController _pageController = PageController(initialPage: 1);
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/trip/screen/trip_detail_screen.dart
   int _selectedDayIndex = 0; // Track the selected day tab
   Day? _selectedDay; // Track the currently selected day
   bool _isLoadingBudget = false;
@@ -96,11 +82,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: $e'),
-<<<<<<< HEAD:lib/presentation/screens/trip/screen/plan_trip_detial.dart
-          backgroundColor:  DertamColors.red,
-=======
           backgroundColor: DertamColors.red,
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/trip/screen/trip_detail_screen.dart
         ),
       );
     } finally {
@@ -132,110 +114,16 @@ class _ItineraryPageState extends State<ItineraryPage> {
           final trip = trips.firstWhere((t) => t.id == widget.tripId);
 
           return Scaffold(
-            backgroundColor: DertamColors.white,
-            appBar: AppBar(
-              automaticallyImplyLeading: false, // Remove auto back button
-              backgroundColor: DertamColors.white,
-
-              elevation: 0,
-            ),
+            backgroundColor: Colors.transparent,
+            
             body: Column(
               children: [
                 // Divider
-                Container(
+                Divider(
                   height: 1,
                   color: Colors.grey[300],
                 ),
 
-<<<<<<< HEAD
-          return WillPopScope(
-            onWillPop: () async => false, // Disable back button
-            child: Scaffold(
-<<<<<<< HEAD:lib/presentation/screens/trip/screen/plan_trip_detial.dart
-              backgroundColor: Colors.transparent,
-              body: trip.days.isEmpty
-                  ? const Center(child: Text('No days in this trip'))
-                  : _buildItineraryContent(trip),
-=======
-              backgroundColor: Colors.grey[100],
-              appBar: AppBar(
-                backgroundColor: Colors.white,
-                elevation: 0,
-                automaticallyImplyLeading: false, // Remove auto back button
-              ),
-              body: Column(
-                children: [
-                  // Tab Bar
-
-                  // Divider
-                  Container(
-                    height: 1,
-                    color: Colors.grey[300],
-                  ),
-
-                  // PageView
-                  Expanded(
-                    child: _buildItineraryPage(trip),
-                  ),
-                ],
-              ),
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/trip/screen/trip_detail_screen.dart
-              floatingActionButton: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  FloatingActionButton(
-                    onPressed: _isLoadingBudget
-                        ? null
-                        : () => _navigateToBudgetScreen(trip),
-<<<<<<< HEAD:lib/presentation/screens/trip/screen/plan_trip_detial.dart
-                    backgroundColor: DertamColors.white,
-                    heroTag: 'Budget',
-                    shape: const CircleBorder(),
-=======
-                    backgroundColor: DertamColors.primary,
-                    heroTag: 'Budget',
-                    shape: CircleBorder(),
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/trip/screen/trip_detail_screen.dart
-                    child: _isLoadingBudget
-                        ? CircularProgressIndicator(color: DertamColors.primary)
-                        : Icon(Icons.account_balance_wallet, color: DertamColors.primary),
-                        
-                  ),
-                  const SizedBox(height: 16),
-                  FloatingActionButton(
-                    onPressed: () {
-                      if (trip.days.isNotEmpty &&
-                          _selectedDayIndex < trip.days.length) {
-                        // Navigate to map screen
-                        _navigateToMapScreen(trip.days[_selectedDayIndex]);
-                      }
-                    },
-                    backgroundColor: DertamColors.primary,
-                    heroTag: 'map',
-                    shape: CircleBorder(),
-                    child: const Icon(Icons.map, color: Colors.white),
-                  ),
-                  const SizedBox(height: 16),
-                  FloatingActionButton(
-                    onPressed: () {
-                      if (trip.days.isNotEmpty &&
-                          _selectedDayIndex < trip.days.length) {
-                        _navigateToSearchPlace(trip.days[_selectedDayIndex]);
-                      }
-                    },
-<<<<<<< HEAD:lib/presentation/screens/trip/screen/plan_trip_detial.dart
-                    shape: const CircleBorder(),
-                    backgroundColor: DertamColors.primary,
-=======
-                    backgroundColor: DertamColors.primary,
-                    shape: CircleBorder(),
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/trip/screen/trip_detail_screen.dart
-                    heroTag: 'add',
-                    child: Icon(Icons.add, color: DertamColors.white),
-                  ),
-                ],
-              ),
-=======
                 // PageView
                 Expanded(
                   child: _buildItineraryPage(trip),
@@ -254,7 +142,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
                   shape: CircleBorder(),
                   child: _isLoadingBudget
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : const Icon(Icons.wallet, color: Colors.white),
+                      : const Icon(Icons.account_balance_wallet_outlined, color: Colors.white),
                 ),
                 const SizedBox(height: 16),
                 FloatingActionButton(
@@ -284,15 +172,11 @@ class _ItineraryPageState extends State<ItineraryPage> {
                   child: const Icon(Icons.add, color: Colors.white),
                 ),
               ],
->>>>>>> db76e5e9e5522789ba9cc73223b2a04c699a82ad
             ),
           );
         });
   }
 
-<<<<<<< HEAD:lib/presentation/screens/trip/screen/plan_trip_detial.dart
-  Widget _buildItineraryContent(Trip trip) {
-=======
   void _navigateToSearchPlace(Day day) async {
     final tripProvider = context.read<TripProvider>();
     if (tripProvider.selectedTrip == null) return;
@@ -333,11 +217,6 @@ class _ItineraryPageState extends State<ItineraryPage> {
     if (trip.days.isEmpty) {
       return const Center(child: Text('No days in this trip'));
     }
-<<<<<<< HEAD
-
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/trip/screen/trip_detail_screen.dart
-=======
->>>>>>> db76e5e9e5522789ba9cc73223b2a04c699a82ad
     // Ensure _selectedDayIndex is within bounds
     if (_selectedDayIndex >= trip.days.length) {
       _selectedDayIndex = 0;
@@ -351,25 +230,15 @@ class _ItineraryPageState extends State<ItineraryPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             // Calendar Icon
-            SizedBox(
+            Container(
               width: 36,
               height: 36,
-<<<<<<< HEAD:lib/presentation/screens/trip/screen/plan_trip_detial.dart
-              child: Icon(Icons.edit_calendar_rounded,
-                  color: DertamColors.primary, size: 20),
-=======
               decoration: BoxDecoration(
                 color: DertamColors.primary,
                 shape: BoxShape.circle,
               ),
-<<<<<<< HEAD
-              child: const Icon(Icons.edit_calendar_rounded,
-                  color: Colors.white, size: 20),
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/trip/screen/trip_detail_screen.dart
-=======
               child: Icon(Icons.edit_calendar_rounded,
                   color: DertamColors.white, size: 20),
->>>>>>> db76e5e9e5522789ba9cc73223b2a04c699a82ad
             ),
 
             // Date Pills
@@ -410,27 +279,6 @@ class _ItineraryPageState extends State<ItineraryPage> {
           _buildDayContent(trip.days[_selectedDayIndex]),
       ],
     );
-  }
-
-  void _navigateToSearchPlace(Day day) async {
-    final tripProvider = context.read<TripProvider>();
-    if (tripProvider.selectedTrip == null) return;
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SearchPlaceScreen(
-          tripId: tripProvider.selectedTrip!.id,
-          dayId: day.id,
-          onPlaceSelected: (Place place) {
-            // This callback will be called when a place is selected
-            // The UI will update automatically through the StreamBuilder
-          },
-        ),
-      ),
-    );
-
-    // If we got a result back, the place was added successfully
-    // The UI will update automatically through the StreamBuilder
   }
 
   Widget _buildDayContent(Day day) {
@@ -502,14 +350,14 @@ class _ItineraryPageState extends State<ItineraryPage> {
               itemCount: places.length,
               itemBuilder: (context, index) {
                 final place = places[index];
-                return ListTile(
-                  title: _buildPlaceCard(place),
+                return InkWell(
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => DetailEachPlace(placeId: place.id),
                     ),
                   ),
+                  child: _buildPlaceCard(place),
                 );
               },
             );
@@ -530,16 +378,9 @@ class _ItineraryPageState extends State<ItineraryPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-<<<<<<< HEAD:lib/presentation/screens/trip/screen/plan_trip_detial.dart
-        color: isSelected
-            ? DertamColors.blueSky
-            : DertamColors.backgroundAccent,
-        borderRadius: BorderRadius.circular(10),
-=======
         color:
             isSelected ? DertamColors.blueSky : DertamColors.backgroundAccent,
         borderRadius: BorderRadius.circular(20),
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/trip/screen/trip_detail_screen.dart
       ),
       child: Text(
         date,
@@ -572,6 +413,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
         ],
       ),
       child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: DertamColors.white,
           borderRadius: BorderRadius.circular(8),
@@ -595,8 +437,8 @@ class _ItineraryPageState extends State<ItineraryPage> {
                   // Location
                   Row(
                     children: [
-                      const Icon(Icons.location_on,
-                          color: Color(0xFF0D3E4C), size: 20),
+                      Icon(Icons.location_on,
+                          color: DertamColors.primary, size: 20),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
@@ -664,6 +506,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
     return GestureDetector(
       onTap: () => _navigateToSearchPlace(day),
       child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
@@ -690,7 +533,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
             SizedBox(
               width: 30,
               height: 30,
-              child: Icon(Icons.add, color: DertamColors.grey, size: 20),
+              child: const Icon(Icons.add, color: Colors.grey, size: 20),
             ),
           ],
         ),
@@ -698,26 +541,6 @@ class _ItineraryPageState extends State<ItineraryPage> {
     );
   }
 
-<<<<<<< HEAD:lib/presentation/screens/trip/screen/plan_trip_detial.dart
-  Widget _buildRecommendedPlacesSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Recommended places',
-          style: TextStyle(
-            color: Colors.grey,
-            fontSize: 14,
-          ),
-        ),
-        const SizedBox(height: 12),
-        // Recommended places content would go here
-      ],
-    );
-  }
-
-=======
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/trip/screen/trip_detail_screen.dart
   Future<void> _deletePlaceFromTrip(String placeId, String dayId) async {
     try {
       final tripProvider = context.read<TripProvider>();
@@ -763,5 +586,11 @@ class _ItineraryPageState extends State<ItineraryPage> {
         ),
       );
     }
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 }

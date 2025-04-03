@@ -1,14 +1,16 @@
 // ignore_for_file: use_build_context_synchronously, deprecated_member_use
 
+
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/models/budget/expend.dart';
 import 'package:tourism_app/models/trips/trips.dart';
-import 'package:tourism_app/ui/widgets/dertam_textfield.dart';
+import 'package:tourism_app/theme/theme.dart';
 import 'package:tourism_app/ui/providers/budget_provider.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
-import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/widgets/dertam_textfield.dart';
 
 class AddExpenseScreen extends StatefulWidget {
   final String selectedCurrency;
@@ -575,93 +577,109 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                 ),
         ],
       ),
-      body: _isLoading && _trip == null
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+        body: _isLoading && _trip == null
+        ? const Center(child: CircularProgressIndicator())
+        : SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Total Section with Background
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: DertamColors.blueSky.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: DertamColors.blueSky.withOpacity(0.5),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text("Total", style: DertamTextStyles.title),
-                      Text("${widget.selectedCurrency} ${_totalExpense.toStringAsFixed(2)}",
-                          style: DertamTextStyles.title),
+                      Text(
+                        "${widget.selectedCurrency} ${_totalExpense.toStringAsFixed(2)}",
+                        style: DertamTextStyles.title,
+                      ),
                     ],
                   ),
-                  SizedBox(height: DertamSpacings.m),
-                  
-                  // Day Dropdown
-                  if (_trip != null && _trip!.days.isNotEmpty)
-                    _buildDayDropdown(),
-                  
-                  SizedBox(height: DertamSpacings.m),
-                  
-                  // Category Selection
-                  ListTile(
-                    leading: Icon(_selectedCategory.icon),
-                    title: Text(_selectedCategory.label),
-                    trailing: Icon(Icons.arrow_drop_down),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      side: BorderSide(color: DertamColors.greyLight),
-                    ),
-                    onTap: () {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          return ListView(
-                            children: ExpenseCategory.values
-                                .map((category) => ListTile(
-                                      leading: Icon(category.icon),
-                                      title: Text(category.label),
-                                      onTap: () {
-                                        setState(() {
-                                          _selectedCategory = category;
-                                        });
-                                        Navigator.pop(context);
-                                      },
-                                    ))
-                                .toList(),
-                          );
-                        },
-                      );
-                    },
+                ),
+                
+                SizedBox(height: DertamSpacings.m),
+                
+                // Day Dropdown
+                if (_trip != null && _trip!.days.isNotEmpty)
+                  _buildDayDropdown(),
+                
+                SizedBox(height: DertamSpacings.m),
+                
+                // Category Selection
+                ListTile(
+                  leading: Icon(_selectedCategory.icon),
+                  title: Text(_selectedCategory.label),
+                  trailing: Icon(Icons.arrow_drop_down),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: BorderSide(color: DertamColors.greyLight),
                   ),
-                  
-                  SizedBox(height: DertamSpacings.m),
-                  
-                  DertamTextfield(
-                    label: "Expense Amount (${widget.selectedCurrency})",
-                    controller: _expenseController,
-                    keyboardType: TextInputType.number,
-                    borderColor: DertamColors.greyLight,
-                    onChanged: (value) => _calculateTotalExpense(),
-                  ),
-                  
-                  SizedBox(height: DertamSpacings.s),
-                  
-                  DertamTextfield(
-                    label: "Number of People",
-                    controller: _peopleController,
-                    keyboardType: TextInputType.number,
-                    borderColor: DertamColors.greyLight,
-                    onChanged: (value) => _calculateTotalExpense(),
-                  ),
-                  
-                  SizedBox(height: DertamSpacings.s),
-                  
-                  DertamTextfield(
-                    label: "Description",
-                    controller: _descriptionController,
-                    borderColor: DertamColors.greyLight,
-                  ),
-                ],
-              ),
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return ListView(
+                          children: ExpenseCategory.values
+                              .map((category) => ListTile(
+                                    leading: Icon(category.icon),
+                                    title: Text(category.label),
+                                    onTap: () {
+                                      setState(() {
+                                        _selectedCategory = category;
+                                      });
+                                      Navigator.pop(context);
+                                    },
+                                  ))
+                              .toList(),
+                        );
+                      },
+                    );
+                  },
+                ),
+                
+                SizedBox(height: DertamSpacings.m),
+                
+                DertamTextfield(
+                  label: "Expense Amount (${widget.selectedCurrency})",
+                  controller: _expenseController,
+                  keyboardType: TextInputType.number,
+                  borderColor: DertamColors.greyLight,
+                  onChanged: (value) => _calculateTotalExpense(),
+                ),
+                
+                SizedBox(height: DertamSpacings.s),
+                
+                DertamTextfield(
+                  label: "Number of People",
+                  controller: _peopleController,
+                  keyboardType: TextInputType.number,
+                  borderColor: DertamColors.greyLight,
+                  onChanged: (value) => _calculateTotalExpense(),
+                ),
+                
+                SizedBox(height: DertamSpacings.s),
+                
+                DertamTextfield(
+                  label: "Description",
+                  controller: _descriptionController,
+                  borderColor: DertamColors.greyLight,
+                ),
+              ],
             ),
-    );
-  }
+          ),
+  );
+}
 
   @override
   void dispose() {

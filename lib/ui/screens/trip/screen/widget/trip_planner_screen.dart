@@ -1,17 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/models/trips/trips.dart';
-<<<<<<< HEAD:lib/presentation/screens/trip/screen/trip_planner_screen.dart
-import 'package:tourism_app/presentation/screens/trip/screen/plan_trip_detial.dart';
-import 'package:tourism_app/providers/trip_provider.dart';
-
-/// This screen is used to plan a trip. It shows the itinerary page and allows the user to select destinations and dates.
-=======
 import 'package:tourism_app/theme/theme.dart';
 import 'package:tourism_app/ui/screens/trip/screen/trip_detail_screen.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
 
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/trip/screen/widget/trip_planner_screen.dart
 class TripPlannerScreen extends StatefulWidget {
   final List<String?> selectedDestinations;
   final DateTime startDate;

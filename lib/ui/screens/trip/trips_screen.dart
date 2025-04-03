@@ -82,17 +82,20 @@ class TripsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<Trip>>(
-      stream: Provider.of<TripProvider>(context, listen: true).getTripsStream(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting &&
-            !snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
-        final trips = snapshot.data ?? [];
+    return Container(
+      color: DertamColors.white,
+      child: StreamBuilder<List<Trip>>(
+        stream:
+            Provider.of<TripProvider>(context, listen: true).getTripsStream(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting &&
+              !snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+          final trips = snapshot.data ?? [];
 
           final upcomingTrips = trips.where((trip) {
             return trip.endDate.isAfter(DateTime.now());
@@ -102,32 +105,30 @@ class TripsBody extends StatelessWidget {
             return trip.endDate.isBefore(DateTime.now());
           }).toList();
 
-        return TabBarView(
-          children: [
-            // Upcoming Trips Tab
-            upcomingTrips.isEmpty
-                ? const EmptyState(
-                    title: 'No upcoming trips',
-                    subtitle: 'Plan a new trip to get started!',
-                    isPastTrips: false,
-                  )
-                : TripsList(trips: upcomingTrips),
-            // Past Trips Tab
-            pastTrips.isEmpty
-                ? const EmptyState(
-                    title: 'No past trips',
-                    subtitle: 'Your completed trips will appear here.',
-                    isPastTrips: true,
-                  )
-                : TripsList(trips: pastTrips),
-          ],
-        );
-      },
+          return TabBarView(
+            children: [
+              // Upcoming Trips Tab
+              upcomingTrips.isEmpty
+                  ? const EmptyState(
+                      title: 'No upcoming trips',
+                      subtitle: 'Plan a new trip to get started!',
+                      isPastTrips: false,
+                    )
+                  : TripsList(trips: upcomingTrips),
+              // Past Trips Tab
+              pastTrips.isEmpty
+                  ? const EmptyState(
+                      title: 'No past trips',
+                      subtitle: 'Your completed trips will appear here.',
+                      isPastTrips: true,
+                    )
+                  : TripsList(trips: pastTrips),
+            ],
+          );
+        },
+      ),
     );
   }
-}
-
-class TripsList {
 }
 
 class EmptyState extends StatelessWidget {
@@ -162,11 +163,11 @@ class EmptyState extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: DertamSpacings.s-4),
+          const SizedBox(height: 8),
           Text(
             subtitle,
-            style: TextStyle(
-              color: DertamColors.grey,
+            style: const TextStyle(
+              color: Colors.grey,
             ),
           ),
           const SizedBox(height: 24),
@@ -398,8 +399,8 @@ class TripCard extends StatelessWidget {
                   ),
                   child: Text(
                     status,
-                    style: TextStyle(
-                      color: DertamColors.white,
+                    style: const TextStyle(
+                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -409,7 +410,7 @@ class TripCard extends StatelessWidget {
 
             // Trip Details
             Padding(
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -420,32 +421,32 @@ class TripCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 8),
                   Row(
                     children: [
-                      Icon(Icons.calendar_today,
-                          size: 16, color: DertamColors.grey),
+                      const Icon(Icons.calendar_today,
+                          size: 16, color: Colors.grey),
                       const SizedBox(width: 4),
                       Text(
                         '${_formatDate(trip.startDate)} - ${_formatDate(trip.endDate)}',
-                        style: TextStyle(color: DertamColors.grey),
+                        style: const TextStyle(color: Colors.grey),
                       ),
                     ],
                   ),
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Icon(Icons.place, size: 16, color: DertamColors.grey),
+                      const Icon(Icons.place, size: 16, color: Colors.grey),
                       const SizedBox(width: 4),
                       Text(
                         '$numberOfPlaces ${numberOfPlaces == 1 ? 'place' : 'places'} to visit',
-                        style: TextStyle(color: DertamColors.grey),
+                        style: const TextStyle(color: Colors.grey),
                       ),
                       const Spacer(),
                       Text(
                         timeInfo,
                         style: TextStyle(
-                          color: DertamColors.grey,
+                          color: _getStatusColor(status),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -463,145 +464,17 @@ class TripCard extends StatelessWidget {
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'planning':
-        return DertamColors.orange;
+        return Colors.orange;
       case 'ongoing':
-<<<<<<< HEAD:lib/presentation/screens/trip/screen/trips_screen.dart
-        return DertamColors.primary;
-=======
         return DertamColors.green;
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/trip/trips_screen.dart
       case 'completed':
-        return DertamColors.green;
+        return Colors.green;
       default:
-        return DertamColors.grey;
+        return Colors.grey;
     }
   }
 
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
   }
-<<<<<<< HEAD:lib/presentation/screens/trip/screen/trips_screen.dart
-
-  void _navigateToTripDetails(Trip trip) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => TripPlannerScreen(
-          tripId: trip.id,
-          tripName: trip.tripName,
-          startDate: trip.startDate,
-          returnDate: trip.endDate,
-          selectedDestinations: const [], // Not needed when viewing existing trip
-        ),
-      ),
-    );
-  }
-
-  void _showTripOptions(Trip trip) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.edit, color: Color(0xFF0D3E4C)),
-                title: const Text('Edit Trip'),
-                onTap: () {
-                  Navigator.pop(context); // Close the bottom sheet
-                  _navigateToEditTrip(trip);
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.delete, color: DertamColors.red),
-                title: Text('Delete Trip',
-                    style: TextStyle(color: DertamColors.red)),
-                onTap: () {
-                  Navigator.pop(context); // Close the bottom sheet
-                  _showDeleteConfirmation(trip);
-                },
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _navigateToEditTrip(Trip trip) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditTripScreen(trip: trip),
-      ),
-    );
-
-    // If the trip was updated successfully, refresh the trips list
-    if (result == true) {
-      Provider.of<TripProvider>(context, listen: false).startListeningToTrips();
-    }
-  }
-
-  void _showDeleteConfirmation(Trip trip) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Trip'),
-        content: Text(
-            'Are you sure you want to delete "${trip.tripName}"? This action cannot be undone.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _deleteTrip(trip);
-            },
-            style: TextButton.styleFrom(foregroundColor: DertamColors.red),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _deleteTrip(Trip trip) async {
-    setState(() {});
-
-    try {
-      final tripProvider = Provider.of<TripProvider>(context, listen: false);
-      await tripProvider.deleteTrip(trip.id);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Trip deleted successfully'),
-            backgroundColor: DertamColors.red,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error deleting trip: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {});
-      }
-    }
-  }
-=======
->>>>>>> 9ac13a8b16be95e2a2cd5381761493e898ac72d3:lib/ui/screens/trip/trips_screen.dart
 }

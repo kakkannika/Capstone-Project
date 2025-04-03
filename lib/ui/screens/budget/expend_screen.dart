@@ -1,16 +1,14 @@
-// ignore_for_file: use_build_context_synchronously, deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/models/budget/budget.dart';
 import 'package:tourism_app/models/budget/expend.dart';
 import 'package:tourism_app/models/trips/trips.dart';
-import 'package:tourism_app/ui/screens/budget/add_expend_screen.dart';
-import 'package:tourism_app/ui/screens/budget/widget/budget_card.dart';
+import 'package:tourism_app/theme/theme.dart';
 import 'package:tourism_app/ui/providers/budget_provider.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
-import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/screens/budget/add_expend_screen.dart';
+import 'package:tourism_app/ui/screens/budget/widget/budget_card.dart';
 
 class ExpenseScreen extends StatefulWidget {
   final String budgetId;
@@ -180,10 +178,10 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
         });
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected ? DertamColors.primary : DertamColors.greyLight,
-        foregroundColor: isSelected ? Colors.white : DertamColors.grey,
+        backgroundColor: isSelected ? DertamColors.blueSky : DertamColors.backgroundAccent,
+        foregroundColor: isSelected ? DertamColors.primary : DertamColors.black,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(10),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         elevation: isSelected ? 2 : 0,
@@ -660,12 +658,13 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                                         ),
                                       ),
                                     ),
+                                    
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: isToday ? DertamColors.primary.withOpacity(0.1) : isUpcoming ? DertamColors.primary.withOpacity(0.1) : DertamColors.grey.withOpacity(0.1),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
+                                      // decoration: BoxDecoration(
+                                      //   color: isToday ? DertamColors.primary.withOpacity(0.1) : isUpcoming ? DertamColors.primary.withOpacity(0.1) : DertamColors.grey.withOpacity(0.1),
+                                      //   borderRadius: BorderRadius.circular(12),
+                                      // ),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
@@ -719,9 +718,13 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
           return FloatingActionButton(
             onPressed: () => _navigateToAddExpense(budget),
             backgroundColor: DertamColors.primary,
+            shape: CircleBorder(),
             child: Icon(Icons.add, color: DertamColors.white),
           );
         },
+      ),
+      bottomNavigationBar: const SizedBox(
+        height: 24,
       ),
     );
   }

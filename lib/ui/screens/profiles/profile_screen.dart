@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/ui/screens/auth/reset_password_screen.dart';
 import 'package:tourism_app/ui/providers/auth_provider.dart';
+import 'package:tourism_app/ui/widgets/dertam_dialog.dart';
+import 'package:tourism_app/ui/widgets/dertam_dialog_button.dart';
 import 'package:tourism_app/ui/widgets/navigationBar.dart';
 import 'package:tourism_app/theme/theme.dart';
 import 'edit_profile_screen.dart';
@@ -9,6 +11,32 @@ import 'setting_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
+
+  Future<bool> _showLogoutConfirmationDialog(BuildContext context) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return DertamDialog(
+              title: 'Confirm Logout',
+              content: 'Are you sure you want to logout?',
+              actions: [
+                DertamDialogButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  text: 'Cancel',
+                  dertamColor: DertamColors.grey,
+                ),
+                DertamDialogButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  text: 'Logout',
+                  dertamColor: DertamColors.red,
+                  hasBackground: true,
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +50,14 @@ class ProfileScreen extends StatelessWidget {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         centerTitle: true,
+        title: Text(
+          'Profile',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: DertamColors.black,
+          ),
+        ),
         elevation: 0,
         backgroundColor: Colors.white,
       ),
@@ -60,7 +96,7 @@ class ProfileScreen extends StatelessWidget {
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: DertamColors.blueSky.withOpacity(0.5),
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
@@ -143,9 +179,12 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void _logout(BuildContext context) {
-    final authProvider =
-        Provider.of<AuthServiceProvider>(context, listen: false);
-    authProvider.signOut(context);
+  void _logout(BuildContext context) async {
+    final shouldLogout = await _showLogoutConfirmationDialog(context);
+    if (shouldLogout) {
+      final authProvider =
+          Provider.of<AuthServiceProvider>(context, listen: false);
+      authProvider.signOut(context);
+    }
   }
 }
