@@ -1,0 +1,2 @@
+C:/Users/Lenovo/testing/fix route ma/Capstone-Project/android/app/.cxx/Debug/2y4w386c/x86/CMakeFiles/edit_cache.dir
+C:/Users/Lenovo/testing/fix route ma/Capstone-Project/android/app/.cxx/Debug/2y4w386c/x86/CMakeFiles/rebuild_cache.dir

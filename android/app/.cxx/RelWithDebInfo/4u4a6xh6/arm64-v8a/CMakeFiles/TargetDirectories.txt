@@ -1,0 +1,2 @@
+C:/Users/Lenovo/testing/fix route ma/Capstone-Project/android/app/.cxx/RelWithDebInfo/4u4a6xh6/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/Lenovo/testing/fix route ma/Capstone-Project/android/app/.cxx/RelWithDebInfo/4u4a6xh6/arm64-v8a/CMakeFiles/rebuild_cache.dir
