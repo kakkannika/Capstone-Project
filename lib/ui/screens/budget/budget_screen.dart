@@ -11,10 +11,12 @@ import 'package:tourism_app/ui/widgets/dertam_textfield.dart';
 
 class BudgetScreen extends StatefulWidget {
   final String tripId;
+  final String? budgetId; // Add budgetId for editing
 
   const BudgetScreen({
     super.key,
     required this.tripId,
+    this.budgetId, // Optional for editing
   });
 
   @override
@@ -36,6 +38,12 @@ class _BudgetScreenState extends State<BudgetScreen> {
   void initState() {
     super.initState();
     _fetchTripData();
+
+    // If editing, fetch the existing budget
+    if (widget.budgetId != null) {
+      _fetchBudgetData();
+    }
+
     _totalBudgetController.addListener(_updateDailyBudget);
     _dailyBudgetController.addListener(() {
       if (!_dailyBudgetManuallyEdited) {
@@ -89,6 +97,41 @@ class _BudgetScreenState extends State<BudgetScreen> {
     }
   }
 
+  Future<void> _fetchBudgetData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final budgetProvider =
+          Provider.of<BudgetProvider>(context, listen: false);
+      final budget = await budgetProvider.getBudgetById(widget.budgetId!);
+
+      if (budget != null) {
+        setState(() {
+          _totalBudgetController.text = budget.total.toString();
+          _dailyBudgetController.text = budget.dailyBudget.toString();
+          selectedCurrency = budget.currency;
+          _dailyBudget = budget.dailyBudget;
+        });
+        _updateDailyBudget();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error fetching budget data: $e"),
+            backgroundColor: DertamColors.red,
+          ),
+        );
+      }
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   void _updateDailyBudget() {
     if (_trip == null || selectedCurrency == null) return;
 
@@ -128,6 +171,21 @@ class _BudgetScreenState extends State<BudgetScreen> {
     }
 
     double totalBudget = double.tryParse(_totalBudgetController.text) ?? 0;
+
+    // Validation for Riel currency
+    if (selectedCurrency == '៛') {
+      if (totalBudget < 50000 || totalBudget % 100 != 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text("Riel currency must be an integer and at least 50000."),
+            backgroundColor: DertamColors.red,
+          ),
+        );
+        return;
+      }
+    }
+
     double dailyBudget = double.tryParse(_dailyBudgetController.text) ?? 0;
 
     if (totalBudget <= 0) {
@@ -157,29 +215,53 @@ class _BudgetScreenState extends State<BudgetScreen> {
     try {
       final budgetProvider =
           Provider.of<BudgetProvider>(context, listen: false);
-
-      final budgetId = await budgetProvider.createBudget(
-        tripId: widget.tripId,
-        total: totalBudget,
-        currency: selectedCurrency!,
-        dailyBudget: dailyBudget,
-      );
-
-      if (budgetId != null && mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ExpenseScreen(
-              budgetId: budgetId,
-              tripId: widget.tripId,
-            ),
-          ),
+      if (widget.budgetId != null) {
+        // Update existing budget
+        await budgetProvider.updateBudget(
+          budgetId: widget.budgetId!,
+          total: totalBudget,
+          currency: selectedCurrency!,
+          dailyBudget: dailyBudget,
         );
-      } else if (mounted) {
+        // Navigate to ExpenseScreen after updating
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ExpenseScreen(
+                budgetId: widget.budgetId!,
+                tripId: widget.tripId,
+              ),
+            ),
+          );
+        }
+      } else {
+        // Create new budget
+        final budgetId = await budgetProvider.createBudget(
+          tripId: widget.tripId,
+          total: totalBudget,
+          currency: selectedCurrency!,
+          dailyBudget: dailyBudget,
+        );
+
+        if (budgetId != null && mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ExpenseScreen(
+                budgetId: budgetId,
+                tripId: widget.tripId,
+              ),
+            ),
+          );
+        }
+      }
+
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Failed to set budget. Please try again."),
-            backgroundColor: DertamColors.red,
+            content: Text("Budget saved successfully."),
+            backgroundColor: DertamColors.green,
           ),
         );
       }
@@ -223,7 +305,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: DertamColors.black),
+          icon: Icon(Icons.arrow_back_ios_new, color: DertamColors.grey),
           onPressed: () => Navigator.pop(context),
         ),
         backgroundColor: Colors.transparent,
@@ -285,31 +367,59 @@ class _BudgetScreenState extends State<BudgetScreen> {
                                       suffixIcon: Padding(
                                         padding: const EdgeInsets.only(
                                             left: 8.0, right: 4.0),
-                                        //dropdown button for currency selection
-                                        child: DropdownButtonHideUnderline(
-                                          child: DropdownButton<String>(
-                                            itemHeight: 60,
-                                            value: selectedCurrency,
-                                            icon: Icon(Icons.arrow_drop_down,
-                                                color: DertamColors.grey),
-                                            items: currencies.map((currency) {
-                                              return DropdownMenuItem<String>(
-                                                value: currency,
-                                                child: Text(
-                                                  currency,
-                                                  style: DertamTextStyles.body,
-                                                ),
-                                              );
-                                            }).toList(),
-                                            onChanged: (value) {
-                                              if (value != null) {
-                                                // Add null check for safety
-                                                setState(() {
-                                                  selectedCurrency = value;
-                                                  _updateDailyBudget();
-                                                });
-                                              }
-                                            },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: DertamColors.greyLight
+                                                .withOpacity(
+                                                    0.2), // Light background
+                                            borderRadius: BorderRadius.circular(
+                                                12), // Rounded corners
+                                          ),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8),
+                                          child: DropdownButtonHideUnderline(
+                                            child: DropdownButton<String>(
+                                              value: selectedCurrency,
+                                              icon: Icon(Icons.arrow_drop_down,
+                                                  color: DertamColors.grey),
+                                              dropdownColor: DertamColors
+                                                  .white, // Dropdown background color
+                                              borderRadius: BorderRadius.circular(
+                                                  12), // Rounded dropdown corners
+                                              items: currencies.map((currency) {
+                                                return DropdownMenuItem<String>(
+                                                  value: currency,
+                                                  child: Row(
+                                                    children: [
+                                                      Icon(
+                                                        currency == '\$'
+                                                            ? Icons.attach_money
+                                                            : Icons
+                                                                .currency_exchange,
+                                                        color: DertamColors
+                                                            .primary,
+                                                      ),
+                                                      const SizedBox(width: 8),
+                                                      Text(
+                                                        currency == '\$'
+                                                            ? 'Dollar (\$)'
+                                                            : 'Riel (៛)',
+                                                        style: DertamTextStyles
+                                                            .body,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              }).toList(),
+                                              onChanged: (value) {
+                                                if (value != null) {
+                                                  setState(() {
+                                                    selectedCurrency = value;
+                                                    _updateDailyBudget();
+                                                  });
+                                                }
+                                              },
+                                            ),
                                           ),
                                         ),
                                       ),

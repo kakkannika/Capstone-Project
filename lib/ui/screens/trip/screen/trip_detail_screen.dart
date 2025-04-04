@@ -113,8 +113,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
           final trip = trips.firstWhere((t) => t.id == widget.tripId);
 
           return Scaffold(
-            backgroundColor: Colors.transparent,
-            
+            backgroundColor: DertamColors.white,
             body: Column(
               children: [
                 // Divider
@@ -141,7 +140,8 @@ class _ItineraryPageState extends State<ItineraryPage> {
                   shape: CircleBorder(),
                   child: _isLoadingBudget
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : const Icon(Icons.account_balance_wallet_outlined, color: Colors.white),
+                      : const Icon(Icons.account_balance_wallet_outlined,
+                          color: Colors.white),
                 ),
                 const SizedBox(height: 16),
                 FloatingActionButton(

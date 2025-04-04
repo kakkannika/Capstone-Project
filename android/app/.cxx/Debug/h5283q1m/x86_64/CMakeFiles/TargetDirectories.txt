@@ -1,0 +1,2 @@
+D:/YEAR3/Term2/CAPSTONE1/Capstone-Project/android/app/.cxx/Debug/h5283q1m/x86_64/CMakeFiles/edit_cache.dir
+D:/YEAR3/Term2/CAPSTONE1/Capstone-Project/android/app/.cxx/Debug/h5283q1m/x86_64/CMakeFiles/rebuild_cache.dir

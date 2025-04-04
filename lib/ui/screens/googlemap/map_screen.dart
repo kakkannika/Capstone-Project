@@ -268,10 +268,12 @@ class _MapNavigationScreenState extends State<MapNavigationScreen> {
     for (final marker in _markers) {
       if (marker.position.latitude < minLat) minLat = marker.position.latitude;
       if (marker.position.latitude > maxLat) maxLat = marker.position.latitude;
-      if (marker.position.longitude < minLng)
+      if (marker.position.longitude < minLng) {
         minLng = marker.position.longitude;
-      if (marker.position.longitude > maxLng)
+      }
+      if (marker.position.longitude > maxLng) {
         maxLng = marker.position.longitude;
+      }
     }
 
     // Add some padding
@@ -296,6 +298,11 @@ class _MapNavigationScreenState extends State<MapNavigationScreen> {
     return Scaffold(
       backgroundColor: DertamColors.white,
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back_ios_new),
+        ),
+        backgroundColor: DertamColors.white,
         title: Text(widget.destinationName),
         centerTitle: true,
         actions: [

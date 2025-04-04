@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tourism_app/theme/theme.dart';
 import 'package:tourism_app/ui/screens/profiles/widget/setting_item.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -7,7 +8,15 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      backgroundColor: DertamColors.white,
+      appBar: AppBar(
+        leading: IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: Icon(Icons.arrow_back_ios_new)),
+        centerTitle: true,
+        title: Text('Settings'),
+        backgroundColor: DertamColors.white,
+      ),
       body: ListView(
         children: [
           SettingItem(
@@ -35,17 +44,8 @@ class SettingsScreen extends StatelessWidget {
             title: 'Help & Support',
             onTap: () {}, // Navigate to help
           ),
-          // const Divider(),
-          // SettingItem(
-          //   icon: Icons.logout,
-          //   title: 'Logout',
-          //   onTap: () {}, // Handle logout
-          //   isDestructive: true,
-          // ),
         ],
       ),
     );
   }
-
-  
 }

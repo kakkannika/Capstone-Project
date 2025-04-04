@@ -161,7 +161,7 @@ class _DetailEachPlaceState extends State<DetailEachPlace> {
                                   shape: BoxShape.circle,
                                   color: Colors.white.withOpacity(0.8),
                                 ),
-                                child: const Icon(Icons.arrow_back),
+                                child: const Icon(Icons.arrow_back_ios_new),
                               ),
                             ),
                           ),

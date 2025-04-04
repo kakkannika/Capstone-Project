@@ -8,20 +8,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: DertamColors.white,
       elevation: 0,
-      flexibleSpace: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [DertamColors.primary, DertamColors.primary],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-      ),
       leading: Builder(
         builder: (context) => IconButton(
-          icon: const Icon(Icons.home, color: Colors.white),
+          icon: Icon(Icons.home, color: DertamColors.grey),
           onPressed: () {
             Navigator.push(
                 context, MaterialPageRoute(builder: (context) => HomeScreen()));
@@ -29,9 +20,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       title: Text(
-        "Dertam Chatbot",
-        style: TextStyle(
-            color: DertamColors.white, fontWeight: FontWeight.bold),
+        "Dertam Bot",
+        style:
+            TextStyle(color: DertamColors.black, fontWeight: FontWeight.bold),
       ),
       centerTitle: true,
     );

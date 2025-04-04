@@ -66,17 +66,16 @@ class _HomeScreenState extends State<DetailHomePages> {
         backgroundColor: DertamColors.white,
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          leading: GestureDetector(
-            onTap: () {
+          leading: IconButton(
+            onPressed: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
                           HomeScreen())); // Navigate back to the previous screen
             },
-            child: Icon(
+            icon: Icon(
               Icons.arrow_back_ios_new,
-              size: 24,
               color: DertamColors.grey,
             ),
           ),

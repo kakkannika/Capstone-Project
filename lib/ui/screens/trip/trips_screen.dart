@@ -399,8 +399,8 @@ class TripCard extends StatelessWidget {
                   ),
                   child: Text(
                     status,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style:  TextStyle(
+                      color: DertamColors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

@@ -36,15 +36,14 @@ class MessageList extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: isQuestion ? Colors.blue[100] : Colors.grey[300],
+                    color: isQuestion ? Colors.grey[350] : Colors.grey[300],
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
                     message["text"]!,
                     style: TextStyle(
-                      color: isQuestion ? DertamColors.primary : DertamColors.black,
-                      fontWeight:
-                          isQuestion ? FontWeight.bold : FontWeight.normal,
+                      color: isQuestion ? DertamColors.black : DertamColors.black,
+
                     ),
                   ),
                 ),

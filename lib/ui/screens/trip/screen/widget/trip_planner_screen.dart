@@ -46,25 +46,27 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
           children: [
             // Simple app bar with back button and trip name
             Container(
-              color: Colors.white,
+              color: DertamColors.white,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 children: [
                   InkWell(
                     onTap: () => Navigator.pop(context),
-                    child: Icon(Icons.arrow_back, color: DertamColors.black),
+                    child: Icon(Icons.arrow_back_ios_new, color: DertamColors.grey),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: Text(
-                      widget.tripName,
-                      style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                        color: DertamColors.black,
+                    child: Center(
+                      child: Text(
+                        widget.tripName,
+                        style: TextStyle(
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                          color: DertamColors.black,
+                          
+                        ),
+                      
                       ),
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
                     ),
                   ),
                 ],

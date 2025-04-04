@@ -144,7 +144,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: DertamColors.black),
+          icon: Icon(Icons.arrow_back_ios_new, color: DertamColors.grey),
           onPressed: () => Navigator.pop(context),
         ),
       ),

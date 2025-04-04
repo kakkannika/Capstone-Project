@@ -358,6 +358,28 @@ class BudgetProvider with ChangeNotifier {
     }
   }
 
+  Future<Budget?> getBudgetById(String budgetId) async {
+    try {
+      _setLoading(true);
+      _error = null;
+
+      // Fetch the budget using the repository
+      final budget = await _budgetService.getBudgetById(budgetId);
+      
+      if (budget != null) {
+        _selectedBudget =
+            budget; // Set the fetched budget as the selected budget
+      }
+
+      _setLoading(false);
+      return budget;
+    } catch (e) {
+      _setLoading(false);
+      _setError('Failed to get budget by ID: $e');
+      return null;
+    }
+  }
+
   @override
   void dispose() {
     _budgetSubscription?.cancel();
