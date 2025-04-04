@@ -509,7 +509,7 @@ class SmartRoutingUtil {
           fullPolyline.addAll(directions['polylinePoints'].skip(1));
         }
       } catch (e) {
-        debugPrint('Error calculating segment ${i}: $e');
+        debugPrint('Error calculating segment $i: $e');
         // Continue to next segment even if this one fails
       }
     }

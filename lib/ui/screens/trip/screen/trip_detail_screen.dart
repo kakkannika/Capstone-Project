@@ -7,10 +7,9 @@ import 'package:tourism_app/models/place/place.dart';
 import 'package:tourism_app/models/trips/trip_days.dart';
 import 'package:tourism_app/models/trips/trips.dart';
 import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/screens/budget/budget_screen.dart';
 import 'package:tourism_app/ui/screens/budget/expend_screen.dart';
-import 'package:tourism_app/ui/screens/budget/selected_currency_screen.dart';
 import 'package:tourism_app/ui/screens/home/detail_each_place.dart';
-
 import 'package:tourism_app/ui/screens/trip/screen/search_place_screen.dart';
 import 'package:tourism_app/ui/providers/budget_provider.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
@@ -72,7 +71,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => SelectCurrencyScreen(
+            builder: (context) => BudgetScreen(
               tripId: trip.id,
             ),
           ),
@@ -114,17 +113,12 @@ class _ItineraryPageState extends State<ItineraryPage> {
           final trip = trips.firstWhere((t) => t.id == widget.tripId);
 
           return Scaffold(
-            backgroundColor: DertamColors.white,
-            appBar: AppBar(
-              automaticallyImplyLeading: false, // Remove auto back button
-              backgroundColor: DertamColors.white,
-
-              elevation: 0,
-            ),
+            backgroundColor: Colors.transparent,
+            
             body: Column(
               children: [
                 // Divider
-                Container(
+                Divider(
                   height: 1,
                   color: Colors.grey[300],
                 ),
@@ -147,7 +141,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
                   shape: CircleBorder(),
                   child: _isLoadingBudget
                       ? const CircularProgressIndicator(color: Colors.white)
-                      : const Icon(Icons.wallet, color: Colors.white),
+                      : const Icon(Icons.account_balance_wallet_outlined, color: Colors.white),
                 ),
                 const SizedBox(height: 16),
                 FloatingActionButton(
@@ -355,14 +349,14 @@ class _ItineraryPageState extends State<ItineraryPage> {
               itemCount: places.length,
               itemBuilder: (context, index) {
                 final place = places[index];
-                return ListTile(
-                  title: _buildPlaceCard(place),
+                return InkWell(
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => DetailEachPlace(placeId: place.id),
                     ),
                   ),
+                  child: _buildPlaceCard(place),
                 );
               },
             );
@@ -418,6 +412,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
         ],
       ),
       child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: DertamColors.white,
           borderRadius: BorderRadius.circular(8),
@@ -441,8 +436,8 @@ class _ItineraryPageState extends State<ItineraryPage> {
                   // Location
                   Row(
                     children: [
-                      const Icon(Icons.location_on,
-                          color: Color(0xFF0D3E4C), size: 20),
+                      Icon(Icons.location_on,
+                          color: DertamColors.primary, size: 20),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
@@ -510,6 +505,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
     return GestureDetector(
       onTap: () => _navigateToSearchPlace(day),
       child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
@@ -533,13 +529,9 @@ class _ItineraryPageState extends State<ItineraryPage> {
               ),
             ),
             const Spacer(),
-            Container(
+            SizedBox(
               width: 30,
               height: 30,
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(4),
-              ),
               child: const Icon(Icons.add, color: Colors.grey, size: 20),
             ),
           ],

@@ -31,7 +31,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Text(
         "Dertam Chatbot",
         style: TextStyle(
-            color: Colors.white, fontWeight: FontWeight.bold),
+            color: DertamColors.white, fontWeight: FontWeight.bold),
       ),
       centerTitle: true,
     );

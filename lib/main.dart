@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tourism_app/config/env_config.dart';
 import 'package:tourism_app/data/repository/firebase/favorite_firebase_repository.dart';
 import 'package:tourism_app/data/repository/firebase/place_firebase_repository.dart';
 import 'package:tourism_app/data/repository/firebase/trip_firebase_repository.dart';
@@ -15,6 +16,9 @@ import 'package:tourism_app/ui/screens/get_start_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize environment configuration
+  await EnvConfig.init();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

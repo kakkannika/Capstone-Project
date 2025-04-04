@@ -16,7 +16,7 @@ class PlaceProvider extends ChangeNotifier {
   List<Place> get places => _places;
   bool get isLoading => _isLoading;
   String? get error => _error;
-  
+
   void _setLoading(bool loading) {
     _isLoading = loading;
     notifyListeners();
@@ -96,5 +96,47 @@ class PlaceProvider extends ChangeNotifier {
     } catch (e) {
       throw Exception('Faile to search places');
     }
+  }
+
+
+  Future<void> addPlace(Place place) async {
+    _setLoading(true);
+    try {
+      final placeId = await _placeRepository.addPlace(place);
+      if (placeId != null) {
+        notifyListeners();
+      }
+    } catch (e) {
+      _setError('Failed to add place');
+    }
+    _setLoading(false);
+  }
+
+
+  Future<void> updatePlace(Place place) async {
+    _setLoading(true);
+    try {
+      final placeId = await _placeRepository.updatePlace(place);
+      if (placeId != null) {
+        notifyListeners();
+      }
+    } catch (e) {
+      _setError('Failed to update place');
+    }
+    _setLoading(false);
+  }
+
+
+  Future<void> deletePlace(String placeId) async {
+    _setLoading(true);
+    try {
+      final isDeleted = await _placeRepository.deletePlace(placeId);
+      if (isDeleted) {
+        notifyListeners();
+      }
+    } catch (e) {
+      _setError('Failed to delete place');
+    }
+    _setLoading(false);
   }
 }

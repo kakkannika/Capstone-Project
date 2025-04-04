@@ -39,10 +39,7 @@ class _TamSearchbarState extends State<TamSearchbar> {
               ),
             ),
           ),
-          IconButton(
-            icon: const Icon(Icons.tune),
-            onPressed: widget.onSearchTap,
-          ),
+          
         ],
       ),
     );

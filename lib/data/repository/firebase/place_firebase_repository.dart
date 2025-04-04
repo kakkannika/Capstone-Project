@@ -37,12 +37,13 @@ class PlaceFirebaseRepository extends PlaceRepository {
 
   // Get place by category
   @override
-  Future<List<Place>> fetchPlacesByCategory(String category,String province) async {
+  Future<List<Place>> fetchPlacesByCategory(
+      String category, String province) async {
     try {
       QuerySnapshot querySnapshot = await _firestore
           .collection(collectionName)
           .where('category', isEqualTo: category)
-          .where('catgory',isEqualTo: 'all')
+          .where('catgory', isEqualTo: 'all')
           .get();
       return querySnapshot.docs.map((doc) => Place.fromFirestore(doc)).toList();
     } catch (e) {
@@ -52,11 +53,13 @@ class PlaceFirebaseRepository extends PlaceRepository {
 
   // Get popular place
   @override
-  Future<List<Place>> fetchHightlyRatedPlaces(double minRating, String province) async {
+  Future<List<Place>> fetchHightlyRatedPlaces(
+      double minRating, String province) async {
     try {
       QuerySnapshot querySnapshot = await _firestore
           .collection(collectionName)
-          .where('averageRating', isGreaterThanOrEqualTo: minRating).where('province', isEqualTo: province)
+          .where('averageRating', isGreaterThanOrEqualTo: minRating)
+          .where('province', isEqualTo: province)
           .get();
       return querySnapshot.docs.map((doc) => Place.fromFirestore(doc)).toList();
     } catch (e) {
@@ -108,4 +111,65 @@ class PlaceFirebaseRepository extends PlaceRepository {
       return [];
     }
   }
+
+  // Add a new place
+  // Function to add a new place
+  @override
+  Future<String?> addPlace(Place place) async {
+    try {
+      final CollectionReference places = _firestore.collection(collectionName);
+      DocumentReference docRef = await places.add({
+        'name': place.name,
+        'description': place.description,
+        'province': place.province,
+        'location': GeoPoint(place.location.latitude, place.location.longitude),
+        'imageURL': place.imageURL,
+        'category': place.category,
+        'averageRating': place.averageRating,
+        'entranceFees': place.entranceFees,
+        'openingHours': place.openingHours,
+      });
+      return docRef.id;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Update an existing place
+  @override
+  Future<String?> updatePlace(Place place) async {
+    try {
+      await _firestore.collection(collectionName).doc(place.id).update({
+        'name': place.name,
+        'description': place.description,
+        'province': place.province,
+        'location': place.location,
+        'imageURL': place.imageURL,
+        'category': place.category,
+        'averageRating': place.averageRating,
+        'entranceFees': place.entranceFees,
+        'openingHours': place.openingHours,
+      });
+
+      return place.id;
+    } catch (e) {
+      print('Error updating place: $e');
+      return null;
+    }
+  }
+
+  // Delete a place
+  @override
+  Future<bool> deletePlace(String placeId) async {
+    try {
+      await _firestore.collection(collectionName).doc(placeId).delete();
+
+      return true;
+    } catch (e) {
+      print('Error deleting place: $e');
+      return false;
+    }
+  }
+
+ 
 }

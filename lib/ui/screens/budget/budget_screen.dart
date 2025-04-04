@@ -1,32 +1,31 @@
-// ignore_for_file: deprecated_member_use, use_build_context_synchronously, avoid_print
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/models/trips/trips.dart';
-import 'package:tourism_app/ui/screens/budget/expend_screen.dart';
-import 'package:tourism_app/ui/widgets/dertam_textfield.dart';
-import 'package:tourism_app/ui/widgets/dertam_button.dart';
+import 'package:tourism_app/theme/theme.dart';
 import 'package:tourism_app/ui/providers/budget_provider.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
-import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/screens/budget/expend_screen.dart';
+import 'package:tourism_app/ui/widgets/dertam_textfield.dart';
 
-class SetBudgetScreen extends StatefulWidget {
-  final String selectedCurrency;
+class BudgetScreen extends StatefulWidget {
   final String tripId;
 
-  const SetBudgetScreen({
+  const BudgetScreen({
     super.key,
-    required this.selectedCurrency,
     required this.tripId,
   });
 
   @override
-  _SetBudgetScreenState createState() => _SetBudgetScreenState();
+  _BudgetScreenState createState() => _BudgetScreenState();
 }
 
-class _SetBudgetScreenState extends State<SetBudgetScreen> {
+class _BudgetScreenState extends State<BudgetScreen> {
   final TextEditingController _totalBudgetController = TextEditingController();
   final TextEditingController _dailyBudgetController = TextEditingController();
+  final List<String> currencies = ['\$', '៛'];
+  String? selectedCurrency = '\$';
   bool _isLoading = false;
   Trip? _trip;
   double _dailyBudget = 0.0;
@@ -37,13 +36,8 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
   void initState() {
     super.initState();
     _fetchTripData();
-
-    // Add listener to total budget controller to update daily budget
     _totalBudgetController.addListener(_updateDailyBudget);
-
-    // Add listener to daily budget controller to track manual edits
     _dailyBudgetController.addListener(() {
-      // Mark as manually edited if the value differs from the calculated one
       if (!_dailyBudgetManuallyEdited) {
         double manualValue = double.tryParse(_dailyBudgetController.text) ?? 0;
         if (manualValue != _dailyBudget && manualValue > 0) {
@@ -63,7 +57,6 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
     super.dispose();
   }
 
-  // Fetch trip data to calculate number of days
   Future<void> _fetchTripData() async {
     setState(() {
       _isLoading = true;
@@ -71,8 +64,6 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
 
     try {
       final tripProvider = Provider.of<TripProvider>(context, listen: false);
-
-      // Listen to the trip stream
       tripProvider.getTripByIdStream(widget.tripId).listen((trip) {
         if (trip != null) {
           setState(() {
@@ -83,12 +74,14 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
         }
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error fetching trip data: $e"),
-          backgroundColor: DertamColors.red,
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error fetching trip data: $e"),
+            backgroundColor: DertamColors.red,
+          ),
+        );
+      }
     } finally {
       setState(() {
         _isLoading = false;
@@ -96,16 +89,12 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
     }
   }
 
-  // Calculate daily budget based on total budget and trip duration
   void _updateDailyBudget() {
-    if (_trip == null) return;
+    if (_trip == null || selectedCurrency == null) return;
 
     double totalBudget = double.tryParse(_totalBudgetController.text) ?? 0;
-
-    // Use the budget provider to calculate daily budget
     final budgetProvider = Provider.of<BudgetProvider>(context, listen: false);
 
-    // Only update the controller if the user hasn't manually edited it
     setState(() {
       _dailyBudget =
           budgetProvider.calculateDailyBudget(totalBudget, _numberOfDays);
@@ -117,8 +106,17 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
     });
   }
 
-  // Save the budget to Firestore
   Future<void> _saveBudget() async {
+    if (selectedCurrency == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please select a currency."),
+          backgroundColor: DertamColors.red,
+        ),
+      );
+      return;
+    }
+
     if (_totalBudgetController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -160,40 +158,30 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
       final budgetProvider =
           Provider.of<BudgetProvider>(context, listen: false);
 
-      // Debug information - remove in production
-      print("Creating budget with:");
-      print("Total budget: $totalBudget");
-      print("Daily budget: $dailyBudget");
-      print("Number of days: $_numberOfDays");
-
       final budgetId = await budgetProvider.createBudget(
         tripId: widget.tripId,
         total: totalBudget,
-        currency: widget.selectedCurrency,
+        currency: selectedCurrency!,
         dailyBudget: dailyBudget,
       );
 
-      if (budgetId != null) {
-        if (mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ExpenseScreen(
-                budgetId: budgetId,
-                tripId: widget.tripId,
-              ),
+      if (budgetId != null && mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ExpenseScreen(
+              budgetId: budgetId,
+              tripId: widget.tripId,
             ),
-          );
-        }
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Failed to set budget. Please try again."),
-              backgroundColor: DertamColors.red,
-            ),
-          );
-        }
+          ),
+        );
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Failed to set budget. Please try again."),
+            backgroundColor: DertamColors.red,
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -215,11 +203,27 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
 
   @override
   Widget build(BuildContext context) {
+    String currencySymbol = selectedCurrency
+            ?.split(' ')
+            .last
+            .replaceAll('(', '')
+            .replaceAll(')', '') ??
+        '';
+
     return Scaffold(
-      backgroundColor: DertamColors.blueSky,
+      backgroundColor: DertamColors.white,
       appBar: AppBar(
+        centerTitle: true,
+        title: Text(
+          "Set Your Budget",
+          style: DertamTextStyles.heading.copyWith(
+            color: DertamColors.black,
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+          ),
+        ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: DertamColors.black),
           onPressed: () => Navigator.pop(context),
         ),
         backgroundColor: Colors.transparent,
@@ -237,29 +241,82 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Center(
-                              child: Text(
-                                "Set Your Budget",
-                                style: DertamTextStyles.heading.copyWith(
-                                  color: DertamColors.primary,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
                             const SizedBox(height: DertamSpacings.xl),
-                            Text(
-                              "Define your total budget in ${widget.selectedCurrency}.",
-                              style: DertamTextStyles.body.copyWith(
-                                color: DertamColors.black.withOpacity(0.7),
-                              ),
-                            ),
-                            const SizedBox(height: DertamSpacings.m),
-                            DertamTextfield(
-                              label:
-                                  "Total Budget (${widget.selectedCurrency})",
-                              controller: _totalBudgetController,
-                              keyboardType: TextInputType.number,
-                              borderColor: DertamColors.greyLight,
+
+                            // Budget input with currency toggle
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    controller: _totalBudgetController,
+                                    keyboardType: TextInputType.number,
+                                    decoration: InputDecoration(
+                                      labelText:
+                                          "Total Budget ${currencySymbol != '' ? '($currencySymbol)' : ''}",
+                                      labelStyle:
+                                          DertamTextStyles.body.copyWith(
+                                        color: DertamColors.grey,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            DertamSpacings.radius),
+                                        borderSide: BorderSide(
+                                            color: DertamColors.greyLight,
+                                            width: 2),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            DertamSpacings.radius),
+                                        borderSide: BorderSide(
+                                            color: DertamColors.greyLight,
+                                            width: 2),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(
+                                            DertamSpacings.radius),
+                                        borderSide: BorderSide(
+                                            color: DertamColors.primary,
+                                            width: 2),
+                                      ),
+                                      fillColor: DertamColors.white,
+                                      filled: true,
+                                      contentPadding: EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 16),
+                                      suffixIcon: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 8.0, right: 4.0),
+                                        //dropdown button for currency selection
+                                        child: DropdownButtonHideUnderline(
+                                          child: DropdownButton<String>(
+                                            itemHeight: 60,
+                                            value: selectedCurrency,
+                                            icon: Icon(Icons.arrow_drop_down,
+                                                color: DertamColors.grey),
+                                            items: currencies.map((currency) {
+                                              return DropdownMenuItem<String>(
+                                                value: currency,
+                                                child: Text(
+                                                  currency,
+                                                  style: DertamTextStyles.body,
+                                                ),
+                                              );
+                                            }).toList(),
+                                            onChanged: (value) {
+                                              if (value != null) {
+                                                // Add null check for safety
+                                                setState(() {
+                                                  selectedCurrency = value;
+                                                  _updateDailyBudget();
+                                                });
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                             if (_trip != null && _trip!.days.isNotEmpty)
                               Padding(
@@ -278,7 +335,7 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
                                     const SizedBox(height: 16),
                                     DertamTextfield(
                                       label:
-                                          "Daily Budget (${widget.selectedCurrency})",
+                                          "Daily Budget ${currencySymbol != '' ? '($currencySymbol)' : ''}",
                                       controller: _dailyBudgetController,
                                       keyboardType: TextInputType.number,
                                       borderColor: DertamColors.greyLight,
@@ -288,13 +345,15 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
                                       child: TextButton.icon(
                                         icon: Icon(
                                           Icons.refresh,
-                                          color: DertamColors.primary,
+                                          color: DertamColors
+                                              .primary, // Matching turquoise color
                                           size: 18,
                                         ),
                                         label: Text(
                                           "Reset to auto-calculated",
                                           style: TextStyle(
-                                            color: DertamColors.primary,
+                                            color: DertamColors
+                                                .primary, // Matching turquoise color
                                             fontSize: 12,
                                           ),
                                         ),
@@ -322,13 +381,27 @@ class _SetBudgetScreenState extends State<SetBudgetScreen> {
                         ),
                       ),
                     ),
-                    Center(
+                    SizedBox(
+                      width: double.infinity,
                       child: _isLoading
-                          ? const CircularProgressIndicator()
-                          : DertamButton(
-                              text: "Continue",
-                              buttonType: ButtonType.primary,
+                          ? const Center(child: CircularProgressIndicator())
+                          : ElevatedButton(
                               onPressed: _saveBudget,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: DertamColors.primary,
+                                padding: EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: Text(
+                                "Continue",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                     ),
                     const SizedBox(height: DertamSpacings.m),

@@ -113,7 +113,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: Text(
                     "Start Chatting with our AI Assistant!",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: DertamColors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),

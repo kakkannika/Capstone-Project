@@ -75,8 +75,8 @@ class _HomeScreenState extends State<DetailHomePages> {
                           HomeScreen())); // Navigate back to the previous screen
             },
             child: Icon(
-              Icons.home,
-              size: 30,
+              Icons.arrow_back_ios_new,
+              size: 24,
               color: DertamColors.grey,
             ),
           ),

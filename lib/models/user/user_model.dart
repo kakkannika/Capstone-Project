@@ -2,6 +2,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tourism_app/models/user/user_preference.dart';
 
+enum UserRole {
+  admin,
+  user,
+}
+
 class AppUser {
   final String uid;
   final String email;
@@ -9,15 +14,16 @@ class AppUser {
   final String? photoUrl;
   final DateTime createdAt;
   final UserPreferences preferences;
+  final UserRole? role;
 
-  AppUser({
-    required this.uid,
-    required this.email,
-    this.displayName,
-    this.photoUrl,
-    required this.createdAt,
-    required this.preferences,
-  });
+  AppUser(
+      {required this.uid,
+      required this.email,
+      this.displayName,
+      this.photoUrl,
+      required this.createdAt,
+      required this.preferences,
+      this.role});
 
   factory AppUser.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data() as Map;
@@ -39,5 +45,25 @@ class AppUser {
       'createdAt': createdAt,
       'preferences': preferences.toMap(),
     };
+  }
+
+  AppUser copyWith({
+    String? uid,
+    String? email,
+    String? displayName,
+    String? photoUrl,
+    DateTime? createdAt,
+    UserPreferences? preferences,
+    UserRole? role,
+  }) {
+    return AppUser(
+      uid: uid ?? this.uid,
+      email: email ?? this.email,
+      displayName: displayName ?? this.displayName,
+      photoUrl: photoUrl ?? this.photoUrl,
+      createdAt: createdAt ?? this.createdAt,
+      preferences: preferences ?? this.preferences,
+      role: role ?? this.role,
+    );
   }
 }

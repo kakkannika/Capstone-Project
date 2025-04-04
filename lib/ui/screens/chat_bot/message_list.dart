@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tourism_app/theme/theme.dart';
 import 'package:tourism_app/ui/providers/auth_provider.dart';
 
 class MessageList extends StatelessWidget {
@@ -41,7 +42,7 @@ class MessageList extends StatelessWidget {
                   child: Text(
                     message["text"]!,
                     style: TextStyle(
-                      color: isQuestion ? Colors.blue : Colors.black,
+                      color: isQuestion ? DertamColors.primary : DertamColors.black,
                       fontWeight:
                           isQuestion ? FontWeight.bold : FontWeight.normal,
                     ),

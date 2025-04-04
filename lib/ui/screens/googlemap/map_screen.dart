@@ -1,7 +1,10 @@
+// ignore_for_file: use_build_context_synchronously, avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:tourism_app/theme/theme.dart';
 import 'package:tourism_app/ui/providers/google_map_service.dart';
 import 'dart:async';
 
@@ -73,13 +76,14 @@ class _MapNavigationScreenState extends State<MapNavigationScreen> {
 
       print("Getting location...");
       locationData = await _locationService.getLocation();
-      print("Location received: ${locationData.latitude}, ${locationData.longitude}");
-      
+      print(
+          "Location received: ${locationData.latitude}, ${locationData.longitude}");
+
       setState(() {
         _currentLocation =
             LatLng(locationData.latitude!, locationData.longitude!);
       });
-      
+
       // Add a marker for current location initially
       _markers.add(
         Marker(
@@ -91,10 +95,9 @@ class _MapNavigationScreenState extends State<MapNavigationScreen> {
 
       // Add a marker for destination
       final LatLng destinationLatLng = LatLng(
-        widget.destinationLocation.latitude,
-        widget.destinationLocation.longitude
-      );
-      
+          widget.destinationLocation.latitude,
+          widget.destinationLocation.longitude);
+
       _markers.add(
         Marker(
           markerId: const MarkerId('destination'),
@@ -102,19 +105,32 @@ class _MapNavigationScreenState extends State<MapNavigationScreen> {
           infoWindow: InfoWindow(title: widget.destinationName),
         ),
       );
-      
+
       setState(() {}); // Refresh to show markers
-      
+
+      // Move the camera to the current location
+      if (_currentLocation != null) {
+        final GoogleMapController controller = await _controller.future;
+        controller.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: _currentLocation!,
+              zoom: 15.0, // Adjust zoom level as needed
+            ),
+          ),
+        );
+      }
+
       // Get directions after a short delay
       Future.delayed(const Duration(milliseconds: 500), () {
         _getDirections();
       });
-      
     } catch (e) {
       print("Error getting location: $e");
       setState(() {
         _isLoading = false;
-        _distance = 'Error: ${e.toString().substring(0, e.toString().length > 30 ? 30 : e.toString().length)}';
+        _distance =
+            'Error: ${e.toString().substring(0, e.toString().length > 30 ? 30 : e.toString().length)}';
       });
     }
   }
@@ -124,16 +140,17 @@ class _MapNavigationScreenState extends State<MapNavigationScreen> {
 
     try {
       // Convert GeoPoint to LatLng
-      final LatLng destinationLatLng = LatLng(widget.destinationLocation.latitude,
+      final LatLng destinationLatLng = LatLng(
+          widget.destinationLocation.latitude,
           widget.destinationLocation.longitude);
 
       print("Fetching directions from $_currentLocation to $destinationLatLng");
-      
+
       // Clear previous polylines if any
       setState(() {
         _polylines.clear();
       });
-      
+
       // Get directions
       final directions = await _directionsService.getDirections(
         origin: _currentLocation!,
@@ -143,7 +160,8 @@ class _MapNavigationScreenState extends State<MapNavigationScreen> {
       print("Directions received successfully with route data");
 
       // Create a polyline
-      final List<LatLng> polylineCoordinates = directions['polylineCoordinates'];
+      final List<LatLng> polylineCoordinates =
+          directions['polylineCoordinates'];
 
       setState(() {
         _polylines.add(
@@ -162,16 +180,14 @@ class _MapNavigationScreenState extends State<MapNavigationScreen> {
 
       // Adjust camera to show the route
       _fitBounds(polylineCoordinates);
-      
     } catch (e) {
       print("Error getting directions: $e");
-      
+
       // Show error and fallback to straight line
       final LatLng destinationLatLng = LatLng(
-        widget.destinationLocation.latitude,
-        widget.destinationLocation.longitude
-      );
-      
+          widget.destinationLocation.latitude,
+          widget.destinationLocation.longitude);
+
       setState(() {
         // Create a straight line as fallback
         _polylines.add(
@@ -183,12 +199,12 @@ class _MapNavigationScreenState extends State<MapNavigationScreen> {
             patterns: [PatternItem.dash(10), PatternItem.gap(5)], // Dashed line
           ),
         );
-        
+
         _isLoading = false;
         _distance = 'Route unavailable';
         _duration = 'Check internet and API key';
       });
-      
+
       // Show a snackbar with the error
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -205,7 +221,7 @@ class _MapNavigationScreenState extends State<MapNavigationScreen> {
           ),
         ),
       );
-      
+
       // Zoom to show both markers
       _fitMarkers();
     }
@@ -217,7 +233,7 @@ class _MapNavigationScreenState extends State<MapNavigationScreen> {
     double minLat = points[0].latitude;
     double maxLat = points[0].latitude;
     double minLng = points[0].longitude;
-    double maxLng = points[0].longitude;  
+    double maxLng = points[0].longitude;
 
     for (var point in points) {
       if (point.latitude < minLat) minLat = point.latitude;
@@ -241,27 +257,29 @@ class _MapNavigationScreenState extends State<MapNavigationScreen> {
   // Add method to fit map to markers when we can't get a proper route
   Future<void> _fitMarkers() async {
     if (_markers.isEmpty) return;
-    
+
     final GoogleMapController controller = await _controller.future;
-    
+
     double minLat = 90;
     double maxLat = -90;
     double minLng = 180;
     double maxLng = -180;
-    
+
     for (final marker in _markers) {
       if (marker.position.latitude < minLat) minLat = marker.position.latitude;
       if (marker.position.latitude > maxLat) maxLat = marker.position.latitude;
-      if (marker.position.longitude < minLng) minLng = marker.position.longitude;
-      if (marker.position.longitude > maxLng) maxLng = marker.position.longitude;
+      if (marker.position.longitude < minLng)
+        minLng = marker.position.longitude;
+      if (marker.position.longitude > maxLng)
+        maxLng = marker.position.longitude;
     }
-    
+
     // Add some padding
     minLat -= 0.05;
     maxLat += 0.05;
     minLng -= 0.05;
     maxLng += 0.05;
-    
+
     controller.animateCamera(
       CameraUpdate.newLatLngBounds(
         LatLngBounds(
@@ -276,8 +294,10 @@ class _MapNavigationScreenState extends State<MapNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: DertamColors.white,
       appBar: AppBar(
         title: Text(widget.destinationName),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -303,7 +323,9 @@ class _MapNavigationScreenState extends State<MapNavigationScreen> {
                     });
                   },
                   initialCameraPosition: CameraPosition(
-                    target: _currentLocation ?? const LatLng(-6.2088, 106.8456), // Default to Jakarta if null
+                    target: _currentLocation ??
+                        const LatLng(
+                            -6.2088, 106.8456), // Default to Jakarta if null
                     zoom: 12.0,
                   ),
                   markers: _markers,
@@ -318,7 +340,8 @@ class _MapNavigationScreenState extends State<MapNavigationScreen> {
               bottom: 20,
               left: 20,
               right: 20,
-              child: SingleChildScrollView( // Wrap with SingleChildScrollView to prevent overflow
+              child: SingleChildScrollView(
+                // Wrap with SingleChildScrollView to prevent overflow
                 child: Card(
                   elevation: 5,
                   child: Padding(

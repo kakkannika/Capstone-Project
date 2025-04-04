@@ -35,11 +35,12 @@ class _DestinationCardState extends State<DestinationCard> {
   @override
   Widget build(BuildContext context) {
     // Get the provider without listening to changes (listen: false)
-    final favoriteProvider = Provider.of<FavoriteProvider>(context, listen: false);
-    
+    final favoriteProvider =
+        Provider.of<FavoriteProvider>(context, listen: false);
+
     // Only initialize the local state once
     if (!mounted) return const SizedBox();
-    
+
     // Only get the initial state from provider, then manage locally
     if (!_localFavoriteState) {
       _localFavoriteState = favoriteProvider.isFavorite(widget.placeId);
@@ -105,7 +106,7 @@ class _DestinationCardState extends State<DestinationCard> {
                 setState(() {
                   _localFavoriteState = !_localFavoriteState;
                 });
-                
+
                 // Tell the provider about the change but don't wait
                 favoriteProvider.toggleFavorite(widget.placeId);
               },

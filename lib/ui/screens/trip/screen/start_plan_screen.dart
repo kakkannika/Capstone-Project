@@ -157,15 +157,25 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
-                      'Plan a new Trip',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: DertamColors.primary,
-                      ),
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: Icon(Icons.arrow_back_ios_new),
+                        ),
+                        SizedBox(width: 32,),
+                        Text(
+                          'Plan a new Trip',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: DertamColors.primary,
+                          ),
+                        ),
+                      ],
                     ),
+
                     const SizedBox(height: 8),
                     Text(
                       'Build an itinerary and organize your\nupcoming travel plans',

@@ -90,13 +90,18 @@ class HomeScreen extends StatelessWidget {
             Text(
               'Hello, $displayName',
               style:  TextStyle(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.w500,
                 color: DertamColors.black,
               ),
             ),
+            
           ],
+          
         ),
+        actions: [
+          IconButton(onPressed: (){}, icon: Icon(Icons.notifications))
+        ],
        
       ),
       body: Container(

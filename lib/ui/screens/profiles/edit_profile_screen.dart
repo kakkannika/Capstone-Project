@@ -127,6 +127,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         false;
   }
 
+  
+
   @override
   Widget build(BuildContext context) {
     // Access the auth provider

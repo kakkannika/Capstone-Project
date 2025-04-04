@@ -1,7 +1,10 @@
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
+
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tourism_app/theme/theme.dart';
 import 'package:tourism_app/ui/screens/googlemap/map_screen.dart';
 import 'package:tourism_app/data/repository/firebase/place_firebase_repository.dart';
 import 'package:tourism_app/ui/screens/trip/screen/start_plan_screen.dart';
@@ -114,6 +117,7 @@ class _DetailEachPlaceState extends State<DetailEachPlace> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: DertamColors.white,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : place == null
@@ -170,9 +174,9 @@ class _DetailEachPlaceState extends State<DetailEachPlace> {
                                     context, place!.location, place!.name);
                               },
                               icon: const Icon(Icons.map_outlined),
-                              label: const Text('Route'),
+                              label: Text('Route'),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue,
+                                backgroundColor: DertamColors.primary,
                                 foregroundColor: Colors.white,
                               ),
                             ),
@@ -326,41 +330,6 @@ class _DetailEachPlaceState extends State<DetailEachPlace> {
                         ),
                       ),
 
-                      // Nearby Attractions Section
-                      _buildSectionTitle('Attractions nearby'),
-                      loadingNearby
-                          ? const Center(child: CircularProgressIndicator())
-                          : nearbyPlaces.isEmpty
-                              ? const Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 16.0),
-                                  child: Text('No nearby attractions found'),
-                                )
-                              : SizedBox(
-                                  height: 200,
-                                  child: ListView.builder(
-                                    scrollDirection: Axis.horizontal,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16),
-                                    itemCount: nearbyPlaces.length,
-                                    itemBuilder: (context, index) {
-                                      final nearbyPlace = nearbyPlaces[index];
-                                      return _buildPlaceCard(
-                                        nearbyPlace.name,
-                                        nearbyPlace.averageRating,
-                                        nearbyPlace.imageURL,
-                                        onTap: () => _navigateToPlaceDetail(
-                                            nearbyPlace.id),
-                                        // Calculate distance from current place
-                                        distance: _calculateDistance(
-                                          place!.location,
-                                          nearbyPlace.location,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-
                       // Hotels section
                       _buildSectionTitle('Hotels Nearby'),
                       loadingNearby
@@ -494,90 +463,6 @@ class _DetailEachPlaceState extends State<DetailEachPlace> {
     );
   }
 
-  Widget _buildPlaceCard(
-    String title,
-    double rating,
-    String imageUrl, {
-    required Function() onTap,
-    required double distance,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 160,
-        margin: const EdgeInsets.only(right: 16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 1,
-              blurRadius: 4,
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(12)),
-              child: imageUrl.isNotEmpty
-                  ? Image.network(
-                      imageUrl,
-                      height: 100,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Image.asset(
-                          'assets/images/placeholder.jpg',
-                          height: 100,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        );
-                      },
-                    )
-                  : Image.asset(
-                      'assets/images/placeholder.jpg',
-                      height: 100,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    '${distance.toStringAsFixed(1)} km away',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 12,
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      const Icon(Icons.star, color: Colors.amber, size: 16),
-                      Text(' ${rating.toStringAsFixed(1)}'),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildHotelCard(
     String name,
     double rating,
@@ -644,7 +529,7 @@ class _DetailEachPlaceState extends State<DetailEachPlace> {
                   Text(
                     description,
                     style: TextStyle(
-                      color: Colors.grey[600],
+                      color: DertamColors.black,
                       fontSize: 12,
                     ),
                     maxLines: 1,

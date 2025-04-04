@@ -1,10 +1,7 @@
-// ignore_for_file: deprecated_member_use, use_build_context_synchronously, avoid_print
-
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/models/place/place.dart';
-import 'package:tourism_app/theme/theme.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
 import 'dart:ui' as ui;
 import 'package:cloud_firestore/cloud_firestore.dart' as firestore;
@@ -33,6 +30,7 @@ class _TripMapScreenState extends State<TripMapScreen> {
   Set<Polyline> _polylines = {};
   bool _isLoading = false;
   SmartRoutingResult? _routingResult;
+  String _selectedTransportMode = 'driving';
   bool _isDirectFallbackRoute = false;
   String? _focusedPlaceId; // Track which place is currently focused
   bool _isCardCollapsed = true; // Track if the bottom card is collapsed
@@ -497,6 +495,78 @@ class _TripMapScreenState extends State<TripMapScreen> {
     return places;
   }
 
+  void _updateMapData(SmartRoutingResult result) {
+    // Clear existing markers and polylines
+    _markers = {};
+    _polylines = {};
+    
+    // Add markers for each place in the optimized route
+    for (var i = 0; i < result.optimizedRoute.length; i++) {
+      final place = result.optimizedRoute[i];
+      final placeType = SmartRoutingUtil.getPlaceType(place);
+      
+      // Choose marker color based on place type
+      BitmapDescriptor markerIcon;
+      switch (placeType) {
+        case PlaceType.hotel:
+          markerIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet);
+        case PlaceType.attraction:
+          markerIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
+        case PlaceType.foodAndBeverage:
+          markerIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
+      }
+      
+      final marker = Marker(
+        markerId: MarkerId(place.id),
+        position: LatLng(place.location.latitude, place.location.longitude),
+        infoWindow: InfoWindow(
+          title: '${i + 1}. ${place.name}',
+          snippet: place.description.length > 50 
+              ? '${place.description.substring(0, 50)}...' 
+              : place.description,
+        ),
+        icon: markerIcon,
+        onTap: () {
+          setState(() {
+            _focusedPlaceId = place.id;
+          });
+        },
+      );
+      
+      _markers.add(marker);
+    }
+    
+    // Set polyline color based on transport mode
+    Color polylineColor;
+    switch (_selectedTransportMode) {
+      case 'driving':
+        polylineColor = Colors.blue.shade700;
+      case 'walking':
+        polylineColor = Colors.green.shade700;
+      case 'bicycling':
+        polylineColor = Colors.orange.shade700;
+      default:
+        polylineColor = Colors.blue.shade700;
+    }
+    
+    // Add polyline connecting all places in order
+    if (result.polylinePoints.isNotEmpty) {
+      final polyline = Polyline(
+        polylineId: const PolylineId('route'),
+        points: result.polylinePoints,
+        color: polylineColor,
+        width: 4,
+        patterns: [
+          PatternItem.dash(10),
+          PatternItem.gap(5),
+        ],
+        endCap: Cap.roundCap,
+        startCap: Cap.roundCap,
+      );
+      
+      _polylines.add(polyline);
+    }
+  }
 
   void _zoomToFitMarkers() {
     if (_mapController == null || _markers.isEmpty) return;
@@ -768,15 +838,13 @@ class _TripMapScreenState extends State<TripMapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: DertamColors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title:  Text(
+        title: const Text(
           'Trip Route Map',
-          style: TextStyle(color: DertamColors.black,fontWeight: FontWeight.bold),
+          style: TextStyle(color: Colors.black),
         ),
-        centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.black),
         actions: [
           IconButton(
