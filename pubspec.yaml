@@ -108,6 +108,7 @@ flutter:
     - assets/provinces/
     - assets/place_images/
     - assets/place.json
+    - .env
 
   
 
