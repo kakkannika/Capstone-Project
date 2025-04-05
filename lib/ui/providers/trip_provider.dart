@@ -99,6 +99,7 @@ class TripProvider with ChangeNotifier {
     required DateTime startDate,
     required DateTime endDate,
     String? budgetId,
+    String? province,
   }) async {
     _setLoading(true);
     _error = null;
@@ -109,6 +110,7 @@ class TripProvider with ChangeNotifier {
         startDate: startDate,
         endDate: endDate,
         budgetId: budgetId,
+        province: province,
       );
       await fetchTripsForCurrentUser(); // Refresh the trip list
       return tripId;

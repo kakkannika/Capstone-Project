@@ -12,12 +12,14 @@ import 'package:tourism_app/ui/providers/trip_provider.dart';
 class SearchPlaceScreen extends StatefulWidget {
   final String tripId;
   final String dayId;
+  final String? province;
   final Function(Place) onPlaceSelected;
 
   const SearchPlaceScreen({
     super.key,
     required this.tripId,
     required this.dayId,
+    this.province,
     required this.onPlaceSelected,
   });
 
@@ -36,6 +38,11 @@ class _SearchPlaceScreenState extends State<SearchPlaceScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _searchFocusNode.requestFocus();
+      
+      // Filter places by province if provided
+      if (widget.province != null && widget.province!.isNotEmpty) {
+        context.read<PlaceProvider>().searchInProvince("", widget.province!);
+      }
     });
   }
 
@@ -102,7 +109,13 @@ class _SearchPlaceScreenState extends State<SearchPlaceScreen> {
                                       ),
                                       onPressed: () {
                                         _searchController.clear();
-                                        placeProvider.searchPlace('');
+                                        if (widget.province != null && widget.province!.isNotEmpty) {
+                                          // When clearing search, filter by province only
+                                          placeProvider.searchInProvince("", widget.province!);
+                                        } else {
+                                          // Clear search with no province filter
+                                          placeProvider.searchPlace('');
+                                        }
                                         setState(() {});
                                       },
                                     )
@@ -115,7 +128,13 @@ class _SearchPlaceScreenState extends State<SearchPlaceScreen> {
                             ),
                             onChanged: (value) {
                               setState(() {}); // Refresh the clear button
-                              placeProvider.searchPlace(value);
+                              if (widget.province != null && widget.province!.isNotEmpty) {
+                                // Search within the province
+                                placeProvider.searchInProvince(value, widget.province!);
+                              } else {
+                                // Standard search without province filter
+                                placeProvider.searchPlace(value);
+                              }
                             },
                             textInputAction: TextInputAction.search,
                             style: TextStyle(

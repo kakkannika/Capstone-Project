@@ -9,6 +9,7 @@ class Trip {
   final DateTime endDate;
   final List<Day> days;
   final String? budgetId;
+  final String? province;
 
   Trip({
     required this.id,
@@ -18,6 +19,7 @@ class Trip {
     required this.endDate,
     required this.days,
     this.budgetId,
+    this.province,
   });
 
   factory Trip.fromFirestore(
@@ -33,6 +35,7 @@ class Trip {
       endDate: (data['endDate'] as firestore.Timestamp).toDate(),
       days: days,
       budgetId: data['budgetId'] as String?,
+      province: data['province'] as String?,
     );
   }
 
@@ -43,6 +46,7 @@ class Trip {
       'startDate': firestore.Timestamp.fromDate(startDate),
       'endDate': firestore.Timestamp.fromDate(endDate),
       'budgetId': budgetId,
+      'province': province,
     };
   }
 
@@ -84,6 +88,7 @@ class Trip {
     DateTime? endDate,
     List<Day>? days,
     String? budgetId,
+    String? province,
   }) {
     return Trip(
       id: id ?? this.id,
@@ -93,6 +98,7 @@ class Trip {
       endDate: endDate ?? this.endDate,
       days: days ?? this.days,
       budgetId: budgetId ?? this.budgetId,
+      province: province ?? this.province,
     );
   }
 }

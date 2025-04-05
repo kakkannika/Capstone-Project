@@ -171,5 +171,35 @@ class PlaceFirebaseRepository extends PlaceRepository {
     }
   }
 
- 
+  @override
+  Future<List<Place>> searchPlacesInProvince(String query, String province) async {
+    try {
+      // Convert query to lowercase for case-insensitive search
+      final queryLower = query.toLowerCase();
+      
+      // Get places from the specified province
+      final placesSnapshot = await _firestore
+          .collection('places')
+          .where('province', isEqualTo: province)
+          .get();
+          
+      // Filter places client-side based on the query
+      final List<Place> results = placesSnapshot.docs
+          .where((doc) {
+            final data = doc.data();
+            final name = (data['name'] as String? ?? '').toLowerCase();
+            final description = (data['description'] as String? ?? '').toLowerCase();
+
+            // Check if the place name or description contains the query
+            return name.contains(queryLower) || description.contains(queryLower);
+          })
+          .map((doc) => Place.fromFirestore(doc))
+          .toList();
+
+      return results;
+    } catch (e) {
+      print('Error searching places in province: $e');
+      throw Exception('Error searching places in province: $e');
+    }
+  }
 }

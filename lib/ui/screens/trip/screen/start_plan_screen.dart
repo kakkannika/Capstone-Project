@@ -7,6 +7,7 @@ import 'package:tourism_app/ui/screens/trip/screen/widget/trip_planner_screen.da
 import 'package:tourism_app/ui/providers/trip_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:tourism_app/ui/widgets/dertam_textfield.dart';
+import 'package:tourism_app/models/place/place_category.dart'; // Import for Province enum
 
 class PlanNewTripScreen extends StatefulWidget {
   const PlanNewTripScreen({super.key});
@@ -21,6 +22,7 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
   DateTime? startDate;
   DateTime? returnDate;
   List<String?> selectedDestinations = [];
+  String? selectedProvince; // Add selected province
 
   @override
   void initState() {
@@ -80,7 +82,8 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
   bool isFormValid() {
     return _tripNameController.text.isNotEmpty &&
         startDate != null &&
-        returnDate != null;
+        returnDate != null &&
+        selectedProvince != null; // Add province validation
   }
 
   Future<void> _createTrip() async {
@@ -92,6 +95,7 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
         tripName: _tripNameController.text,
         startDate: startDate!,
         endDate: returnDate!,
+        province: selectedProvince, // Pass selected province
       );
 
       if (tripId != null && mounted) {
@@ -112,6 +116,7 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
               startDate: startDate!,
               returnDate: returnDate,
               tripId: tripId,
+              province: selectedProvince, // Pass province to next screen
             ),
           ),
         );
@@ -201,13 +206,70 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
                         return null;
                       },
                       onChanged: (value) {
-                        setState(
-                            () {}); // Trigger rebuild to update button state
+                        setState(() {}); // Trigger rebuild to update button state
                       },
                     ),
                     const SizedBox(height: 20),
+                    
+                    // Province Dropdown
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Select Province',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: DertamColors.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey[300]!),
+                            borderRadius: BorderRadius.circular(8),
+                            color: selectedProvince != null
+                                ? Colors.teal.withOpacity(0.1)
+                                : null,
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              isExpanded: true,
+                              hint: Text('Select a province'),
+                              value: selectedProvince,
+                              icon: Icon(
+                                Icons.arrow_drop_down,
+                                color: selectedProvince != null
+                                    ? DertamColors.primary
+                                    : DertamColors.grey,
+                              ),
+                              elevation: 16,
+                              style: TextStyle(
+                                color: DertamColors.black,
+                                fontSize: 16,
+                              ),
+                              onChanged: (String? value) {
+                                setState(() {
+                                  selectedProvince = value;
+                                });
+                              },
+                              items: Province.values.map<DropdownMenuItem<String>>(
+                                (Province province) {
+                                  return DropdownMenuItem<String>(
+                                    value: province.displayName,
+                                    child: Text(province.displayName),
+                                  );
+                                },
+                              ).toList(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    
                     // Date Selection Row
-                    // ...existing code...
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [

@@ -14,6 +14,8 @@ abstract class PlaceRepository {
 
   Future<List<Place>> fetchPlacesByProvince(String province);
 
+  Future<List<Place>> searchPlacesInProvince(String query, String province);
+
   Future<String?> addPlace(Place place);
 
   Future<String?> updatePlace(Place place);

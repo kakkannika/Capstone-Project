@@ -29,6 +29,7 @@ class TripFirebaseRepository extends TripRepository {
     required DateTime startDate,
     required DateTime endDate,
     String? budgetId,
+    String? province,
   }) async {
     try {
       final userId = getCurrentUserId();
@@ -41,6 +42,7 @@ class TripFirebaseRepository extends TripRepository {
         'startDate': firestore.Timestamp.fromDate(startDate),
         'endDate': firestore.Timestamp.fromDate(endDate),
         'budgetId': budgetId,
+        'province': province,
       });
 
       // Create days subcollection with specific IDs (day1, day2, etc.)

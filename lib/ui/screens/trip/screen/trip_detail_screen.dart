@@ -18,10 +18,12 @@ import 'package:tourism_app/ui/screens/trip/screen/trip_map_screen.dart';
 
 class ItineraryPage extends StatefulWidget {
   final String? tripId;
+  final String? province;
 
   const ItineraryPage({
     super.key,
     this.tripId,
+    this.province,
   });
 
   @override
@@ -185,6 +187,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
         builder: (context) => SearchPlaceScreen(
           tripId: tripProvider.selectedTrip!.id,
           dayId: day.id,
+          province: tripProvider.selectedTrip!.province,
           onPlaceSelected: (Place place) {
             // This callback will be called when a place is selected
             // The UI will update automatically through the StreamBuilder

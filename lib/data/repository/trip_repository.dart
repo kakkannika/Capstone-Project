@@ -7,6 +7,7 @@ abstract class TripRepository {
     required DateTime startDate,
     required DateTime endDate,
     String? budgetId,
+    String? province,
   });
 
   Future<Trip?> getTripById(String tripId);
