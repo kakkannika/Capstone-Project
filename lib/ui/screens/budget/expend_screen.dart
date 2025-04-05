@@ -11,7 +11,7 @@ import 'package:tourism_app/ui/screens/budget/budget_screen.dart';
 import 'package:tourism_app/ui/screens/budget/widget/budget_card.dart';
 import 'package:tourism_app/ui/providers/budget_provider.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
-import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/theme/theme.dart';
 
 class ExpenseScreen extends StatefulWidget {
   final String budgetId;

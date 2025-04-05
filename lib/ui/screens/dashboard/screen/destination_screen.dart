@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:tourism_app/data/repository/firebase/place_firebase_repository.dart';
 import 'package:tourism_app/models/place/place.dart';
 import 'package:tourism_app/models/place/place_category.dart';
-import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/theme/theme.dart';
 import 'package:tourism_app/ui/providers/place_provider.dart';
 import 'package:tourism_app/ui/widgets/dertam_button.dart';
 

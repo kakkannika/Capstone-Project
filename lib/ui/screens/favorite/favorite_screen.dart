@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'package:iconsax/iconsax.dart';
 import 'package:tourism_app/models/place/place.dart';
-import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/theme/theme.dart';
 import 'package:tourism_app/ui/providers/favorite_provider.dart';
 import 'package:tourism_app/ui/screens/home/detail_each_place.dart';
 import 'package:tourism_app/ui/widgets/navigationBar.dart';

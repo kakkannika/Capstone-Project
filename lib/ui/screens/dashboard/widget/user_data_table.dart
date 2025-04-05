@@ -1,35 +1,46 @@
-import 'package:flutter/material.dart';
-import 'package:tourism_app/theme/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:tourism_app/models/place/place.dart';
-import 'package:provider/provider.dart';
-import 'package:tourism_app/ui/dashboard/screen/destination_screen.dart';
-import 'package:tourism_app/ui/providers/place_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
+import '../../../../../models/user/user_model.dart';
+import '../../../theme/theme.dart';
 
-class DataTables extends StatelessWidget {
-  const DataTables({super.key});
+class UsersDataTable extends StatelessWidget {
+  const UsersDataTable({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final placeCrudService =
-        Provider.of<PlaceProvider>(context, listen: true);
-
     return SizedBox(
       width: MediaQuery.of(context).size.width - 48,
       child: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('places').snapshots(),
+        stream: FirebaseFirestore.instance.collection('users').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return Center(child: Text('Something went wrong'));
+            return Center(child: Text('Error: ${snapshot.error}'));
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           }
 
-          final places = snapshot.data!.docs.map((doc) {
-            return Place.fromFirestore(doc);
-          }).toList();
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(child: Text('No users found'));
+          }
+
+          final users = snapshot.data!.docs
+              .map((doc) {
+                try {
+                  return AppUser.fromFirestore(doc);
+                } catch (e) {
+                  print('Error parsing user data: $e');
+                  return null;
+                }
+              })
+              .where((user) => user != null)
+              .toList();
+
+          if (users.isEmpty) {
+            return Center(child: Text('No valid user data found'));
+          }
 
           return Container(
             padding: EdgeInsets.all(DertamSpacings.m),
@@ -43,36 +54,30 @@ class DataTables extends StatelessWidget {
               columns: [
                 DataColumn(label: Text('Image', style: DertamTextStyles.body)),
                 DataColumn(label: Text('Name', style: DertamTextStyles.body)),
-                DataColumn(label: Text('Rating', style: DertamTextStyles.body)),
-                DataColumn(
-                    label: Text('Province', style: DertamTextStyles.body)),
-                DataColumn(
-                    label: Text('Category', style: DertamTextStyles.body)),
-                DataColumn(label: Text('Fee', style: DertamTextStyles.body)),
-                DataColumn(label: Text('Hours', style: DertamTextStyles.body)),
+                DataColumn(label: Text('Email', style: DertamTextStyles.body)),
+                DataColumn(label: Text('Role', style: DertamTextStyles.body)),
                 DataColumn(
                     label: Text('Actions', style: DertamTextStyles.body)),
               ],
-              rows: places
-                  .map((place) => DataRow(cells: [
+              rows: users
+                  .map((user) => DataRow(cells: [
                         DataCell(
-                          place.imageURL.isNotEmpty
+                          user?.photoUrl != null
                               ? Image.network(
-                                  place.imageURL,
+                                  user!.photoUrl!,
                                   width: 50,
                                   height: 50,
                                   fit: BoxFit.cover,
                                 )
-                              : Icon(Icons.image_not_supported),
+                              : const Icon(Iconsax.user),
                         ),
-                        DataCell(Text(place.name)),
-                        DataCell(
-                            Text(place.averageRating.toString())),
-                        DataCell(Text(place.province)),
-                        DataCell(Text(place.category)),
-                        DataCell(Text(
-                            '\$${place.entranceFees.toStringAsFixed(2)}')),
-                        DataCell(Text(place.openingHours)),
+                        DataCell(Text(user?.displayName ?? 'N/A')),
+                        DataCell(Text(user?.email ?? 'N/A')),
+                        DataCell(Text(user?.role != null
+                            ? user!.role == UserRole.admin
+                                ? 'Admin'
+                                : 'User'
+                            : 'N/A')),
                         DataCell(
                           SizedBox(
                             width: 120,
@@ -83,15 +88,7 @@ class DataTables extends StatelessWidget {
                                 IconButton(
                                   icon: Icon(Icons.edit,
                                       color: Colors.green, size: 25),
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            DestinationScreen(place: place),
-                                      ),
-                                    );
-                                  },
+                                  onPressed: () {},
                                   padding: EdgeInsets.zero,
                                   constraints: BoxConstraints(
                                     minWidth: 30,
@@ -102,11 +99,7 @@ class DataTables extends StatelessWidget {
                                 IconButton(
                                   icon: Icon(Icons.delete,
                                       color: Colors.red, size: 25),
-                                  onPressed: () async {
-                                    // Delete the place using the service
-                                    await placeCrudService
-                                        .deletePlace(place.id);
-                                  },
+                                  onPressed: () async {},
                                   padding: EdgeInsets.zero,
                                   constraints: BoxConstraints(
                                     minWidth: 30,

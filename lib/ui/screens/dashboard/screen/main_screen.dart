@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/theme/theme.dart';
-import 'package:tourism_app/ui/dashboard/screen/dashboard_screen.dart';
-import 'package:tourism_app/ui/dashboard/screen/user_screen.dart';
-import 'package:tourism_app/ui/dashboard/widget/side_menu.dart';
+import 'package:tourism_app/ui/theme/theme.dart';
+import 'package:tourism_app/ui/screens/dashboard/screen/dashboard_screen.dart';
+import 'package:tourism_app/ui/screens/dashboard/screen/user_screen.dart';
+import 'package:tourism_app/ui/screens/dashboard/widget/side_menu.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});

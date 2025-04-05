@@ -3,13 +3,13 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
-import 'package:tourism_app/theme/theme.dart';
-import 'package:tourism_app/ui/dashboard/provider/user_provider.dart';
+import 'package:tourism_app/ui/theme/theme.dart';
+import 'package:tourism_app/ui/screens/dashboard/provider/user_provider.dart';
 import 'package:tourism_app/ui/providers/auth_provider.dart';
 import 'package:tourism_app/ui/widgets/dertam_button.dart';
 import 'package:tourism_app/ui/widgets/dertam_textfield.dart';
 
-import '../../../../models/user/user_model.dart';
+import '../../../../../models/user/user_model.dart';
 import 'main_screen.dart';
 
 class LoginScreen extends StatefulWidget {

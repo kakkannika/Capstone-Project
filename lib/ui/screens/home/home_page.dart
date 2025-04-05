@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:provider/provider.dart';
-import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/theme/theme.dart';
 import 'package:tourism_app/ui/providers/auth_provider.dart';
 import 'package:tourism_app/ui/screens/chat_bot/chat_screen.dart';
 import 'package:tourism_app/ui/screens/home/detail_home_pages.dart';

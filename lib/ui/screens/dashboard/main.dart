@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/data/repository/firebase/place_firebase_repository.dart';
 import 'package:tourism_app/firebase_options.dart';
-import 'package:tourism_app/ui/dashboard/provider/user_provider.dart';
-import 'package:tourism_app/ui/dashboard/screen/main_screen.dart';
+import 'package:tourism_app/ui/screens/dashboard/provider/user_provider.dart';
+import 'package:tourism_app/ui/screens/dashboard/screen/main_screen.dart';
 import 'package:tourism_app/ui/providers/auth_provider.dart';
 import 'package:tourism_app/ui/providers/place_provider.dart';
 

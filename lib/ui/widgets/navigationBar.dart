@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/theme/theme.dart';
 import 'package:tourism_app/ui/screens/favorite/favorite_screen.dart';
 import 'package:tourism_app/ui/screens/home/home_page.dart';
 import 'package:tourism_app/ui/screens/profiles/profile_screen.dart';

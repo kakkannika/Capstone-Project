@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/theme/theme.dart';
 
 class DertamTextfield extends StatelessWidget {
   final String label;

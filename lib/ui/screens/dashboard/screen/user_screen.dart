@@ -2,11 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/theme/theme.dart';
 import 'package:tourism_app/models/user/user_model.dart';
 import 'package:iconsax/iconsax.dart';
-import 'package:tourism_app/ui/dashboard/provider/user_provider.dart';
-import 'package:tourism_app/ui/dashboard/widget/user_data_table.dart';
+import 'package:tourism_app/ui/screens/dashboard/provider/user_provider.dart';
+import 'package:tourism_app/ui/screens/dashboard/widget/user_data_table.dart';
 import 'package:tourism_app/ui/widgets/dertam_button.dart';
 import 'package:tourism_app/ui/widgets/dertam_textfield.dart';
 

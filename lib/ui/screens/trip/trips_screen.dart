@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/models/trips/trips.dart';
-import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/theme/theme.dart';
 import 'package:tourism_app/ui/screens/trip/screen/edit_trip_screen.dart';
 import 'package:tourism_app/ui/screens/trip/screen/start_plan_screen.dart';
 import 'package:tourism_app/ui/screens/trip/screen/widget/trip_planner_screen.dart';

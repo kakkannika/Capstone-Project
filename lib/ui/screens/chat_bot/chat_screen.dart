@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/theme/theme.dart';
 import 'package:tourism_app/ui/screens/chat_bot/chat_input_field.dart';
 import 'package:tourism_app/ui/screens/chat_bot/message_list.dart';
 import 'package:tourism_app/ui/screens/chat_bot/widget/custom_chatbot_bar.dart';

@@ -2,8 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tourism_app/theme/theme.dart';
-import 'package:tourism_app/ui/dashboard/provider/user_provider.dart';
+import 'package:tourism_app/ui/theme/theme.dart';
+import 'package:tourism_app/ui/screens/dashboard/provider/user_provider.dart';
 import 'package:tourism_app/ui/providers/auth_provider.dart';
 import 'package:tourism_app/ui/screens/auth/login_screen.dart';
 

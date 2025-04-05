@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:tourism_app/ui/widgets/dertam_dialog_button.dart';
 import 'package:tourism_app/ui/widgets/dertam_dialog.dart';
 import 'package:tourism_app/ui/providers/auth_provider.dart';
-import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/theme/theme.dart';
 import 'package:tourism_app/ui/widgets/dertam_textfield.dart';
 import 'package:tourism_app/ui/widgets/dertam_button.dart';
 import 'package:image_picker/image_picker.dart';

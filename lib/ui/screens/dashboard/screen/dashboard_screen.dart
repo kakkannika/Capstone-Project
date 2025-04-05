@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/theme/theme.dart';
-import 'package:tourism_app/ui/dashboard/screen/destination_screen.dart';
-import 'package:tourism_app/ui/dashboard/widget/place_data_table.dart';
+import 'package:tourism_app/ui/theme/theme.dart';
+import 'package:tourism_app/ui/screens/dashboard/screen/destination_screen.dart';
+import 'package:tourism_app/ui/screens/dashboard/widget/place_data_table.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});

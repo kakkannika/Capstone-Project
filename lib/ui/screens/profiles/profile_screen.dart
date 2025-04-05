@@ -7,7 +7,7 @@ import 'package:tourism_app/ui/providers/auth_provider.dart';
 import 'package:tourism_app/ui/widgets/dertam_dialog.dart';
 import 'package:tourism_app/ui/widgets/dertam_dialog_button.dart';
 import 'package:tourism_app/ui/widgets/navigationBar.dart';
-import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/theme/theme.dart';
 import 'edit_profile_screen.dart';
 import 'setting_screen.dart';
 

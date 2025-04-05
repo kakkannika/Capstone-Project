@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tourism_app/ui/widgets/dertam_dialog_button.dart';
-import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/theme/theme.dart';
 
 class DertamDialog extends StatelessWidget {
   final String title;

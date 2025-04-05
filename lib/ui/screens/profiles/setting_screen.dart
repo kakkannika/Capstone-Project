@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tourism_app/theme/theme.dart';
+import 'package:tourism_app/ui/theme/theme.dart';
 import 'package:tourism_app/ui/screens/profiles/widget/setting_item.dart';
 
 class SettingsScreen extends StatelessWidget {
