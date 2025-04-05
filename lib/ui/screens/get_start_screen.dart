@@ -2,7 +2,7 @@
 
 import 'dart:math'; // Import this to use Random
 import 'package:flutter/material.dart';
-import 'auth/login_screen.dart';
+import 'package:tourism_app/ui/screens/auth/login_screen.dart';
 
 class GetStartedScreen extends StatelessWidget {
   const GetStartedScreen({super.key});
@@ -65,10 +65,9 @@ class GetStartedScreen extends StatelessWidget {
                       elevation: 5,
                     ),
                     onPressed: () {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) =>  LoginScreen()),
+                        MaterialPageRoute(builder: (context) => LoginScreen()),
                       );
                     },
                     child: const Text(

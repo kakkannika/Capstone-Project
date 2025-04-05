@@ -16,12 +16,13 @@ import 'package:tourism_app/ui/screens/get_start_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize environment configuration
   await EnvConfig.init();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   runApp(
     const MyApp(),
   );

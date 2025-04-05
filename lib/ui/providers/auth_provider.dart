@@ -30,6 +30,66 @@ class AuthServiceProvider extends ChangeNotifier {
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
+  Future<bool> initializeAuth() async {
+    try {
+      // Get the current Firebase user
+      User? firebaseUser = FirebaseAuth.instance.currentUser;
+
+      // Debug print to see if there's a current user
+      _handleError(
+          "Current Firebase User: ${firebaseUser?.uid ?? 'No user found'}");
+
+      // Clear user state if no Firebase user
+      if (firebaseUser == null) {
+        _currentUser = null;
+        notifyListeners();
+        return false; // No user is logged in
+      }
+
+      // For email/password users, check verification
+      if (firebaseUser.providerData
+              .any((info) => info.providerId == 'password') &&
+          !firebaseUser.emailVerified) {
+        _handleError("Email not verified, signing out");
+        await FirebaseAuth.instance.signOut();
+        _currentUser = null;
+        notifyListeners();
+        return false;
+      }
+
+      // Fetch user data from Firestore
+      try {
+        DocumentSnapshot userDoc =
+            await _authRepository.getUserData(firebaseUser.uid);
+
+        if (userDoc.exists) {
+          _currentUser = AppUser.fromFirestore(userDoc);
+          notifyListeners();
+          return true; // User is authenticated
+        } else {
+          _handleError("User not found in Firestore");
+          // Sign out from Firebase Auth if no Firestore record
+          await FirebaseAuth.instance.signOut();
+          _currentUser = null;
+          notifyListeners();
+          return false;
+        }
+      } catch (e) {
+        _handleError("Error fetching user data: $e");
+        // Sign out if there's an error fetching user data
+        await FirebaseAuth.instance.signOut();
+        _currentUser = null;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _handleError('Authentication Error: $e');
+      _currentUser = null;
+      notifyListeners();
+      return false;
+    }
+  }
+
   // Signup method with Firestore integration
   Future<void> signUpWithEmail({
     required String email,
@@ -210,7 +270,9 @@ class AuthServiceProvider extends ChangeNotifier {
     Map<String, dynamic> updates = {};
     if (displayName != null) updates['displayName'] = displayName;
     if (email != null) updates['email'] = email; // Correctly update email
-    if (photoUrl != null) updates['photoUrl'] = photoUrl; // Correctly update photoUrl
+    if (photoUrl != null) {
+      updates['photoUrl'] = photoUrl; // Correctly update photoUrl
+    }
 
     await _authRepository.updateUserProfile(_currentUser!.uid, updates);
 
@@ -238,15 +300,50 @@ class AuthServiceProvider extends ChangeNotifier {
   }
 
   // Sign Out
+// Sign Out
   Future<void> signOut(BuildContext context) async {
-    await _authRepository.signOutGoogle();
-    await _authRepository.signOutFacebook();
-    await _authRepository.signOut();
+    _isLoading = true;
+    notifyListeners();
 
-    _currentUser = null;
-    _showToast('Signed out successfully');
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => LoginScreen()));
+    try {
+      // Sign out from each provider individually with try-catch blocks
+      try {
+        await _authRepository.signOutGoogle();
+      } catch (e) {
+        _handleError('Google sign out error: $e');
+        // Continue with other sign outs regardless
+      }
+
+      try {
+        await _authRepository.signOutFacebook();
+      } catch (e) {
+        _handleError('Facebook sign out error: $e');
+        // Continue with other sign outs regardless
+      }
+
+      // Final sign out from Firebase
+      await _authRepository.signOut();
+
+      // Clear current user state
+      _currentUser = null;
+
+      _showToast('Signed out successfully');
+
+      // Navigate after successful sign out
+      if (context.mounted) {
+        // Check if context is still valid
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      _handleError('Logout Error: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   // Error Handling

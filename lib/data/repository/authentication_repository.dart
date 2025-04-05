@@ -18,5 +18,4 @@ abstract class AuthenticationRepository {
   Future<void> signOutGoogle();
   Future<void> signOutFacebook();
   Future<void> updateUserProfile(String uid, Map<String, dynamic> updates);
-
 }

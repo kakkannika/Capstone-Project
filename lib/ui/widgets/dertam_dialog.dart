@@ -21,6 +21,7 @@ class DertamDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: DertamColors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(DertamSpacings.radius),
       ),
