@@ -3,9 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:tourism_app/models/place/place.dart';
-import 'package:tourism_app/models/trips/trip_days.dart';
-import 'package:tourism_app/models/trips/trips.dart';
+import 'package:tourism_app/domain/models/place/place.dart';
+import 'package:tourism_app/domain/models/trips/trip_days.dart';
+import 'package:tourism_app/domain/models/trips/trips.dart';
 import 'package:tourism_app/ui/theme/theme.dart';
 import 'package:tourism_app/ui/screens/budget/budget_screen.dart';
 import 'package:tourism_app/ui/screens/budget/expend_screen.dart';
@@ -18,10 +18,12 @@ import 'package:tourism_app/ui/screens/trip/screen/trip_map_screen.dart';
 
 class ItineraryPage extends StatefulWidget {
   final String? tripId;
+  final String? province;
 
   const ItineraryPage({
     super.key,
     this.tripId,
+    this.province,
   });
 
   @override
@@ -185,6 +187,7 @@ class _ItineraryPageState extends State<ItineraryPage> {
         builder: (context) => SearchPlaceScreen(
           tripId: tripProvider.selectedTrip!.id,
           dayId: day.id,
+          province: tripProvider.selectedTrip!.province,
           onPlaceSelected: (Place place) {
             // This callback will be called when a place is selected
             // The UI will update automatically through the StreamBuilder

@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart' as firestore;
-import 'package:tourism_app/models/place/place.dart';
+import 'package:tourism_app/domain/models/place/place.dart';
 
 class Day {
   final String id;  // This will be 'day1', 'day2', etc.

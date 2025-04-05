@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:tourism_app/data/repository/trip_repository.dart';
-import 'package:tourism_app/models/place/place.dart';
-import 'package:tourism_app/models/trips/trips.dart';
+import 'package:tourism_app/domain/models/place/place.dart';
+import 'package:tourism_app/domain/models/trips/trips.dart';
 
 class TripProvider with ChangeNotifier {
   final TripRepository _tripService;
@@ -99,6 +99,7 @@ class TripProvider with ChangeNotifier {
     required DateTime startDate,
     required DateTime endDate,
     String? budgetId,
+    String? province,
   }) async {
     _setLoading(true);
     _error = null;
@@ -109,6 +110,7 @@ class TripProvider with ChangeNotifier {
         startDate: startDate,
         endDate: endDate,
         budgetId: budgetId,
+        province: province,
       );
       await fetchTripsForCurrentUser(); // Refresh the trip list
       return tripId;
@@ -218,6 +220,7 @@ class TripProvider with ChangeNotifier {
     String? tripName,
     DateTime? startDate,
     DateTime? endDate,
+    String? province,
   }) async {
     _setLoading(true);
     _error = null;

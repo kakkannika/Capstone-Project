@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tourism_app/data/repository/budget_repository.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
-import 'package:tourism_app/models/budget/budget.dart';
-import 'package:tourism_app/models/budget/expend.dart';
+import 'package:tourism_app/domain/models/budget/budget.dart';
+import 'package:tourism_app/domain/models/budget/expend.dart';
 
 class BudgetFirebaseRepository extends BudgetRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

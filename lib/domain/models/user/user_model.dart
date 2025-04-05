@@ -1,6 +1,6 @@
 // Main User Model
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:tourism_app/models/user/user_preference.dart';
+import 'package:tourism_app/domain/models/user/user_preference.dart';
 
 enum UserRole {
   admin,

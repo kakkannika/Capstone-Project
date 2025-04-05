@@ -2,7 +2,7 @@
 // ignore_for_file: avoid_types_as_parameter_names
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:tourism_app/models/budget/expend.dart';
+import 'package:tourism_app/domain/models/budget/expend.dart';
 
 class Budget {
   final String id;

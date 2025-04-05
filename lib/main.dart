@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => AuthServiceProvider()),
         ChangeNotifierProvider(
           create: (context) => ChatbotProvider(
-              apiUrl: 'https://eee6-45-119-135-16.ngrok-free.app/chat'),
+              apiUrl: 'https://d44c-36-37-169-236.ngrok-free.app/chat'),
         ),
         ChangeNotifierProvider(
             create: (context) => PlaceProvider(PlaceFirebaseRepository())),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tourism_app/models/trips/trips.dart';
+import 'package:tourism_app/domain/models/trips/trips.dart';
 import 'package:tourism_app/ui/theme/theme.dart';
 import 'package:tourism_app/ui/screens/trip/screen/trip_detail_screen.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
@@ -11,6 +11,7 @@ class TripPlannerScreen extends StatefulWidget {
   final DateTime? returnDate;
   final String tripName;
   final String? tripId;
+  final String? province;
 
   const TripPlannerScreen({
     super.key,
@@ -19,6 +20,7 @@ class TripPlannerScreen extends StatefulWidget {
     this.returnDate,
     required this.tripName,
     this.tripId,
+    this.province,
   });
 
   @override
@@ -102,13 +104,20 @@ class _TripPlannerScreenState extends State<TripPlannerScreen> {
                             endDate: widget.returnDate ??
                                 widget.startDate.add(const Duration(days: 7)),
                             days: [],
+                            province: widget.province,
                           ),
                         );
 
-                        return ItineraryPage(tripId: widget.tripId);
+                        return ItineraryPage(
+                          tripId: widget.tripId,
+                          province: widget.province,
+                        );
                       },
                     )
-                  : ItineraryPage(tripId: widget.tripId),
+                  : ItineraryPage(
+                      tripId: widget.tripId,
+                      province: widget.province,
+                    ),
             ),
           ],
         ),

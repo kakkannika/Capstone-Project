@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:tourism_app/models/place/place.dart';
+import 'package:tourism_app/domain/models/place/place.dart';
 
 List<Place> dummyPlaces = [
   Place(

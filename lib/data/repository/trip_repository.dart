@@ -1,5 +1,5 @@
-import 'package:tourism_app/models/place/place.dart';
-import 'package:tourism_app/models/trips/trips.dart';
+import 'package:tourism_app/domain/models/place/place.dart';
+import 'package:tourism_app/domain/models/trips/trips.dart';
 
 abstract class TripRepository {
   Future<String> createTrip({
@@ -7,12 +7,13 @@ abstract class TripRepository {
     required DateTime startDate,
     required DateTime endDate,
     String? budgetId,
+    String? province,
   });
 
   Future<Trip?> getTripById(String tripId);
 
   Future<List<Trip>> getTripsForCurrentUser();
-  
+
   Future<void> addPlaceToDay({
     required String tripId,
     required String dayId, // Should be in format 'day1', 'day2', etc.
@@ -34,6 +35,7 @@ abstract class TripRepository {
     String? tripName,
     DateTime? startDate,
     DateTime? endDate,
+    String? province,
   });
 
   Future<void> deleteTrip(String tripId);

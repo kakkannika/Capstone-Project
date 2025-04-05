@@ -2,9 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tourism_app/models/trips/trips.dart';
+import 'package:tourism_app/domain/models/trips/trips.dart';
 import 'package:tourism_app/ui/theme/theme.dart';
-import 'package:tourism_app/ui/screens/trip/screen/edit_trip_screen.dart';
 import 'package:tourism_app/ui/screens/trip/screen/start_plan_screen.dart';
 import 'package:tourism_app/ui/screens/trip/screen/widget/trip_planner_screen.dart';
 import 'package:tourism_app/ui/widgets/navigationBar.dart';
@@ -268,7 +267,7 @@ class TripsList extends StatelessWidget {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => EditTripScreen(trip: trip),
+        builder: (context) => PlanNewTripScreen(trip: trip),
       ),
     );
 
@@ -281,6 +280,7 @@ class TripsList extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: DertamColors.white,
         title: const Text('Delete Trip'),
         content: Text(
             'Are you sure you want to delete "${trip.tripName}"? This action cannot be undone.'),
@@ -382,7 +382,7 @@ class TripCard extends StatelessWidget {
                           trip.days.first.places.isNotEmpty &&
                           trip.days.first.places.first.imageURL.isNotEmpty
                       ? NetworkImage(trip.days.first.places.first.imageURL)
-                      : const AssetImage('assets/place_images/AngKor_wat.jpg')
+                      : const AssetImage('assets/place_images/Angkor.jpg')
                           as ImageProvider,
                   fit: BoxFit.cover,
                 ),
@@ -399,7 +399,7 @@ class TripCard extends StatelessWidget {
                   ),
                   child: Text(
                     status,
-                    style:  TextStyle(
+                    style: TextStyle(
                       color: DertamColors.white,
                       fontWeight: FontWeight.bold,
                     ),
@@ -464,13 +464,13 @@ class TripCard extends StatelessWidget {
   Color _getStatusColor(String status) {
     switch (status.toLowerCase()) {
       case 'planning':
-        return Colors.orange;
+        return DertamColors.orange;
       case 'ongoing':
         return DertamColors.green;
       case 'completed':
-        return Colors.green;
+        return DertamColors.green;
       default:
-        return Colors.grey;
+        return DertamColors.grey;
     }
   }
 

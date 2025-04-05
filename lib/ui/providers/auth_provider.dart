@@ -8,8 +8,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_storage/firebase_storage.dart'; // Add this import
-import 'package:tourism_app/models/user/user_model.dart';
-import 'package:tourism_app/models/user/user_preference.dart';
+import 'package:tourism_app/domain/models/user/user_model.dart';
+import 'package:tourism_app/domain/models/user/user_preference.dart';
 import 'package:tourism_app/data/repository/authentication_repository.dart';
 import 'package:tourism_app/data/repository/firebase/auth_firebase_repository.dart';
 import 'package:tourism_app/ui/screens/auth/login_screen.dart';

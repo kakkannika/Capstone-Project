@@ -2,7 +2,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tourism_app/models/place/place.dart';
+import 'package:tourism_app/domain/models/place/place.dart';
 import 'package:tourism_app/data/repository/favorite_repository.dart';
 import 'package:tourism_app/data/repository/firebase/place_firebase_repository.dart';
 import 'package:tourism_app/data/repository/place_repository.dart';

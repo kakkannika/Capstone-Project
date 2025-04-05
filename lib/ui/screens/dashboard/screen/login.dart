@@ -9,7 +9,7 @@ import 'package:tourism_app/ui/providers/auth_provider.dart';
 import 'package:tourism_app/ui/widgets/dertam_button.dart';
 import 'package:tourism_app/ui/widgets/dertam_textfield.dart';
 
-import '../../../../../models/user/user_model.dart';
+import '../../../../domain/models/user/user_model.dart';
 import 'main_screen.dart';
 
 class LoginScreen extends StatefulWidget {

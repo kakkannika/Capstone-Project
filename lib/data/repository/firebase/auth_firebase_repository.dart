@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-import 'package:tourism_app/models/user/user_model.dart';
+import 'package:tourism_app/domain/models/user/user_model.dart';
 import 'package:tourism_app/data/repository/authentication_repository.dart';
 
 class AuthFirebaseRepository extends AuthenticationRepository {

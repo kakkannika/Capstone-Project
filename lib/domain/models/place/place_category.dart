@@ -5,9 +5,7 @@ enum PlaceCategory {
   entertainAttraction('Entertain Attraction'),
   hotel('Hotel'),
   restaurant('Restaurant');
-
   final String displayName;
-
   const PlaceCategory(this.displayName);
 } // categories place
 

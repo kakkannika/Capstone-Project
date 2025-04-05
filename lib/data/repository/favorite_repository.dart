@@ -1,4 +1,4 @@
-import 'package:tourism_app/models/place/place.dart';
+import 'package:tourism_app/domain/models/place/place.dart';
 import 'package:tourism_app/data/repository/place_repository.dart';
 
 abstract class FavoriteRepository {

@@ -1,4 +1,4 @@
-import 'package:tourism_app/models/place/place.dart';
+import 'package:tourism_app/domain/models/place/place.dart';
 
 abstract class PlaceRepository {
   Future<List<Place>> fetchAllPlaces();
@@ -19,4 +19,6 @@ abstract class PlaceRepository {
   Future<String?> updatePlace(Place place);
 
   Future<bool> deletePlace(String placeId);
+  
+  Future<List<Place>> searchPlacesInProvince(String query, String province);
 }

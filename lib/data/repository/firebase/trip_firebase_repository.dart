@@ -3,9 +3,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart' as firestore;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tourism_app/data/repository/trip_repository.dart';
-import 'package:tourism_app/models/place/place.dart';
-import 'package:tourism_app/models/trips/trip_days.dart';
-import 'package:tourism_app/models/trips/trips.dart';
+import 'package:tourism_app/domain/models/place/place.dart';
+import 'package:tourism_app/domain/models/trips/trip_days.dart';
+import 'package:tourism_app/domain/models/trips/trips.dart';
 
 class TripFirebaseRepository extends TripRepository {
   final firestore.FirebaseFirestore _firestore =
@@ -29,6 +29,7 @@ class TripFirebaseRepository extends TripRepository {
     required DateTime startDate,
     required DateTime endDate,
     String? budgetId,
+    String? province,
   }) async {
     try {
       final userId = getCurrentUserId();
@@ -41,6 +42,7 @@ class TripFirebaseRepository extends TripRepository {
         'startDate': firestore.Timestamp.fromDate(startDate),
         'endDate': firestore.Timestamp.fromDate(endDate),
         'budgetId': budgetId,
+        'province': province,
       });
 
       // Create days subcollection with specific IDs (day1, day2, etc.)
@@ -246,6 +248,7 @@ class TripFirebaseRepository extends TripRepository {
     String? tripName,
     DateTime? startDate,
     DateTime? endDate,
+    String? province,
   }) async {
     try {
       final tripRef = _firestore.collection('trips').doc(tripId);
@@ -269,6 +272,9 @@ class TripFirebaseRepository extends TripRepository {
 
       if (endDate != null) {
         updateData['endDate'] = firestore.Timestamp.fromDate(endDate);
+      }
+      if (province != null) {
+        updateData['province'] = province;
       }
 
       // If there's nothing to update, return early

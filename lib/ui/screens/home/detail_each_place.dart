@@ -10,7 +10,7 @@ import 'package:tourism_app/data/repository/firebase/place_firebase_repository.d
 import 'package:tourism_app/ui/screens/trip/screen/start_plan_screen.dart';
 import 'package:tourism_app/ui/widgets/dertam_button.dart';
 import 'package:tourism_app/ui/providers/place_provider.dart';
-import 'package:tourism_app/models/place/place.dart';
+import 'package:tourism_app/domain/models/place/place.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DetailEachPlace extends StatefulWidget {

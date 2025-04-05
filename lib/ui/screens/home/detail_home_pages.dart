@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:iconsax/iconsax.dart';
-import 'package:tourism_app/models/place/place.dart';
+import 'package:tourism_app/domain/models/place/place.dart';
 import 'package:tourism_app/ui/theme/theme.dart';
 import 'package:tourism_app/ui/providers/favorite_provider.dart';
 import 'package:tourism_app/ui/providers/place_provider.dart';

@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tourism_app/domain/models/place/place_category.dart';
+import 'package:tourism_app/domain/models/trips/trips.dart';
 import 'package:tourism_app/ui/theme/theme.dart';
 import 'package:tourism_app/ui/screens/trip/screen/widget/trip_planner_screen.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
@@ -9,7 +11,8 @@ import 'package:intl/intl.dart';
 import 'package:tourism_app/ui/widgets/dertam_textfield.dart';
 
 class PlanNewTripScreen extends StatefulWidget {
-  const PlanNewTripScreen({super.key});
+  final Trip? trip;
+  const PlanNewTripScreen({super.key, this.trip});
 
   @override
   _PlanNewTripScreenState createState() => _PlanNewTripScreenState();
@@ -17,22 +20,57 @@ class PlanNewTripScreen extends StatefulWidget {
 
 class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _tripNameController = TextEditingController();
+  late TextEditingController _tripNameController;
   DateTime? startDate;
   DateTime? returnDate;
   List<String?> selectedDestinations = [];
+  String? selectedProvince; // Add selected province
+  bool _hasChanges = false;
 
   @override
   void initState() {
     super.initState();
-    startDate = DateTime.now();
-    selectedDestinations.add(null);
+    _tripNameController = TextEditingController();
+
+    if (widget.trip != null) {
+      // Edit mode - populate fields with existing trip data
+      _tripNameController.text = widget.trip!.tripName;
+      startDate = widget.trip!.startDate;
+      returnDate = widget.trip!.endDate;
+      selectedProvince = widget.trip!.province;
+      _tripNameController.addListener(_checkForChanges);
+    } else {
+      // Create mode - initialize with defaults
+      startDate = DateTime.now();
+      selectedDestinations.add(null);
+    }
   }
 
   @override
   void dispose() {
+    if (widget.trip != null) {
+      _tripNameController.removeListener(_checkForChanges);
+    }
     _tripNameController.dispose();
     super.dispose();
+  }
+
+  void _checkForChanges() {
+    if (widget.trip == null) return;
+
+    final nameChanged = _tripNameController.text != widget.trip!.tripName;
+    final startDateChanged = startDate != widget.trip!.startDate;
+    final endDateChanged = returnDate != widget.trip!.endDate;
+    final provincesChanged = selectedProvince != widget.trip!.province;
+
+    final newHasChanges =
+        nameChanged || startDateChanged || endDateChanged || provincesChanged;
+
+    if (newHasChanges != _hasChanges) {
+      setState(() {
+        _hasChanges = newHasChanges;
+      });
+    }
   }
 
   String formatDate(DateTime? date) {
@@ -54,9 +92,9 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
               primary: DertamColors.primary,
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Colors.black,
+              onPrimary: DertamColors.white,
+              surface: DertamColors.white,
+              onSurface: DertamColors.black,
             ),
           ),
           child: child!,
@@ -68,11 +106,12 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
         if (isStartDate) {
           startDate = picked;
           if (returnDate != null && returnDate!.isBefore(picked)) {
-            returnDate = null;
+            returnDate = startDate!.add(const Duration(days: 1));
           }
         } else {
           returnDate = picked;
         }
+        _checkForChanges();
       });
     }
   }
@@ -80,7 +119,8 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
   bool isFormValid() {
     return _tripNameController.text.isNotEmpty &&
         startDate != null &&
-        returnDate != null;
+        returnDate != null &&
+        selectedProvince != null; // Add province validation
   }
 
   Future<void> _createTrip() async {
@@ -88,42 +128,83 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
 
     final tripProvider = context.read<TripProvider>();
     try {
-      final tripId = await tripProvider.createTrip(
-        tripName: _tripNameController.text,
-        startDate: startDate!,
-        endDate: returnDate!,
-      );
-
-      if (tripId != null && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Trip created successfully!'),
-            backgroundColor: DertamColors.green,
-          ),
+      if (widget.trip == null) {
+        // Create new trip
+        final tripId = await tripProvider.createTrip(
+          tripName: _tripNameController.text,
+          startDate: startDate!,
+          endDate: returnDate!,
+          province: selectedProvince,
         );
 
-        // Navigate to TripPlannerScreen with the created trip details
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TripPlannerScreen(
-              tripName: _tripNameController.text,
-              selectedDestinations: selectedDestinations,
-              startDate: startDate!,
-              returnDate: returnDate,
-              tripId: tripId,
+        if (tripId != null && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Trip created successfully!'),
+              backgroundColor: DertamColors.green,
             ),
+          );
+
+          // Navigate to TripPlannerScreen with the created trip details
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TripPlannerScreen(
+                tripName: _tripNameController.text,
+                selectedDestinations: selectedDestinations,
+                startDate: startDate!,
+                returnDate: returnDate,
+                tripId: tripId,
+                province: selectedProvince,
+              ),
+            ),
+          );
+        }
+      } else {
+        final String? newName =
+            _tripNameController.text != widget.trip!.tripName
+                ? _tripNameController.text
+                : null;
+        final DateTime? newStartDate =
+            startDate != widget.trip!.startDate ? startDate : null;
+        final DateTime? newEndDate =
+            returnDate != widget.trip!.endDate ? returnDate : null;
+        final String? newProvince =
+            selectedProvince != widget.trip!.province ? selectedProvince : null;
+
+        await tripProvider.updateTrip(
+          tripId: widget.trip!.id,
+          tripName: newName,
+          startDate: newStartDate,
+          endDate: newEndDate,
+          province: newProvince,
+        );
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Trip updated successfully!'),
+              backgroundColor: DertamColors.green,
+            ),
+          );
+          Navigator.pop(context, true); // Return true to indicate success
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Error ${widget.trip == null ? "creating" : "updating"} trip: $e'),
+            backgroundColor: DertamColors.red,
           ),
         );
       }
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error creating trip: $e'),
-          backgroundColor: DertamColors.red,
-        ),
-      );
+    } finally {
+      if (mounted) {
+        setState(() {
+        });
+      }
     }
   }
 
@@ -163,14 +244,15 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
                           onPressed: () => Navigator.pop(context),
                           icon: Icon(Icons.arrow_back_ios_new),
                         ),
-                        SizedBox(width: 32,),
-                        Text(
-                          'Plan a new Trip',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: DertamColors.primary,
+                        Expanded(
+                          child: Text(
+                            widget.trip == null ? 'Plan a new Trip' : 'Edit Trip',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: DertamColors.primary,
+                            ),
                           ),
                         ),
                       ],
@@ -206,8 +288,67 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
                       },
                     ),
                     const SizedBox(height: 20),
+
+                    // Province Dropdown
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Select Province',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: DertamColors.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey[300]!),
+                            borderRadius: BorderRadius.circular(8),
+                            color: selectedProvince != null
+                                ? Colors.teal.withOpacity(0.1)
+                                : null,
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              isExpanded: true,
+                              hint: Text('Select a province'),
+                              value: selectedProvince,
+                              icon: Icon(
+                                Icons.arrow_drop_down,
+                                color: selectedProvince != null
+                                    ? DertamColors.primary
+                                    : DertamColors.grey,
+                              ),
+                              elevation: 16,
+                              style: TextStyle(
+                                color: DertamColors.black,
+                                fontSize: 16,
+                              ),
+                              onChanged: (String? value) {
+                                setState(() {
+                                  selectedProvince = value;
+                                });
+                              },
+                              items:
+                                  Province.values.map<DropdownMenuItem<String>>(
+                                (Province province) {
+                                  return DropdownMenuItem<String>(
+                                    value: province.displayName,
+                                    child: Text(province.displayName),
+                                  );
+                                },
+                              ).toList(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
                     // Date Selection Row
-                    // ...existing code...
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -343,14 +484,18 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
                         child: Text(
                           tripProvider.error!,
                           style: TextStyle(
-                            color: Colors.red[400],
+                            color: DertamColors.red,
                             fontSize: 12,
                           ),
                           textAlign: TextAlign.center,
                         ),
                       ),
+                    // In the build method, update the ElevatedButton
                     ElevatedButton(
-                      onPressed: tripProvider.isLoading || !isFormValid()
+                      onPressed: tripProvider.isLoading ||
+                              (widget.trip == null && !isFormValid()) ||
+                              (widget.trip != null &&
+                                  (!isFormValid() || !_hasChanges))
                           ? null
                           : _createTrip,
                       style: ElevatedButton.styleFrom(
@@ -373,8 +518,10 @@ class _PlanNewTripScreenState extends State<PlanNewTripScreen> {
                                     AlwaysStoppedAnimation<Color>(Colors.white),
                               ),
                             )
-                          : const Text(
-                              'START PLANNING',
+                          : Text(
+                              widget.trip == null
+                                  ? 'START PLANNING'
+                                  : 'UPDATE TRIP',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,

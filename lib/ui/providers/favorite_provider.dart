@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:tourism_app/models/place/place.dart';
+import 'package:tourism_app/domain/models/place/place.dart';
 import 'package:tourism_app/data/repository/favorite_repository.dart';
 
 class FavoriteProvider extends ChangeNotifier {

@@ -3,9 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:tourism_app/models/budget/budget.dart';
-import 'package:tourism_app/models/budget/expend.dart';
-import 'package:tourism_app/models/trips/trips.dart';
+import 'package:tourism_app/domain/models/budget/budget.dart';
+import 'package:tourism_app/domain/models/budget/expend.dart';
+import 'package:tourism_app/domain/models/trips/trips.dart';
 import 'package:tourism_app/ui/screens/budget/add_expend_screen.dart';
 import 'package:tourism_app/ui/screens/budget/budget_screen.dart';
 import 'package:tourism_app/ui/screens/budget/widget/budget_card.dart';

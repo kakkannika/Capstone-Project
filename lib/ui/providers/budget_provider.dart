@@ -3,9 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:tourism_app/data/repository/budget_repository.dart';
 import 'package:tourism_app/data/repository/firebase/budget_firebase_repository.dart';
 import 'package:tourism_app/data/repository/firebase/trip_firebase_repository.dart';
-import 'package:tourism_app/models/budget/budget.dart';
-import 'package:tourism_app/models/budget/expend.dart';
-import 'package:tourism_app/models/trips/trips.dart';
+import 'package:tourism_app/domain/models/budget/budget.dart';
+import 'package:tourism_app/domain/models/budget/expend.dart';
+import 'package:tourism_app/domain/models/trips/trips.dart';
 import 'package:tourism_app/ui/providers/trip_provider.dart';
 
 class BudgetProvider with ChangeNotifier {

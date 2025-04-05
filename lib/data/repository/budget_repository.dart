@@ -1,5 +1,5 @@
-import 'package:tourism_app/models/budget/budget.dart';
-import 'package:tourism_app/models/budget/expend.dart';
+import 'package:tourism_app/domain/models/budget/budget.dart';
+import 'package:tourism_app/domain/models/budget/expend.dart';
 
 abstract class BudgetRepository {
   Future<String> createBudget({

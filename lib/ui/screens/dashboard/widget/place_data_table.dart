@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tourism_app/ui/theme/theme.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:tourism_app/models/place/place.dart';
+import 'package:tourism_app/domain/models/place/place.dart';
 import 'package:provider/provider.dart';
 import 'package:tourism_app/ui/screens/dashboard/screen/destination_screen.dart';
 import 'package:tourism_app/ui/providers/place_provider.dart';
