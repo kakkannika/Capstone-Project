@@ -1,7 +1,0 @@
-Flask==2.3.3
-nltk==3.8.1
-joblib==1.3.2
-numpy==1.26.4
-torch==2.2.1
-scikit-learn==1.4.1
-python -m nltk.downloader punkt
