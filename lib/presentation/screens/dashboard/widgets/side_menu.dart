@@ -37,7 +37,7 @@ class _SideMenuState extends State<SideMenu> {
               borderRadius: BorderRadius.circular(DertamSpacings.radius),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
+                  color: Colors.grey.withValues(alpha: 0.5),
                   spreadRadius: 1,
                   blurRadius: 5,
                 ),
@@ -69,7 +69,7 @@ class _SideMenuState extends State<SideMenu> {
                 child: Column(
                   children: [
                     Image.asset(
-                      'lib/assets/images/logo.png',
+                      'assets/images/logo.png',
                       height: 48,
                       width: 48,
                     ),
@@ -95,7 +95,7 @@ class _SideMenuState extends State<SideMenu> {
                     ),
                     child: const Icon(Icons.dashboard, color: Colors.white),
                   ),
-                  label: Text('Dashboard', style: DertamTextStyles.title),
+                  label: Text('Destinations', style: DertamTextStyles.title),
                 ),
                 NavigationRailDestination(
                   icon: Icon(Icons.people),
@@ -121,13 +121,12 @@ class _SideMenuState extends State<SideMenu> {
                         CircleAvatar(
                           radius: 24,
                           backgroundColor:
-                              DertamColors.primary.withOpacity(0.1),
+                              DertamColors.primary.withValues(alpha: 0.1),
                           child: CircleAvatar(
                             radius: 22,
                             backgroundImage: user?.photoUrl != null
                                 ? NetworkImage(user!.photoUrl!) as ImageProvider
-                                : const AssetImage(
-                                    'lib/assets/images/user_profile.jpg'),
+                                : const AssetImage('assets/images/avatar.jpg'),
                           ),
                         ),
                         const SizedBox(height: DertamSpacings.s),

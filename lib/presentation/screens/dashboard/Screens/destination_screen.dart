@@ -306,6 +306,28 @@ class _DestinationScreenState extends State<DestinationScreen> {
       });
 
       try {
+        // Check for duplicate place before saving
+        if (!_isEditing) {
+          final bool placeExists = await _placeCrudService.doesPlaceExist(
+            _nameController.text,
+            selectedProvince?.displayName ?? '',
+          );
+
+          if (placeExists) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('A place with this name already exists!'),
+                backgroundColor: Colors.orange,
+                duration: Duration(seconds: 3),
+              ),
+            );
+            setState(() {
+              _isLoading = false;
+            });
+            return;
+          }
+        } // Create or update the place object
+
         final place = Place(
           id: _isEditing ? widget.place!.id : '',
           name: _nameController.text,
@@ -347,6 +369,8 @@ class _DestinationScreenState extends State<DestinationScreen> {
         setState(() {
           _isLoading = false;
         });
+
+        Navigator.of(context).pop();
       } catch (e) {
         // Show error message
         ScaffoldMessenger.of(context).showSnackBar(

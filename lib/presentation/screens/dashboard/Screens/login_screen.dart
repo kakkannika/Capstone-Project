@@ -137,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(fit: StackFit.expand, children: [
-        Image.asset('lib/assets/images/background.jpg',
+        Image.asset('assets/images/background.jpg',
             fit: BoxFit.cover, width: double.infinity, height: double.infinity),
         Center(
           child: Container(
@@ -164,7 +164,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Padding(
                         padding: const EdgeInsets.all(24.0),
                         child: Image.asset(
-                          'lib/assets/images/logo.png',
+                          'assets/images/logo.png',
                           width: 150,
                           height: 150,
                           fit: BoxFit.contain,

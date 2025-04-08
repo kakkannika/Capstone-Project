@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:iconsax/iconsax.dart';
 import '../../../../models/user/user_model.dart';
 import '../../../../theme/theme.dart';
 
@@ -62,14 +61,40 @@ class UsersDataTable extends StatelessWidget {
               rows: users
                   .map((user) => DataRow(cells: [
                         DataCell(
-                          user?.photoUrl != null
-                              ? Image.network(
-                                  user!.photoUrl!,
-                                  width: 50,
-                                  height: 50,
-                                  fit: BoxFit.cover,
-                                )
-                              : const Icon(Iconsax.user),
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: DertamColors.primary.withOpacity(0.1),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: user?.photoUrl != null &&
+                                      user!.photoUrl!.isNotEmpty
+                                  ? Image.network(
+                                      user.photoUrl!,
+                                      width: 40,
+                                      height: 40,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Image.asset(
+                                          'assets/images/avatar.jpg',
+                                          width: 40,
+                                          height: 40,
+                                          fit: BoxFit.cover,
+                                        );
+                                      },
+                                    )
+                                  : Image.asset(
+                                      'assets/images/avatar.jpg',
+                                      width: 40,
+                                      height: 40,
+                                      fit: BoxFit.cover,
+                                    ),
+                            ),
+                          ),
                         ),
                         DataCell(Text(user?.displayName ?? 'N/A')),
                         DataCell(Text(user?.email ?? 'N/A')),

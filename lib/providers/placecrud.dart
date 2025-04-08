@@ -10,8 +10,6 @@ class PlaceCrudService extends ChangeNotifier {
 
   set firestore(FirebaseFirestore firestore) {}
 
-  // Add a new place
-  // Function to add a new place
   Future<String?> addPlace(Place place) async {
     try {
       final CollectionReference places = _firestore.collection(collectionName);
@@ -100,5 +98,15 @@ class PlaceCrudService extends ChangeNotifier {
       print('Error searching places: $e');
       return [];
     }
+  }
+
+  Future<bool> doesPlaceExist(String name, String province) async {
+    final QuerySnapshot result = await _firestore
+        .collection('places')
+        .where('name', isEqualTo: name)
+        .where('province', isEqualTo: province)
+        .get();
+
+    return result.docs.isNotEmpty;
   }
 }
